@@ -32,13 +32,12 @@ class AuthViewModel extends GetxController {
     try {
       // Get the current user ID
       String userId = _auth.currentUser!.uid;
-      if (userId != null) {
-        // Store the user's name in Firestore
-        await _firestore.collection('users').doc(userId).set({
-          'firstName': firstName,
-          'lastName': lastName,
-        });
-      }
+
+      // Store the user's name in Firestore
+      await _firestore.collection('users').doc(userId).set({
+        'firstName': firstName,
+        'lastName': lastName,
+      });
     } catch (e) {
       print("Error storing user name: $e");
       throw e;
