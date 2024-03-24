@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spotbud/ui/viewmodels/auth_viewmodel.dart';
+import 'package:spotbud/ui/viewmodels/login_viewmodel.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/textform.dart';
 
-class LoginView extends StatelessWidget {
-  final AuthViewModel viewModel = Get.put(AuthViewModel());
+class SignUpView extends StatelessWidget {
+  final DataViewModel viewModel = Get.put(DataViewModel());
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -27,9 +27,9 @@ class LoginView extends StatelessWidget {
               height: 200,
             ),
 
-            SizedBox(height: 2),
+            SizedBox(height: 20),
             Text(
-              'Welcome Back!',
+              'Sign Up',
               style: TextStyle(
                 fontSize: 32,
                 color: Colors.white,
@@ -55,21 +55,21 @@ class LoginView extends StatelessWidget {
             ),
             SizedBox(height: 40),
             buildLoginButton(
-              text: 'Login',
+              text: 'Sign Up',
               onPressed: () async {
                 String email = emailController.text.trim();
                 String password = passwordController.text.trim();
                 if (email.isNotEmpty && password.isNotEmpty) {
-                  bool success =
-                      await viewModel.signInWithEmailPassword(email, password);
-                  if (success) {
-                    // Login successful, redirect to '/trial' screen
-                    Get.toNamed('/trial');
+                  bool isSignedUp =
+                      await viewModel.signUpWithEmailPassword(email, password);
+                  if (isSignedUp) {
+                    // Sign-up successful, redirect to '/login' screen
+                    Get.toNamed('/login');
                   } else {
-                    // Login failed, show error in snackbar
+                    // Sign-up failed, show error in snackbar
                     Get.snackbar(
-                      'Login Failed',
-                      'Invalid email or password',
+                      'Sign Up Failed',
+                      'Failed to sign up. Please try again later.',
                       snackPosition: SnackPosition.BOTTOM,
                       backgroundColor: Colors.red,
                       colorText: Colors.white,
@@ -78,7 +78,7 @@ class LoginView extends StatelessWidget {
                 } else {
                   // Fields are empty, show error in snackbar
                   Get.snackbar(
-                    'Login Failed',
+                    'Sign Up Failed',
                     'Email and password are required',
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
@@ -91,11 +91,11 @@ class LoginView extends StatelessWidget {
             SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                Get.toNamed('/signup');
-                // Navigate to sign-up screen
+                // Navigate to login screen
+                Get.toNamed('/login');
               },
               child: Text(
-                'Don\'t have an account? Sign Up',
+                'Already have an account? Login',
                 style: TextStyle(color: Colors.white),
               ),
             ),

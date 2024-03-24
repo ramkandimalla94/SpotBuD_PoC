@@ -1,8 +1,11 @@
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginViewModel extends GetxController {
+class AuthViewModel extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<bool> signInWithEmailPassword(String email, String password) async {
     try {
@@ -22,6 +25,23 @@ class LoginViewModel extends GetxController {
     } catch (e) {
       print("Error signing up: $e");
       return false; // Return false if sign-up fails
+    }
+  }
+
+  Future<void> storeUserName(String firstName, String lastName) async {
+    try {
+      // Get the current user ID
+      String userId = _auth.currentUser!.uid;
+      if (userId != null) {
+        // Store the user's name in Firestore
+        await _firestore.collection('users').doc(userId).set({
+          'firstName': firstName,
+          'lastName': lastName,
+        });
+      }
+    } catch (e) {
+      print("Error storing user name: $e");
+      throw e;
     }
   }
 }

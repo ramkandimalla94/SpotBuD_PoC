@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spotbud/ui/viewmodels/auth_viewmodel.dart';
+import 'package:spotbud/ui/viewmodels/login_viewmodel.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/textform.dart';
 
 class LoginView extends StatelessWidget {
-  final AuthViewModel viewModel = Get.put(AuthViewModel());
+  final DataViewModel viewModel = Get.put(DataViewModel());
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "341521927870",
+    "project_id": "spotbud-b9d9e",
+    "storage_bucket": "spotbud-b9d9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341521927870:android:b845b5980825ae4273d8ef",
+        "android_client_info": {
+          "package_name": "com.example.spotbud"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSitSodg2WrcDi94jR7hWfKBjOk7lj6to"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
