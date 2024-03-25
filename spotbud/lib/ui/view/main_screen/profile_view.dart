@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
 class ProfileView extends StatelessWidget {
-  final NameViewModel _nameViewModel = Get.find();
+  final UserDataViewModel _nameViewModel = Get.find();
 
   @override
   Widget build(BuildContext context) {

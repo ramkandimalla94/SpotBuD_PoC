@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class NameViewModel extends GetxController {
+class UserDataViewModel extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   RxString firstName = ''.obs;
@@ -17,7 +17,6 @@ class NameViewModel extends GetxController {
         String userId = user.uid;
         String email = user.email ?? '';
 
-        // Capitalize the first letter of the first name and last name
         String capitalizedFirstName = firstName.substring(0, 1).toUpperCase() +
             firstName.substring(1).toLowerCase();
         String capitalizedLastName = lastName.substring(0, 1).toUpperCase() +
@@ -32,15 +31,75 @@ class NameViewModel extends GetxController {
           'firstName': capitalizedFirstName,
           'lastName': capitalizedLastName,
           'email': email,
+          'workoutHistory': [],
         });
 
-        // Navigate to the next screen (e.g., '/trial') after saving the data
-        Get.offNamed('/trial');
+        Get.offNamed('/login');
       } else {
         print('User not authenticated');
       }
     } catch (e) {
       print('Error saving user data: $e');
+    }
+  }
+
+  Future<void> addWorkoutDetails(Map<String, dynamic> workoutData) async {
+    try {
+      // Get the current user from FirebaseAuth
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        // Reference to the user document in Firestore
+        DocumentReference userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(userId);
+
+        // Add the workout details to the user's workout history
+        await userDocRef.update({
+          'workoutHistory': FieldValue.arrayUnion([workoutData]),
+        });
+      } else {
+        print('User not authenticated');
+      }
+    } catch (e) {
+      print('Error adding workout details: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchWorkoutHistory() async {
+    try {
+      // Get the current user from Firebase Authentication
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // Get the user ID
+        String userId = user.uid;
+
+        // Reference to the user document in Firestore
+        DocumentReference userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(userId);
+
+        // Fetch the user document
+        DocumentSnapshot userSnapshot = await userDocRef.get();
+
+        if (userSnapshot.exists) {
+          // Extract workout history
+          Map<String, dynamic>? userData =
+              userSnapshot.data() as Map<String, dynamic>?;
+          if (userData != null && userData['workoutHistory'] != null) {
+            // Check if 'workoutHistory' exists and is a List<Map<String, dynamic>>
+            if (userData['workoutHistory'] is List) {
+              return List<Map<String, dynamic>>.from(
+                  userData['workoutHistory']);
+            }
+          }
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching workout history: $e');
+      return [];
     }
   }
 

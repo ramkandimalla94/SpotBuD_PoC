@@ -43,4 +43,72 @@ class AuthViewModel extends GetxController {
       throw e;
     }
   }
+
+  Future<void> saveWorkoutLog({
+    required String bodyPart,
+    required String machine,
+    required List<Map<String, dynamic>> sets,
+  }) async {
+    try {
+      // Get the current user from FirebaseAuth
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        // Reference to the workouts collection
+        CollectionReference workouts = _firestore.collection('workouts');
+
+        // Save the workout log to Firestore
+        await workouts.add({
+          'userId': userId,
+          'timestamp': Timestamp.now(),
+          'bodyPart': bodyPart,
+          'machine': machine,
+          'sets': sets,
+        });
+      } else {
+        print('User not authenticated');
+      }
+    } catch (e) {
+      print('Error saving workout log: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchWorkoutHistory() async {
+    List<Map<String, dynamic>> workoutHistory = [];
+
+    try {
+      // Get the current user from Firebase Authentication
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // Get the user ID
+        String userId = user.uid;
+
+        // Reference to the workouts collection
+        CollectionReference workouts = _firestore.collection('workouts');
+
+        // Query workout logs for the current user
+        QuerySnapshot querySnapshot = await workouts
+            .where('userId', isEqualTo: userId)
+            .orderBy('timestamp', descending: true)
+            .get();
+
+        // Extract workout log data
+        querySnapshot.docs.forEach((doc) {
+          Map<String, dynamic>? workoutData =
+              doc.data() as Map<String, dynamic>?;
+
+          if (workoutData != null) {
+            workoutHistory.add(workoutData);
+          }
+        });
+      }
+    } catch (e) {
+      print('Error fetching workout history: $e');
+    }
+
+    return workoutHistory;
+  }
 }

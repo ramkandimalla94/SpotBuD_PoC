@@ -61,9 +61,7 @@ class _HomeViewState extends State<HomeView> {
                 imagePath: AppAssets.logworkout),
             customhomebutton(
                 text: "History",
-                onPressed: () {
-                  Get.toNamed('/history');
-                },
+                onPressed: () {},
                 imagePath: AppAssets.history),
             customhomebutton(
                 text: "Progress Tracker",
