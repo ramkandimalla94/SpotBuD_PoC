@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
+
+class HistoryPage extends StatelessWidget {
+  final UserDataViewModel _userDataViewModel = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Workout History'),
+      ),
+      body: FutureBuilder(
+        future: _userDataViewModel.fetchWorkoutHistory(),
+        builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            // Sort workout history by date
+            snapshot.data!
+                .sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+
+            // Group workout history by date
+            Map<DateTime, List<Map<String, dynamic>>> groupedByDate = {};
+            snapshot.data!.forEach((workout) {
+              DateTime date = workout['timestamp'].toDate();
+              DateTime formattedDate =
+                  DateTime(date.year, date.month, date.day);
+              if (groupedByDate.containsKey(formattedDate)) {
+                groupedByDate[formattedDate]!.add(workout);
+              } else {
+                groupedByDate[formattedDate] = [workout];
+              }
+            });
+
+            return ListView(
+              children: groupedByDate.entries.map((entry) {
+                return ExpansionTile(
+                  title: Text(DateFormat.yMMMd().format(entry.key)),
+                  children: _buildBodyPartSegments(entry.value),
+                );
+              }).toList(),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  List<Widget> _buildBodyPartSegments(List<Map<String, dynamic>> workouts) {
+    Set<String> bodyParts = Set<String>();
+    workouts.forEach((workout) {
+      bodyParts.add(workout['bodyPart']);
+    });
+
+    return bodyParts.map((bodyPart) {
+      List<Map<String, dynamic>> filteredWorkouts =
+          workouts.where((workout) => workout['bodyPart'] == bodyPart).toList();
+
+      return ExpansionTile(
+        title: Text(bodyPart),
+        children: filteredWorkouts.map((workout) {
+          return ListTile(
+            title: Text(workout['machine']),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: workout['sets'].map<Widget>((set) {
+                return Text(
+                    'Reps: ${set['reps']}, Weight: ${set['weight']}, Notes: ${set['notes']}');
+              }).toList(),
+            ),
+          );
+        }).toList(),
+      );
+    }).toList();
+  }
+}
