@@ -97,7 +97,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
               children: [
                 Expanded(
                   child: TextFormField(
-                    style: TextStyle(color: AppColors.acccentColor),
+                    style: AppTheme.primaryText(color),
                     initialValue: sets[index].reps,
                     onChanged: (value) => sets[index].reps = value,
                     decoration: InputDecoration(

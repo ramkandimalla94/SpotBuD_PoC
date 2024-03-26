@@ -13,7 +13,7 @@ class HistoryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Workout History ',
+          'Log Workout ',
           style: AppTheme.primaryText(fontWeight: FontWeight.w500),
         ),
       ),
