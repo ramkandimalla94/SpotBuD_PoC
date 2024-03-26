@@ -86,8 +86,8 @@ class LoginView extends StatelessWidget {
                     UserCredential? userCredential = await viewModel
                         .signInWithEmailPassword(email, password);
                     if (userCredential != null) {
-                      // Login successful, redirect to '/mainscreen' screen
-                      Get.toNamed('/mainscreen');
+                      // Login successful, redirect to '/main' screen
+                      Get.toNamed('/main');
                     } else {
                       // Login failed, show error in snackbar
                       Get.snackbar(

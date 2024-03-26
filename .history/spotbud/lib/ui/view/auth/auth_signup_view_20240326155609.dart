@@ -1,21 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/viewmodels/auth_viewmodel.dart';
-import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/textform.dart';
 
 class SignUpView extends StatelessWidget {
-  final AuthViewModel authViewModel = Get.put(AuthViewModel());
-  final UserDataViewModel userDataViewModel = Get.put(UserDataViewModel());
-
+  final AuthViewModel viewModel = Get.put(AuthViewModel());
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>(); // Form key for validation
 
@@ -30,7 +25,7 @@ class SignUpView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
+              SizedBox(height: 150),
               Text(
                 'Sign Up',
                 style: TextStyle(
@@ -72,32 +67,6 @@ class SignUpView extends StatelessWidget {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
-              buildStyledInput(
-                controller: firstNameController,
-                labelText: 'First Name',
-                hintText: 'Enter your first name',
-                autofocus: false,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter your first name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              buildStyledInput(
-                controller: lastNameController,
-                labelText: 'Last Name',
-                hintText: 'Enter your last name',
-                autofocus: false,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter your last name';
-                  }
-                  return null;
-                },
-              ),
               SizedBox(height: 40),
               buildLoginButton(
                 text: 'Sign Up',
@@ -105,41 +74,25 @@ class SignUpView extends StatelessWidget {
                   if (_formKey.currentState!.validate()) {
                     String email = emailController.text.trim();
                     String password = passwordController.text.trim();
-                    String firstName = firstNameController.text.trim();
-                    String lastName = lastNameController.text.trim();
                     try {
-                      // Sign up with email and password
-                      UserCredential? userCredential = await authViewModel
-                          .signUpWithEmailPassword(email, password);
-                      if (userCredential != null) {
-                        // Save user data after successful sign-up
-                        await userDataViewModel.saveUserData(
-                            userCredential.user!.uid,
-                            email,
-                            firstName,
-                            lastName);
-                        // Show success message
-                        Get.snackbar(
-                          'Sign Up Successful',
-                          'You have successfully signed up!',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                        );
-                        // Redirect to the login screen after sign-up
-                        // Get.toNamed('/login');
+                      bool isSignedUp = await viewModel.signUpWithEmailPassword(
+                          email, password);
+                      if (isSignedUp) {
+                        // Sign-up successful, redirect to '/name' screen
+                        Get.toNamed('/name');
                       } else {
-                        // Show error message if sign-up fails
+                        // Sign-up failed, show generic error message
                         Get.snackbar(
                           'Sign Up Failed',
                           'Failed to sign up. Please try again later.',
                           snackPosition: SnackPosition.BOTTOM,
                           backgroundColor: Colors.red,
                           colorText: Colors.white,
+                          duration: Duration(milliseconds: 2000),
                         );
                       }
                     } catch (e) {
-                      // Handle sign-up failure
+                      // Handle different Firebase Auth exceptions
                       String errorMessage =
                           'Failed to sign up. Please try again later.';
                       print('Firebase Auth Exception: ${e.toString()}');
@@ -165,7 +118,7 @@ class SignUpView extends StatelessWidget {
                 },
                 buttonColor: Colors.white,
               ),
-              //SizedBox(height: 10),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   // Navigate to login screen
@@ -175,13 +128,6 @@ class SignUpView extends StatelessWidget {
                   'Already have an account? Login',
                   style: TextStyle(color: Colors.white),
                 ),
-              ),
-              //  SizedBox(height: 20),
-              // Logo
-              Image.asset(
-                AppAssets.logogolden,
-                width: 300,
-                height: 100,
               ),
             ],
           ),

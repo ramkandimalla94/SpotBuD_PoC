@@ -7,6 +7,7 @@ import 'package:spotbud/ui/view/log_workout/machine_selection_view.dart';
 import 'package:spotbud/ui/view/main_screen/home_view.dart';
 import 'package:spotbud/ui/view/main_screen/main_screen.dart';
 import 'package:spotbud/ui/view/main_screen/profile_view.dart';
+import 'package:spotbud/ui/view/onboarding/name_view.dart';
 import 'package:spotbud/ui/view/splash_screen/splash_screen.dart';
 import 'package:spotbud/ui/view/trial.dart';
 
@@ -39,7 +40,7 @@ class AppRoutes {
       page: () => ProfileView(),
     ),
     GetPage(
-      name: '/mainscreen',
+      name: '/main',
       page: () => MainScreen(),
     ),
     GetPage(

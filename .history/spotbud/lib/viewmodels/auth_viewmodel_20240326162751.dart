@@ -7,27 +7,34 @@ class AuthViewModel extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<UserCredential?> signUpWithEmailPassword(
-      String email, String password) async {
+  Future<bool> signInWithEmailPassword(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
-      return userCredential; // Return UserCredential if sign-up is successful
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return true; // Return true if login is successful
     } catch (e) {
-      print("Error signing up: $e");
-      return null; // Return null if sign-up fails
+      print("Error signing in: $e");
+      return false; // Return false if login fails
     }
   }
 
-  Future<UserCredential?> signInWithEmailPassword(
-      String email, String password) async {
+  Future<bool> signUpWithEmailPassword(
+      String email, String password, String firstName, String lastName) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return userCredential; // Return UserCredential if login is successful
+      // Create user with email and password
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      // Store user's name in Firestore
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+      });
+
+      return true; // Return true if sign-up is successful
     } catch (e) {
-      print("Error signing in: $e");
-      return null; // Return null if login fails
+      print("Error signing up: $e");
+      return false; // Return false if sign-up fails
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
@@ -15,6 +16,19 @@ class NameView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[900],
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryColor,
+        leading: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: Icon(
+            Icons.arrow_circle_left_outlined,
+            size: 40,
+            color: AppColors.acccentColor,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey, // Assign form key
@@ -22,20 +36,14 @@ class NameView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 30),
-              // Logo
-              Image.asset(
-                AppAssets.logowhite,
-                width: 300,
-                height: 200,
-              ),
+              SizedBox(height: 25),
 
-              SizedBox(height: 2),
+              SizedBox(height: 145),
               Text(
                 'Enter Your Name',
                 style: TextStyle(
                   fontSize: 32,
-                  color: Colors.white,
+                  color: AppColors.acccentColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -77,6 +85,13 @@ class NameView extends StatelessWidget {
                   }
                 },
                 buttonColor: Colors.white,
+              ),
+              SizedBox(height: 30),
+              // Logo
+              Image.asset(
+                AppAssets.logogolden,
+                width: 300,
+                height: 200,
               ),
             ],
           ),

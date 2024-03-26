@@ -30,7 +30,7 @@ class SignUpView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
+              SizedBox(height: 120),
               Text(
                 'Sign Up',
                 style: TextStyle(
@@ -45,7 +45,7 @@ class SignUpView extends StatelessWidget {
                 labelText: 'Email',
                 hintText: 'Enter your email address',
                 prefixIcon: Icons.email,
-                autofocus: false,
+                autofocus: true,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your email';
@@ -127,7 +127,7 @@ class SignUpView extends StatelessWidget {
                           colorText: Colors.white,
                         );
                         // Redirect to the login screen after sign-up
-                        // Get.toNamed('/login');
+                        Get.toNamed('/login');
                       } else {
                         // Show error message if sign-up fails
                         Get.snackbar(
@@ -165,7 +165,7 @@ class SignUpView extends StatelessWidget {
                 },
                 buttonColor: Colors.white,
               ),
-              //SizedBox(height: 10),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   // Navigate to login screen
@@ -176,12 +176,12 @@ class SignUpView extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              //  SizedBox(height: 20),
+              SizedBox(height: 20),
               // Logo
               Image.asset(
                 AppAssets.logogolden,
                 width: 300,
-                height: 100,
+                height: 200,
               ),
             ],
           ),

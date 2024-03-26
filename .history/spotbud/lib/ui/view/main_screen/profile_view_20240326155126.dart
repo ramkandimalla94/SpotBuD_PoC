@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
@@ -15,7 +14,7 @@ class ProfileView extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          SingleChildScrollView(
+          Flexible(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
@@ -72,15 +71,13 @@ class ProfileView extends StatelessWidget {
               ),
             ),
           ),
+
+          buildWorkoutButton(
+              text: "Log Out",
+              onPressed: () {
+                _logout(context);
+              }),
           Spacer(),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
-            child: buildWorkoutButton(
-                text: "Log Out",
-                onPressed: () {
-                  _logout(context);
-                }),
-          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: Image.asset(

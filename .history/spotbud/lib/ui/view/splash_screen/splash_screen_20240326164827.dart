@@ -28,8 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user != null) {
           // User is signed in, navigate to home screen
-          Get.offNamed(
-              '/mainscreen'); // Replace '/home' with your home screen route
+          Get.offNamed('/main'); // Replace '/home' with your home screen route
         } else {
           // No user is signed in, navigate to login screen
           Get.offNamed(

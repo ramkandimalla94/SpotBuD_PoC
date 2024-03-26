@@ -127,7 +127,7 @@ class SignUpView extends StatelessWidget {
                           colorText: Colors.white,
                         );
                         // Redirect to the login screen after sign-up
-                        // Get.toNamed('/login');
+                        Get.toNamed('/login');
                       } else {
                         // Show error message if sign-up fails
                         Get.snackbar(

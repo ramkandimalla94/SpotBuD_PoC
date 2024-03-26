@@ -30,7 +30,7 @@ class SignUpView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
+              SizedBox(height: 120),
               Text(
                 'Sign Up',
                 style: TextStyle(
@@ -45,7 +45,7 @@ class SignUpView extends StatelessWidget {
                 labelText: 'Email',
                 hintText: 'Enter your email address',
                 prefixIcon: Icons.email,
-                autofocus: false,
+                autofocus: true,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your email';
@@ -109,35 +109,22 @@ class SignUpView extends StatelessWidget {
                     String lastName = lastNameController.text.trim();
                     try {
                       // Sign up with email and password
-                      UserCredential? userCredential = await authViewModel
-                          .signUpWithEmailPassword(email, password);
-                      if (userCredential != null) {
-                        // Save user data after successful sign-up
-                        await userDataViewModel.saveUserData(
-                            userCredential.user!.uid,
-                            email,
-                            firstName,
-                            lastName);
-                        // Show success message
-                        Get.snackbar(
-                          'Sign Up Successful',
-                          'You have successfully signed up!',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                        );
-                        // Redirect to the login screen after sign-up
-                        // Get.toNamed('/login');
-                      } else {
-                        // Show error message if sign-up fails
-                        Get.snackbar(
-                          'Sign Up Failed',
-                          'Failed to sign up. Please try again later.',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
+                      UserCredential userCredential =
+                          await authViewModel.signUpWithEmailPassword(
+                              email, password, firstName, las);
+                      // Save user data after successful sign-up
+                      await userDataViewModel.saveUserData(
+                          userCredential.user!.uid, email, firstName, lastName);
+                      // Show success message
+                      Get.snackbar(
+                        'Sign Up Successful',
+                        'You have successfully signed up!',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                      );
+                      // Redirect to the login screen after sign-up
+                      Get.toNamed('/login');
                     } catch (e) {
                       // Handle sign-up failure
                       String errorMessage =
@@ -165,7 +152,7 @@ class SignUpView extends StatelessWidget {
                 },
                 buttonColor: Colors.white,
               ),
-              //SizedBox(height: 10),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   // Navigate to login screen
@@ -176,12 +163,12 @@ class SignUpView extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              //  SizedBox(height: 20),
+              SizedBox(height: 20),
               // Logo
               Image.asset(
                 AppAssets.logogolden,
                 width: 300,
-                height: 100,
+                height: 200,
               ),
             ],
           ),

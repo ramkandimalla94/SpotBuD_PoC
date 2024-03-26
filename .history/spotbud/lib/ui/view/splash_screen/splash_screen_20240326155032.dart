@@ -23,19 +23,15 @@ class _SplashScreenState extends State<SplashScreen>
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _controller.forward();
 
-    Future.delayed(Duration(seconds: 3), () {
-      // Check if the user is already logged in
-      FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user != null) {
-          // User is signed in, navigate to home screen
-          Get.offNamed(
-              '/mainscreen'); // Replace '/home' with your home screen route
-        } else {
-          // No user is signed in, navigate to login screen
-          Get.offNamed(
-              '/login'); // Replace '/login' with your login screen route
-        }
-      });
+    // Check if the user is already logged in
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        // User is signed in, navigate to home screen
+        Get.offNamed('/main'); // Replace '/home' with your home screen route
+      } else {
+        // No user is signed in, navigate to login screen
+        Get.offNamed('/login'); // Replace '/login' with your login screen route
+      }
     });
   }
 

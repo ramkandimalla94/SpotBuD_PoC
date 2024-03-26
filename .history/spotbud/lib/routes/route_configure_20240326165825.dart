@@ -39,7 +39,7 @@ class AppRoutes {
       page: () => ProfileView(),
     ),
     GetPage(
-      name: '/mainscreen',
+      name: '/main',
       page: () => MainScreen(),
     ),
     GetPage(

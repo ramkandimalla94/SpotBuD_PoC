@@ -74,7 +74,7 @@ class ProfileView extends StatelessWidget {
           ),
           Spacer(),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: buildWorkoutButton(
                 text: "Log Out",
                 onPressed: () {
