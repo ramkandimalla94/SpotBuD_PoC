@@ -16,10 +16,11 @@ class HistoryPage extends StatelessWidget {
       backgroundColor: AppColors.bluebackgroundColor,
       appBar: AppBar(
         backgroundColor: AppColors.bluebackgroundColor,
+        iconTheme: IconThemeData(color: AppColors.acccentColor),
         title: Text(
           'Workout History ',
           style: AppTheme.primaryText(
-              fontWeight: FontWeight.w500, color: AppColors.black),
+              fontWeight: FontWeight.w500, color: AppColors.acccentColor),
         ),
       ),
       body: FutureBuilder(
@@ -57,6 +58,10 @@ class HistoryPage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         size: 18),
                   ),
+                  trailing: Icon(
+                    Icons.arrow_drop_down,
+                    color: AppColors.acccentColor,
+                  ),
                   children: _buildBodyPartSegments(entry.value),
                 );
               }).toList(),
@@ -84,6 +89,10 @@ class HistoryPage extends StatelessWidget {
               color: AppColors.backgroundColor,
               fontWeight: FontWeight.w500,
               size: 18),
+        ),
+        trailing: Icon(
+          Icons.arrow_drop_down,
+          color: AppColors.backgroundColor,
         ),
         children: filteredWorkouts.map((workout) {
           return ListTile(
