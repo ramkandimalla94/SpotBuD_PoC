@@ -118,19 +118,12 @@ class LoginView extends StatelessWidget {
                 height: 10,
               ),
 
-              SignInButton(Buttons.google, onPressed: () {
+              SignInButton(Buttons.google, mini: true, onPressed: () {
                 viewModel.signInWithGoogle().then((userCredential) {
                   if (userCredential != null) {
-                    Get.toNamed('/mainscreen');
                     // Navigate to the home screen or perform other actions
                   } else {
-                    Get.snackbar(
-                      'Sign-In Error',
-                      'Failed to sign in. Please try again later.',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                    ); // Handle sign-in failure
+                    // Handle sign-in failure
                   }
                 });
               })

@@ -12,7 +12,20 @@
           "package_name": "com.example.spotbud"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "341521927870-uv5lf2kmoueqs9med9g20ih6u7umcbtg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.spotbud",
+            "certificate_hash": "3b5a3ef55b09373c6deeed0a2f5c6eb853ac5b4d"
+          }
+        },
+        {
+          "client_id": "341521927870-569ettmmtqid3plr1fd1mf9ok00i1rhf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCSitSodg2WrcDi94jR7hWfKBjOk7lj6to"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341521927870-569ettmmtqid3plr1fd1mf9ok00i1rhf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341521927870-q6b6gm3et29hm22vaimm0a35rtariou7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.spotbud"
+              }
+            }
+          ]
         }
       }
     }

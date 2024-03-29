@@ -124,13 +124,7 @@ class LoginView extends StatelessWidget {
                     Get.toNamed('/mainscreen');
                     // Navigate to the home screen or perform other actions
                   } else {
-                    Get.snackbar(
-                      'Sign-In Error',
-                      'Failed to sign in. Please try again later.',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                    ); // Handle sign-in failure
+                    // Handle sign-in failure
                   }
                 });
               })

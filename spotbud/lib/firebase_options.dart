@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '341521927870',
     projectId: 'spotbud-b9d9e',
     storageBucket: 'spotbud-b9d9e.appspot.com',
+    androidClientId: '341521927870-uv5lf2kmoueqs9med9g20ih6u7umcbtg.apps.googleusercontent.com',
+    iosClientId: '341521927870-q6b6gm3et29hm22vaimm0a35rtariou7.apps.googleusercontent.com',
     iosBundleId: 'com.example.spotbud',
   );
 }

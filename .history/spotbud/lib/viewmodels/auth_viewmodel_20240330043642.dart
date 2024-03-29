@@ -38,49 +38,21 @@ class AuthViewModel extends GetxController {
     return null;
   }
 
-  // Future<void> saveUserDataFromGoogleSignIn(User user) async {
-  //   try {
-  //     // Reference to the users collection and document for the current user
-  //     CollectionReference users = _firestore.collection('users');
-  //     DocumentReference userDoc = users.doc(user.uid);
-
-  //     // Save the user's data to Firestore
-  //     await userDoc.set({
-  //       'firstName': user.displayName!
-  //           .split(' ')[0], // Extract first name from display name
-  //       'lastName': user.displayName!
-  //           .split(' ')[1], // Extract last name from display name
-  //       'email': user.email,
-  //       'workoutHistory': [],
-  //     });
-
-  //     // Update observables or do any other required tasks
-  //   } catch (e) {
-  //     print('Error saving user data from Google Sign-In: $e');
-  //   }
-  // }
   Future<void> saveUserDataFromGoogleSignIn(User user) async {
     try {
       // Reference to the users collection and document for the current user
       CollectionReference users = _firestore.collection('users');
       DocumentReference userDoc = users.doc(user.uid);
 
-      // Check if the user's document already exists in Firestore
-      DocumentSnapshot userSnapshot = await userDoc.get();
-
-      if (!userSnapshot.exists) {
-        // Save the user's data to Firestore only if the document does not exist
-        await userDoc.set({
-          'firstName': user.displayName!
-              .split(' ')[0], // Extract first name from display name
-          'lastName': user.displayName!
-              .split(' ')[1], // Extract last name from display name
-          'email': user.email,
-          'workoutHistory': [],
-        });
-      } else {
-        print('User data already exists in Firestore');
-      }
+      // Save the user's data to Firestore
+      await userDoc.set({
+        'firstName': user.displayName!
+            .split(' ')[0], // Extract first name from display name
+        'lastName': user.displayName!
+            .split(' ')[1], // Extract last name from display name
+        'email': user.email,
+        'workoutHistory': [],
+      });
 
       // Update observables or do any other required tasks
     } catch (e) {
