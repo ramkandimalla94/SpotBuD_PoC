@@ -1,93 +1,24 @@
+// user_data_viewmodel.dart
+
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:spotbud/core/models/machines.dart';
-import 'package:spotbud/ui/widgets/assets.dart';
 
 class UserDataViewModel extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  RxString firstName = ''.obs;
-  RxString lastName = ''.obs;
-  RxString email = ''.obs;
 
-  // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
-  final List<Map<String, dynamic>> machines = MachineData.getMachines();
+  final RxString firstName = ''.obs;
+  final RxString lastName = ''.obs;
+  final RxString email = ''.obs;
+  final RxList<Map<String, dynamic>> workoutHistory =
+      <Map<String, dynamic>>[].obs;
 
-  List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
-        .map((machine) => machine['name'] as String)
-        .toList();
-
-    return machinesForBodyPart;
-  }
-
-  // Method to fetch distinct machines from workout history
-  Future<List<String>> fetchDistinctMachines() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        DocumentReference userDocRef =
-            FirebaseFirestore.instance.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await userDocRef.get();
-        if (userSnapshot.exists) {
-          Map<String, dynamic>? userData =
-              userSnapshot.data() as Map<String, dynamic>?;
-          if (userData != null && userData['workoutHistory'] != null) {
-            List<dynamic> workoutHistory = userData['workoutHistory'];
-            Set<String> machines = Set<String>();
-            workoutHistory.forEach((workout) {
-              machines.add(workout['machine']);
-            });
-            return machines.toList();
-          }
-        }
-      }
-      return [];
-    } catch (e) {
-      print('Error fetching distinct machines: $e');
-      return [];
-    }
-  }
-
-  // Method to fetch distinct body parts from workout history
-  Future<List<String>> fetchDistinctBodyParts() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        DocumentReference userDocRef =
-            FirebaseFirestore.instance.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await userDocRef.get();
-        if (userSnapshot.exists) {
-          Map<String, dynamic>? userData =
-              userSnapshot.data() as Map<String, dynamic>?;
-          if (userData != null && userData['workoutHistory'] != null) {
-            List<dynamic> workoutHistory = userData['workoutHistory'];
-            Set<String> bodyParts = Set<String>();
-            workoutHistory.forEach((workout) {
-              bodyParts.add(workout['bodyPart']);
-            });
-            return bodyParts.toList();
-          }
-        }
-      }
-      return [];
-    } catch (e) {
-      print('Error fetching distinct body parts: $e');
-      return [];
-    }
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUserNames();
+    fetchWorkoutHistory(); // Fetch workout history when the ViewModel initializes
   }
 
   Future<void> saveUserData(
@@ -137,7 +68,7 @@ class UserDataViewModel extends GetxController {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchWorkoutHistory() async {
+  Future<void> fetchWorkoutHistory() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
 
@@ -154,16 +85,23 @@ class UserDataViewModel extends GetxController {
               userSnapshot.data() as Map<String, dynamic>?;
           if (userData != null && userData['workoutHistory'] != null) {
             if (userData['workoutHistory'] is List) {
-              return List<Map<String, dynamic>>.from(
-                  userData['workoutHistory']);
+              List<dynamic> historyList = userData['workoutHistory'];
+              List<Map<String, dynamic>> parsedHistoryList = [];
+
+              // Parsing each history item
+              historyList.forEach((item) {
+                if (item is Map<String, dynamic>) {
+                  parsedHistoryList.add(item);
+                }
+              });
+
+              workoutHistory.value = parsedHistoryList;
             }
           }
         }
       }
-      return [];
     } catch (e) {
       print('Error fetching workout history: $e');
-      return [];
     }
   }
 
@@ -184,9 +122,7 @@ class UserDataViewModel extends GetxController {
             if (firstName != null && lastName != null) {
               this.firstName.value = firstName;
               this.lastName.value = lastName;
-              print(firstName);
-              print(lastName);
-              print(email);
+              this.email.value = email ?? '';
             }
           } else {
             print('userData is not a Map<String, dynamic>');

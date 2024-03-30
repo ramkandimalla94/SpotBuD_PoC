@@ -120,13 +120,7 @@ class SignUpView extends StatelessWidget {
                             firstName,
                             lastName);
                         // Show success message
-                        CustomAlertBox(
-                          message: 'You have successfully signed up!',
-                          onButtonPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          title: 'Sign Up Successful',
-                        );
+                        CustomAlertBox(message:'You have successfully signed up!' ,onButtonPressed:(){} ,title: 'Sign Up Successful',)
                         Get.snackbar(
                           'Sign Up Successful',
                           'You have successfully signed up!',

@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:spotbud/core/models/machines.dart';
-import 'package:spotbud/ui/widgets/assets.dart';
 
 class UserDataViewModel extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,85 +8,6 @@ class UserDataViewModel extends GetxController {
   RxString firstName = ''.obs;
   RxString lastName = ''.obs;
   RxString email = ''.obs;
-
-  // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
-  final List<Map<String, dynamic>> machines = MachineData.getMachines();
-
-  List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
-        .map((machine) => machine['name'] as String)
-        .toList();
-
-    return machinesForBodyPart;
-  }
-
-  // Method to fetch distinct machines from workout history
-  Future<List<String>> fetchDistinctMachines() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        DocumentReference userDocRef =
-            FirebaseFirestore.instance.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await userDocRef.get();
-        if (userSnapshot.exists) {
-          Map<String, dynamic>? userData =
-              userSnapshot.data() as Map<String, dynamic>?;
-          if (userData != null && userData['workoutHistory'] != null) {
-            List<dynamic> workoutHistory = userData['workoutHistory'];
-            Set<String> machines = Set<String>();
-            workoutHistory.forEach((workout) {
-              machines.add(workout['machine']);
-            });
-            return machines.toList();
-          }
-        }
-      }
-      return [];
-    } catch (e) {
-      print('Error fetching distinct machines: $e');
-      return [];
-    }
-  }
-
-  // Method to fetch distinct body parts from workout history
-  Future<List<String>> fetchDistinctBodyParts() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        DocumentReference userDocRef =
-            FirebaseFirestore.instance.collection('users').doc(userId);
-        DocumentSnapshot userSnapshot = await userDocRef.get();
-        if (userSnapshot.exists) {
-          Map<String, dynamic>? userData =
-              userSnapshot.data() as Map<String, dynamic>?;
-          if (userData != null && userData['workoutHistory'] != null) {
-            List<dynamic> workoutHistory = userData['workoutHistory'];
-            Set<String> bodyParts = Set<String>();
-            workoutHistory.forEach((workout) {
-              bodyParts.add(workout['bodyPart']);
-            });
-            return bodyParts.toList();
-          }
-        }
-      }
-      return [];
-    } catch (e) {
-      print('Error fetching distinct body parts: $e');
-      return [];
-    }
-  }
 
   Future<void> saveUserData(
       String userId, String email, String firstName, String lastName) async {
@@ -98,9 +17,11 @@ class UserDataViewModel extends GetxController {
       String capitalizedLastName = lastName.substring(0, 1).toUpperCase() +
           lastName.substring(1).toLowerCase();
 
+      // Reference to the users collection and document for the current user
       CollectionReference users = _firestore.collection('users');
       DocumentReference userDoc = users.doc(userId);
 
+      // Save the user's data to Firestore
       await userDoc.set({
         'firstName': capitalizedFirstName,
         'lastName': capitalizedLastName,
@@ -108,6 +29,7 @@ class UserDataViewModel extends GetxController {
         'workoutHistory': [],
       });
 
+      // Update observables
       this.email.value = email;
       this.firstName.value = capitalizedFirstName;
       this.lastName.value = capitalizedLastName;
@@ -118,14 +40,17 @@ class UserDataViewModel extends GetxController {
 
   Future<void> addWorkoutDetails(Map<String, dynamic> workoutData) async {
     try {
+      // Get the current user from FirebaseAuth
       User? user = _auth.currentUser;
 
       if (user != null) {
         String userId = user.uid;
 
+        // Reference to the user document in Firestore
         DocumentReference userDocRef =
             FirebaseFirestore.instance.collection('users').doc(userId);
 
+        // Add the workout details to the user's workout history
         await userDocRef.update({
           'workoutHistory': FieldValue.arrayUnion([workoutData]),
         });
@@ -139,20 +64,26 @@ class UserDataViewModel extends GetxController {
 
   Future<List<Map<String, dynamic>>> fetchWorkoutHistory() async {
     try {
+      // Get the current user from Firebase Authentication
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
+        // Get the user ID
         String userId = user.uid;
 
+        // Reference to the user document in Firestore
         DocumentReference userDocRef =
             FirebaseFirestore.instance.collection('users').doc(userId);
 
+        // Fetch the user document
         DocumentSnapshot userSnapshot = await userDocRef.get();
 
         if (userSnapshot.exists) {
+          // Extract workout history
           Map<String, dynamic>? userData =
               userSnapshot.data() as Map<String, dynamic>?;
           if (userData != null && userData['workoutHistory'] != null) {
+            // Check if 'workoutHistory' exists and is a List<Map<String, dynamic>>
             if (userData['workoutHistory'] is List) {
               return List<Map<String, dynamic>>.from(
                   userData['workoutHistory']);
@@ -169,19 +100,32 @@ class UserDataViewModel extends GetxController {
 
   Future<void> fetchUserNames() async {
     try {
+      // Get the current user from Firebase Authentication
       User? user = FirebaseAuth.instance.currentUser;
+      //print(user);
       if (user != null) {
+        // Get the user ID
         String userId = user.uid;
+        //  print(userId);
+        // Reference to the user document in Firestore
         DocumentReference userDocRef =
             FirebaseFirestore.instance.collection('users').doc(userId);
+        // print(userDocRef);
+        // Fetch the user document
         DocumentSnapshot userSnapshot = await userDocRef.get();
+        //  print(userSnapshot);
+        // Check if the user document exists and contains data
         if (userSnapshot.exists) {
+          // Extract first name and last name
           var userData = userSnapshot.data();
+          // print('userData type: ${userData.runtimeType}');
+          // print('userData value: $userData');
           if (userData is Map<String, dynamic>) {
             String? firstName = userData['firstName'];
             String? lastName = userData['lastName'];
             String? email = userData['email'];
             if (firstName != null && lastName != null) {
+              // Update firstName and lastName values
               this.firstName.value = firstName;
               this.lastName.value = lastName;
               print(firstName);

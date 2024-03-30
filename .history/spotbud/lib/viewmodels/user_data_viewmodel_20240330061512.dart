@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:spotbud/core/models/machines.dart';
-import 'package:spotbud/ui/widgets/assets.dart';
 
 class UserDataViewModel extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -12,25 +10,14 @@ class UserDataViewModel extends GetxController {
   RxString email = ''.obs;
 
   // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
-  final List<Map<String, dynamic>> machines = MachineData.getMachines();
-
-  List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
-        .map((machine) => machine['name'] as String)
-        .toList();
-
-    return machinesForBodyPart;
-  }
+  List<String> get bodyParts => [
+        'Legs',
+        'Chest',
+        'Back',
+        'Arms',
+        'Shoulders',
+        // Add more body parts here if needed
+      ];
 
   // Method to fetch distinct machines from workout history
   Future<List<String>> fetchDistinctMachines() async {

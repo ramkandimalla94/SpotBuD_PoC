@@ -59,33 +59,19 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       body: Column(
         children: [
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Filters',
-                  style: TextStyle(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Filters',
+                style: AppTheme.primaryText(
                     color: AppColors.secondaryColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                  ),
-                ),
-
-                IconButton(
-                  icon: Icon(Icons.filter_list,
-                      color: AppColors
-                          .acccentColor), // You can change the icon as per your preference
-                  onPressed: () {
-                    // Add your filter logic or show a filter dialog here
-                  },
-                ),
-                SizedBox(
-                    width:
-                        10), // Add some space between the "Filters" text and dropdowns
-                _buildFilterDropdowns(),
-              ],
-            ),
+                    size: 25),
+              ),
+              Spacer(),
+              _buildFilterDropdowns(),
+            ],
           ),
           Expanded(
             child: FutureBuilder(
@@ -174,7 +160,7 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Body Part',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
@@ -207,12 +193,12 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Machine',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
           icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          dropdownColor: AppColors.bluebackgroundColor,
+          dropdownColor: AppColors.acccentColor,
           onChanged: (value) {
             setState(() {
               selectedMachine = value;

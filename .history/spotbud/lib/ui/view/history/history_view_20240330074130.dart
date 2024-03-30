@@ -71,7 +71,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     fontSize: 25,
                   ),
                 ),
-
+                Spacer(),
                 IconButton(
                   icon: Icon(Icons.filter_list,
                       color: AppColors
@@ -174,7 +174,7 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Body Part',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
@@ -207,12 +207,12 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Machine',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
           icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          dropdownColor: AppColors.bluebackgroundColor,
+          dropdownColor: AppColors.acccentColor,
           onChanged: (value) {
             setState(() {
               selectedMachine = value;

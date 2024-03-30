@@ -20,19 +20,14 @@ class UserDataViewModel extends GetxController {
   //       'Shoulders',
   //       // Add more body parts here if needed
   //     ];
-  final List<Map<String, dynamic>> machines = MachineData.getMachines();
-
-  List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
-        .map((machine) => machine['name'] as String)
-        .toList();
-
-    return machinesForBodyPart;
+  Future<void> _fetchMachines() async {
+    List<String> machines =
+        await _userDataViewModel.fetchDistinctMachines(selectedBodyPart!);
+    setState(() {
+      machinesList = machines;
+    });
   }
 
-  // Method to fetch distinct machines from workout history
   Future<List<String>> fetchDistinctMachines() async {
     try {
       User? user = _auth.currentUser;
@@ -47,8 +42,17 @@ class UserDataViewModel extends GetxController {
           if (userData != null && userData['workoutHistory'] != null) {
             List<dynamic> workoutHistory = userData['workoutHistory'];
             Set<String> machines = Set<String>();
+
+            // Iterate through each workout entry in history
             workoutHistory.forEach((workout) {
-              machines.add(workout['machine']);
+              String loggedMachine = workout['machine'];
+              String bodyPart = workout['bodyPart'];
+
+              // Check if the logged machine is associated with the selected body part
+              if (bodyPart == selectedBodyPart) {
+                // Add the logged machine to the set
+                machines.add(loggedMachine);
+              }
             });
             return machines.toList();
           }
@@ -61,9 +65,19 @@ class UserDataViewModel extends GetxController {
     }
   }
 
-  // Method to fetch distinct body parts from workout history
-  Future<List<String>> fetchDistinctBodyParts() async {
+  List<String> getMachinesForBodyPart(String bodyPart) {
+    // Filter machines based on the provided body part
+    List<String> machinesForBodyPart = machines
+        .where((machine) => machine['bodyPart'] == bodyPart)
+        .map((machine) => machine['name'] as String)
+        .toList();
+
+    return machinesForBodyPart;
+  }
+
+  Future<List<String>> fetchDistinctMachines(String selectedBodyPart) async {
     try {
+      // Fetch user and workout history data
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.uid;
@@ -75,17 +89,26 @@ class UserDataViewModel extends GetxController {
               userSnapshot.data() as Map<String, dynamic>?;
           if (userData != null && userData['workoutHistory'] != null) {
             List<dynamic> workoutHistory = userData['workoutHistory'];
-            Set<String> bodyParts = Set<String>();
+            Set<String> machines = Set<String>();
+
+            // Iterate through each workout entry in history
             workoutHistory.forEach((workout) {
-              bodyParts.add(workout['bodyPart']);
+              String loggedMachine = workout['machine'];
+              String bodyPart = workout['bodyPart'];
+
+              // Check if the logged machine is associated with the selected body part
+              if (bodyPart == selectedBodyPart) {
+                // Add the logged machine to the set
+                machines.add(loggedMachine);
+              }
             });
-            return bodyParts.toList();
+            return machines.toList();
           }
         }
       }
       return [];
     } catch (e) {
-      print('Error fetching distinct body parts: $e');
+      print('Error fetching distinct machines: $e');
       return [];
     }
   }

@@ -59,33 +59,18 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       body: Column(
         children: [
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Filters',
-                  style: TextStyle(
+          Row(
+            children: [
+              Text(
+                'Filters',
+                style: AppTheme.primaryText(
                     color: AppColors.secondaryColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                  ),
-                ),
-
-                IconButton(
-                  icon: Icon(Icons.filter_list,
-                      color: AppColors
-                          .acccentColor), // You can change the icon as per your preference
-                  onPressed: () {
-                    // Add your filter logic or show a filter dialog here
-                  },
-                ),
-                SizedBox(
-                    width:
-                        10), // Add some space between the "Filters" text and dropdowns
-                _buildFilterDropdowns(),
-              ],
-            ),
+                    size: 25),
+              ),
+              Spacer(),
+              _buildFilterDropdowns(),
+            ],
           ),
           Expanded(
             child: FutureBuilder(
@@ -166,70 +151,99 @@ class _HistoryPageState extends State<HistoryPage> {
       filteredMachines = machinesList;
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Row(
       children: [
-        DropdownButton<String>(
-          value: selectedBodyPart,
-          hint: Text(
-            'Select Body Part',
-            style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
-                fontWeight: FontWeight.w500,
-                size: 18),
-          ),
-          icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          onChanged: (value) {
-            setState(() {
-              selectedBodyPart = value;
-              // Reset selected machine when body part changes
-              selectedMachine = null;
-              // Fetch machines based on the selected body part
-              _fetchMachines();
-            });
-          },
-          dropdownColor: AppColors.bluebackgroundColor,
-          items: bodyPartsList.map<DropdownMenuItem<String>>((bodyPart) {
-            return DropdownMenuItem<String>(
-              value: bodyPart,
-              child: Text(
-                bodyPart,
-                style: AppTheme.primaryText(
+        Expanded(
+          flex: 1,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 8.0),
+            decoration: BoxDecoration(
+              color: AppColors.bluebackgroundColor,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: DropdownButton<String>(
+              value: selectedBodyPart,
+              hint: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Select Body Part',
+                  style: AppTheme.primaryText(
                     color: AppColors.acccentColor,
                     fontWeight: FontWeight.w500,
-                    size: 18),
+                    size: 18,
+                  ),
+                ),
               ),
-            );
-          }).toList(),
+              icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
+              onChanged: (value) {
+                setState(() {
+                  selectedBodyPart = value;
+                  // Reset selected machine when body part changes
+                  selectedMachine = null;
+                  // Fetch machines based on the selected body part
+                  _fetchMachines();
+                });
+              },
+              dropdownColor: AppColors.bluebackgroundColor,
+              items: bodyPartsList.map<DropdownMenuItem<String>>((bodyPart) {
+                return DropdownMenuItem<String>(
+                  value: bodyPart,
+                  child: Text(
+                    bodyPart,
+                    style: AppTheme.primaryText(
+                      color: AppColors.acccentColor,
+                      fontWeight: FontWeight.w500,
+                      size: 18,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ),
-        DropdownButton<String>(
-          value: selectedMachine,
-          hint: Text(
-            'Select Machine',
-            style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
-                fontWeight: FontWeight.w500,
-                size: 18),
-          ),
-          icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          dropdownColor: AppColors.bluebackgroundColor,
-          onChanged: (value) {
-            setState(() {
-              selectedMachine = value;
-            });
-          },
-          items: filteredMachines.map<DropdownMenuItem<String>>((machine) {
-            return DropdownMenuItem<String>(
-              value: machine,
-              child: Text(
-                machine,
-                style: AppTheme.primaryText(
+        Expanded(
+          flex: 1,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 8.0),
+            decoration: BoxDecoration(
+              color: AppColors.bluebackgroundColor,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: DropdownButton<String>(
+              value: selectedMachine,
+              hint: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Select Machine',
+                  style: AppTheme.primaryText(
                     color: AppColors.acccentColor,
                     fontWeight: FontWeight.w500,
-                    size: 18),
+                    size: 18,
+                  ),
+                ),
               ),
-            );
-          }).toList(),
+              icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
+              dropdownColor: AppColors.bluebackgroundColor,
+              onChanged: (value) {
+                setState(() {
+                  selectedMachine = value;
+                });
+              },
+              items: filteredMachines.map<DropdownMenuItem<String>>((machine) {
+                return DropdownMenuItem<String>(
+                  value: machine,
+                  child: Text(
+                    machine,
+                    style: AppTheme.primaryText(
+                      color: AppColors.acccentColor,
+                      fontWeight: FontWeight.w500,
+                      size: 18,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ),
       ],
     );

@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -57,95 +55,73 @@ class _HistoryPageState extends State<HistoryPage> {
               fontWeight: FontWeight.w500, color: AppColors.acccentColor),
         ),
       ),
-      body: Column(
-        children: [
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Filters',
-                  style: TextStyle(
-                    color: AppColors.secondaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                  ),
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildFilterDropdowns(),
+            Expanded(
+              child: FutureBuilder(
+                future: _userDataViewModel.fetchWorkoutHistory(),
+                builder: (context,
+                    AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    // Filter workout history based on selected body part and machine
+                    List<Map<String, dynamic>> filteredHistory = snapshot.data!
+                        .where((workout) =>
+                            (selectedBodyPart == null ||
+                                workout['bodyPart'] == selectedBodyPart) &&
+                            (selectedMachine == null ||
+                                workout['machine'] == selectedMachine))
+                        .toList();
 
-                IconButton(
-                  icon: Icon(Icons.filter_list,
-                      color: AppColors
-                          .acccentColor), // You can change the icon as per your preference
-                  onPressed: () {
-                    // Add your filter logic or show a filter dialog here
-                  },
-                ),
-                SizedBox(
-                    width:
-                        10), // Add some space between the "Filters" text and dropdowns
-                _buildFilterDropdowns(),
-              ],
+                    // Sort filtered workout history by date
+                    filteredHistory.sort(
+                        (a, b) => b['timestamp'].compareTo(a['timestamp']));
+
+                    // Group filtered workout history by date
+                    Map<DateTime, List<Map<String, dynamic>>> groupedByDate =
+                        {};
+                    filteredHistory.forEach((workout) {
+                      DateTime date = workout['timestamp'].toDate();
+                      DateTime formattedDate =
+                          DateTime(date.year, date.month, date.day);
+                      if (groupedByDate.containsKey(formattedDate)) {
+                        groupedByDate[formattedDate]!.add(workout);
+                      } else {
+                        groupedByDate[formattedDate] = [workout];
+                      }
+                    });
+
+                    return ListView(
+                      children: groupedByDate.entries.map((entry) {
+                        return ExpansionTile(
+                          title: Text(
+                            DateFormat.yMMMd().format(entry.key),
+                            style: AppTheme.primaryText(
+                                color: AppColors.acccentColor,
+                                fontWeight: FontWeight.w500,
+                                size: 18),
+                          ),
+                          trailing: Icon(
+                            Icons.arrow_drop_down,
+                            color: AppColors.acccentColor,
+                          ),
+                          children: _buildBodyPartSegments(entry.value),
+                        );
+                      }).toList(),
+                    );
+                  }
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: FutureBuilder(
-              future: _userDataViewModel.fetchWorkoutHistory(),
-              builder: (context,
-                  AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  // Filter workout history based on selected body part and machine
-                  List<Map<String, dynamic>> filteredHistory = snapshot.data!
-                      .where((workout) =>
-                          (selectedBodyPart == null ||
-                              workout['bodyPart'] == selectedBodyPart) &&
-                          (selectedMachine == null ||
-                              workout['machine'] == selectedMachine))
-                      .toList();
-
-                  // Sort filtered workout history by date
-                  filteredHistory
-                      .sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
-
-                  // Group filtered workout history by date
-                  Map<DateTime, List<Map<String, dynamic>>> groupedByDate = {};
-                  filteredHistory.forEach((workout) {
-                    DateTime date = workout['timestamp'].toDate();
-                    DateTime formattedDate =
-                        DateTime(date.year, date.month, date.day);
-                    if (groupedByDate.containsKey(formattedDate)) {
-                      groupedByDate[formattedDate]!.add(workout);
-                    } else {
-                      groupedByDate[formattedDate] = [workout];
-                    }
-                  });
-
-                  return ListView(
-                    children: groupedByDate.entries.map((entry) {
-                      return ExpansionTile(
-                        title: Text(
-                          DateFormat.yMMMd().format(entry.key),
-                          style: AppTheme.primaryText(
-                              color: AppColors.acccentColor,
-                              fontWeight: FontWeight.w500,
-                              size: 18),
-                        ),
-                        trailing: Icon(
-                          Icons.arrow_drop_down,
-                          color: AppColors.acccentColor,
-                        ),
-                        children: _buildBodyPartSegments(entry.value),
-                      );
-                    }).toList(),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+            Spacer(),
+            _buildFilterDropdowns(),
+          ],
+        ),
       ),
     );
   }
@@ -166,7 +142,7 @@ class _HistoryPageState extends State<HistoryPage> {
       filteredMachines = machinesList;
     }
 
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         DropdownButton<String>(
@@ -174,7 +150,7 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Body Part',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
@@ -188,17 +164,10 @@ class _HistoryPageState extends State<HistoryPage> {
               _fetchMachines();
             });
           },
-          dropdownColor: AppColors.bluebackgroundColor,
           items: bodyPartsList.map<DropdownMenuItem<String>>((bodyPart) {
             return DropdownMenuItem<String>(
               value: bodyPart,
-              child: Text(
-                bodyPart,
-                style: AppTheme.primaryText(
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.w500,
-                    size: 18),
-              ),
+              child: Text(bodyPart),
             );
           }).toList(),
         ),
@@ -207,12 +176,11 @@ class _HistoryPageState extends State<HistoryPage> {
           hint: Text(
             'Select Machine',
             style: AppTheme.primaryText(
-                color: AppColors.secondaryColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.w500,
                 size: 18),
           ),
           icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          dropdownColor: AppColors.bluebackgroundColor,
           onChanged: (value) {
             setState(() {
               selectedMachine = value;
@@ -221,13 +189,7 @@ class _HistoryPageState extends State<HistoryPage> {
           items: filteredMachines.map<DropdownMenuItem<String>>((machine) {
             return DropdownMenuItem<String>(
               value: machine,
-              child: Text(
-                machine,
-                style: AppTheme.primaryText(
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.w500,
-                    size: 18),
-              ),
+              child: Text(machine),
             );
           }).toList(),
         ),

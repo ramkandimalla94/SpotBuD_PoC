@@ -212,7 +212,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 size: 18),
           ),
           icon: Icon(Icons.arrow_drop_down, color: AppColors.acccentColor),
-          dropdownColor: AppColors.bluebackgroundColor,
+          dropdownColor: AppColors.acccentColor,
           onChanged: (value) {
             setState(() {
               selectedMachine = value;

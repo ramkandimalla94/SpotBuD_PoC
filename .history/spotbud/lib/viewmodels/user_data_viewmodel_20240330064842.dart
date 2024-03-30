@@ -12,20 +12,22 @@ class UserDataViewModel extends GetxController {
   RxString email = ''.obs;
 
   // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
+  List<String> get bodyParts => [
+        'Legs',
+        'Chest',
+        'Back',
+        'Arms',
+        'Shoulders',
+        // Add more body parts here if needed
+      ];
   final List<Map<String, dynamic>> machines = MachineData.getMachines();
-
   List<String> getMachinesForBodyPart(String bodyPart) {
+    // Get all machines
+    List<Map<String, dynamic>> allMachines = MachineData.getMachines();
+
     // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
+    List<String> machinesForBodyPart = allMachines
+        .where((machine) => machine['imagePath'].contains(bodyPart))
         .map((machine) => machine['name'] as String)
         .toList();
 

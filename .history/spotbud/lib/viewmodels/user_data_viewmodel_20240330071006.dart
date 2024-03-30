@@ -21,18 +21,6 @@ class UserDataViewModel extends GetxController {
   //       // Add more body parts here if needed
   //     ];
   final List<Map<String, dynamic>> machines = MachineData.getMachines();
-
-  List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
-        .map((machine) => machine['name'] as String)
-        .toList();
-
-    return machinesForBodyPart;
-  }
-
-  // Method to fetch distinct machines from workout history
   Future<List<String>> fetchDistinctMachines() async {
     try {
       User? user = _auth.currentUser;
@@ -47,8 +35,17 @@ class UserDataViewModel extends GetxController {
           if (userData != null && userData['workoutHistory'] != null) {
             List<dynamic> workoutHistory = userData['workoutHistory'];
             Set<String> machines = Set<String>();
+
+            // Iterate through each workout entry in history
             workoutHistory.forEach((workout) {
-              machines.add(workout['machine']);
+              String loggedMachine = workout['machine'];
+              String bodyPart = workout['bodyPart'];
+
+              // Check if the logged machine is associated with the selected body part
+              if (bodyPart == selectedBodyPart) {
+                // Add the logged machine to the set
+                machines.add(loggedMachine);
+              }
             });
             return machines.toList();
           }
@@ -59,6 +56,16 @@ class UserDataViewModel extends GetxController {
       print('Error fetching distinct machines: $e');
       return [];
     }
+  }
+
+  List<String> getMachinesForBodyPart(String bodyPart) {
+    // Filter machines based on the provided body part
+    List<String> machinesForBodyPart = machines
+        .where((machine) => machine['bodyPart'] == bodyPart)
+        .map((machine) => machine['name'] as String)
+        .toList();
+
+    return machinesForBodyPart;
   }
 
   // Method to fetch distinct body parts from workout history

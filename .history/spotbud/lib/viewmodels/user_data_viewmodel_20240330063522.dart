@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:spotbud/core/models/machines.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 
 class UserDataViewModel extends GetxController {
@@ -12,24 +11,53 @@ class UserDataViewModel extends GetxController {
   RxString email = ''.obs;
 
   // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
-  final List<Map<String, dynamic>> machines = MachineData.getMachines();
+  List<String> get bodyParts => [
+        'Legs',
+        'Chest',
+        'Back',
+        'Arms',
+        'Shoulders',
+        // Add more body parts here if needed
+      ];
+  final Map<String, List<Map<String, dynamic>>> machines = {
+    'Legs': [
+      {'name': 'Squat Rack', 'imagePath': AppAssets.legs},
+      {'name': 'Leg Press', 'imagePath': AppAssets.legs},
+      {'name': 'Leg Curl', 'imagePath': AppAssets.legs},
+      {'name': 'Leg Extension', 'imagePath': AppAssets.legs},
+    ],
+    'Chest': [
+      {'name': 'Bench Press', 'imagePath': AppAssets.chest},
+      {'name': 'Dumbbell Press', 'imagePath': AppAssets.chest},
+      {'name': 'Chest Fly', 'imagePath': AppAssets.chest},
+      {'name': 'Push-up', 'imagePath': AppAssets.chest},
+    ],
+    'Back': [
+      {'name': 'Deadlift', 'imagePath': AppAssets.back},
+      {'name': 'Pull-up', 'imagePath': AppAssets.back},
+      {'name': 'Seated Row', 'imagePath': AppAssets.back},
+      {'name': 'Lat Pulldown', 'imagePath': AppAssets.back},
+    ],
+    'Shoulders': [
+      {'name': 'Military Press', 'imagePath': AppAssets.shoulder},
+      {'name': 'Lateral Raise', 'imagePath': AppAssets.shoulder},
+      {'name': 'Front Raise', 'imagePath': AppAssets.shoulder},
+      {'name': 'Shrug', 'imagePath': AppAssets.shoulder},
+    ],
+    'Arms': [
+      {'name': 'Bicep Curl', 'imagePath': AppAssets.arms},
+      {'name': 'Tricep Dip', 'imagePath': AppAssets.arms},
+      {'name': 'Hammer Curl', 'imagePath': AppAssets.arms},
+      {'name': 'Skull Crusher', 'imagePath': AppAssets.arms},
+    ],
+  };
 
+  // Method to get machines associated with a body part
   List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
+    List<Map<String, dynamic>> machinesForBodyPart = machines[bodyPart] ?? [];
+    return machinesForBodyPart
         .map((machine) => machine['name'] as String)
         .toList();
-
-    return machinesForBodyPart;
   }
 
   // Method to fetch distinct machines from workout history

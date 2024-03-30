@@ -12,24 +12,30 @@ class UserDataViewModel extends GetxController {
   RxString email = ''.obs;
 
   // Getter for body parts
-  // List<String> get bodyParts => [
-  //       'Legs',
-  //       'Chest',
-  //       'Back',
-  //       'Arms',
-  //       'Shoulders',
-  //       // Add more body parts here if needed
-  //     ];
+  List<String> get bodyParts => [
+        'Legs',
+        'Chest',
+        'Back',
+        'Arms',
+        'Shoulders',
+        // Add more body parts here if needed
+      ];
   final List<Map<String, dynamic>> machines = MachineData.getMachines();
 
+  // Method to get machines associated with a body part
   List<String> getMachinesForBodyPart(String bodyPart) {
-    // Filter machines based on the provided body part
-    List<String> machinesForBodyPart = machines
-        .where((machine) => machine['bodyPart'] == bodyPart)
+    // Access machines for the specified body part
+    dynamic machinesForBodyPart = machines[bodyPart];
+
+    // If machinesForBodyPart is null or not a list, return an empty list
+    if (machinesForBodyPart == null || machinesForBodyPart is! List) {
+      return [];
+    }
+
+    // Convert the machine map to a list of machine names
+    return (machinesForBodyPart as List)
         .map((machine) => machine['name'] as String)
         .toList();
-
-    return machinesForBodyPart;
   }
 
   // Method to fetch distinct machines from workout history
