@@ -1,16 +1,21 @@
+// MachineSelectionScreen
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:spotbud/ui/view/log_workout/machine_selection_view.dart';
+import 'package:spotbud/ui/view/log_workout/work_out_form.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/ui/widgets/textform.dart';
-import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
-class BodyPartSelectionScreen extends StatelessWidget {
+import '../../../viewmodels/user_data_viewmodel.dart';
+
+class MachineSelectionScreen extends StatelessWidget {
+  final String bodyPart;
   final UserDataViewModel _userDataViewModel = Get.find();
+
+  MachineSelectionScreen({required this.bodyPart});
 
   @override
   Widget build(BuildContext context) {
@@ -20,118 +25,60 @@ class BodyPartSelectionScreen extends StatelessWidget {
         iconTheme: IconThemeData(color: AppColors.acccentColor),
         backgroundColor: AppColors.bluebackgroundColor,
         title: Text(
-          'Select Body Part',
+          'Select Machine',
           style: AppTheme.secondaryText(
               fontWeight: FontWeight.w500, color: AppColors.acccentColor),
         ),
       ),
       body: SingleChildScrollView(
         child: FutureBuilder<List<String>>(
-          future: _userDataViewModel.getBodyParts(),
+          future: _userDataViewModel.getMachineNames(bodyPart),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: LoadingIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
-              List<String> bodyParts = snapshot.data ?? [];
-              return _buildBodyPartButtons(bodyParts);
+              List<String> machineNames = snapshot.data ?? [];
+              return Column(
+                children: _buildButtonRows(machineNames),
+              );
             }
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.acccentColor,
+        backgroundColor: AppColors.primaryColor,
         shape: CircleBorder(),
-        onPressed: () {
-          _showAddBodyPartDialog();
-        },
+        onPressed: () => _showAddMachineDialog(),
         child: Icon(
           Icons.add,
-          color: AppColors.primaryColor,
+          color: AppColors.acccentColor,
         ),
       ),
     );
   }
 
-  Widget _buildBodyPartButtons(List<String> bodyParts) {
-    List<Widget> rows = [];
-    for (int i = 0; i < bodyParts.length; i += 2) {
-      if (i + 1 < bodyParts.length) {
-        // If there are at least two more elements
-        rows.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildButton(bodyParts[i]),
-              _buildButton(bodyParts[i + 1]),
-            ],
-          ),
-        );
-      } else {
-        // If there's only one more element
-        rows.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildButton(bodyParts[i]),
-            ],
-          ),
-        );
-      }
-    }
-    return Column(
-      children: rows,
-    );
-  }
-
-  Widget _buildButton(String bodyPart) {
-    String imagePath = _getAppropriateImagePath(bodyPart);
-    return custombodybutton(
-      text: bodyPart,
-      onPressed: () {
-        _handleBodyPartSelection(bodyPart);
-      },
-      imagePath: imagePath,
-      onRemovePressed: () {
-        _showRemoveBodyPartConfirmation(bodyPart);
-      },
-    );
-  }
-
-  String _getAppropriateImagePath(String bodyPart) {
-    // Add logic to determine image path based on body part
-    // For now, returning a default image
-    return AppAssets.legs;
-  }
-
-  void _handleBodyPartSelection(String bodyPart) {
-    // Navigate to machine selection screen and pass the selected body part
-    Get.to(() => MachineSelectionScreen(bodyPart: bodyPart));
-  }
-
-  void _showAddBodyPartDialog() {
-    TextEditingController _bodyPartController = TextEditingController();
+  void _showAddMachineDialog() {
+    TextEditingController machineController = TextEditingController();
     Get.defaultDialog(
       backgroundColor: AppColors.primaryColor,
-      title: 'Add Body Part',
+      title: 'Add New Machine',
       titleStyle: TextStyle(
         color: AppColors.acccentColor,
         fontWeight: FontWeight.bold,
         fontSize: 20,
       ),
       content: buildStyledInput(
-        controller: _bodyPartController,
-        hintText: "Enter the body part name",
+        controller: machineController,
+        hintText: "Enter the new Machine",
         labelText: '',
       ),
-
-      // TextField(
-      //   controller: _bodyPartController,
-      //   decoration: InputDecoration(hintText: 'Enter Body Part'),
-      // ),
       actions: <Widget>[
         TextButton(
+          onPressed: () {
+            Get.back();
+          },
           child: Text(
             'Cancel',
             style: TextStyle(
@@ -139,11 +86,21 @@ class BodyPartSelectionScreen extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          onPressed: () {
-            Get.back();
-          },
         ),
         ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(
+              AppColors.blue,
+            ),
+          ),
+          onPressed: () {
+            String machineName = machineController.text.trim();
+            if (machineName.isNotEmpty) {
+              _addNewMachine(machineName);
+              Get.back();
+              Get.back();
+            }
+          },
           child: Text(
             'Add',
             style: TextStyle(
@@ -151,33 +108,71 @@ class BodyPartSelectionScreen extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          onPressed: () {
-            String bodyPart = _bodyPartController.text.trim();
-            if (bodyPart.isNotEmpty) {
-              _addCustomBodyPart(bodyPart);
-              Get.back();
-              Get.back();
-            }
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              AppColors.blue,
-            ),
-          ),
         ),
       ],
     );
   }
 
-  void _addCustomBodyPart(String bodyPart) {
-    _userDataViewModel.addCustomBodyPart(bodyPart);
+  void _addNewMachine(String machineName) {
+    print('add custom machine called');
+    _userDataViewModel.addCustomMachine(bodyPart, machineName);
+  }
+
+  void _removeMachine(String machineName) {
+    _userDataViewModel.removeCustomMachine(bodyPart, machineName);
     _userDataViewModel.update();
   }
 
-  void _showRemoveBodyPartConfirmation(String bodyPart) {
+  List<Widget> _buildButtonRows(List<String> machineNames) {
+    List<Widget> rows = [];
+    int numButtons = machineNames.length;
+    int numFullRows = numButtons ~/ 2; // Integer division
+
+    // Add rows with two buttons each
+    for (int i = 0; i < numFullRows; i++) {
+      rows.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildButton(machineNames[i * 2]),
+            _buildButton(machineNames[i * 2 + 1]),
+          ],
+        ),
+      );
+    }
+
+    // Add the last row if there's an odd number of buttons
+    if (numButtons % 2 != 0) {
+      rows.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildButton(machineNames[numButtons - 1]),
+          ],
+        ),
+      );
+    }
+
+    return rows;
+  }
+
+  Widget _buildButton(String machineName) {
+    return CustomMachineButton(
+      text: machineName,
+      onPressed: () {
+        _handleMachineSelection(machineName);
+      },
+      onRemovePressed: () {
+        _showRemoveMachineConfirmation(machineName);
+      },
+      imagePath: AppAssets.arms, // Set image path if needed
+    );
+  }
+
+  void _showRemoveMachineConfirmation(String machineName) {
     Get.defaultDialog(
       backgroundColor: AppColors.primaryColor,
-      title: 'Remove Body Part',
+      title: 'Remove Machine',
       titleStyle: TextStyle(
         color: AppColors.acccentColor,
         fontWeight: FontWeight.bold,
@@ -188,7 +183,7 @@ class BodyPartSelectionScreen extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'Are you sure you want to remove $bodyPart?',
+              'Are you sure you want to remove $machineName?',
               style: TextStyle(
                 color: AppColors.acccentColor,
                 fontSize: 16,
@@ -211,7 +206,7 @@ class BodyPartSelectionScreen extends StatelessWidget {
                 SizedBox(width: 20),
                 ElevatedButton(
                   onPressed: () {
-                    _removeBodyPart(bodyPart);
+                    _removeMachine(machineName);
                     Get.back();
                     Get.back();
                   },
@@ -234,8 +229,8 @@ class BodyPartSelectionScreen extends StatelessWidget {
     );
   }
 
-  void _removeBodyPart(String bodyPart) {
-    _userDataViewModel.removeBodyPart(bodyPart);
-    _userDataViewModel.update();
-  }
-}
+//   void _handleMachineSelection(String machine) {
+//     // Navigate to workout logging form and pass the selected machine
+//     Get.to(() => WorkoutLoggingForm(bodyPart: bodyPart, machine: machine));
+//   }
+// }
