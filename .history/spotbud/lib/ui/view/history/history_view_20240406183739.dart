@@ -14,7 +14,8 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late Stream<QuerySnapshot> _workoutLogsStream;
+  late Stream<QuerySnapshot> _workoutLogsStream = Stream<QuerySnapshot>.empty();
+  late List<DateTime> _dates = [];
 
   @override
   void initState() {
@@ -22,9 +23,8 @@ class _HistoryViewState extends State<HistoryView> {
     _fetchWorkoutLogs();
   }
 
-  Future<void> _fetchWorkoutLogs() async {
-    try {
-      User? user = _auth.currentUser;
+  void _fetchWorkoutLogs() {
+    _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         String userId = user.uid;
         _workoutLogsStream = _firestore
@@ -34,9 +34,7 @@ class _HistoryViewState extends State<HistoryView> {
             .orderBy('timestamp', descending: true)
             .snapshots();
       }
-    } catch (e) {
-      print('Error fetching workout logs: $e');
-    }
+    });
   }
 
   @override
@@ -71,11 +69,11 @@ class _HistoryViewState extends State<HistoryView> {
             );
           } else {
             final workoutLogs = snapshot.data!.docs;
-            List<DateTime> dates = _extractDates(workoutLogs);
+            _dates = _extractDates(workoutLogs);
             return ListView.builder(
-              itemCount: dates.length,
+              itemCount: _dates.length,
               itemBuilder: (context, index) {
-                final date = dates[index];
+                final date = _dates[index];
                 final dateFormatted = DateFormat('yyyy-MM-dd').format(date);
                 final workouts = _filterWorkoutsByDate(workoutLogs, date);
 
@@ -100,11 +98,12 @@ class _HistoryViewState extends State<HistoryView> {
                       ExpansionTile(
                         trailing: Icon(
                           Icons.arrow_drop_down,
-                          color: AppColors.backgroundColor,
+                          color: AppColors
+                              .backgroundColor, // Change the color to your desired color
                         ),
                         title: Text(
-                          'Start time:' +
-                              (workouts[i]['startTime'] as String? ?? 'N/A'),
+                          'Start time:' + workouts[i]['startTime'] as String? ??
+                              'N/A',
                           style: AppTheme.secondaryText(
                               size: 18,
                               fontWeight: FontWeight.w500,
@@ -195,7 +194,8 @@ class _HistoryViewState extends State<HistoryView> {
       return ExpansionTile(
         trailing: Icon(
           Icons.arrow_drop_down,
-          color: AppColors.acccentColor,
+          color:
+              AppColors.acccentColor, // Change the color to your desired color
         ),
         title: Text(
           exerciseName,

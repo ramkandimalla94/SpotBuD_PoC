@@ -12,9 +12,23 @@ class UserDataViewModel extends GetxController {
   Rx<DateTime?> endDate = Rx<DateTime?>(null);
   Rx<String?> bodyPart = Rx<String?>(null);
   Rx<String?> exerciseName = Rx<String?>(null);
+  late Stream<QuerySnapshot> workoutLogsStream;
 
   // Define getter for startDate
   DateTime? get startDateValue => startDate.value;
+
+  // Method to update filters
+  void updateFilters({
+    DateTime? newStartDate,
+    DateTime? newEndDate,
+    String? newBodyPart,
+    String? newExerciseName,
+  }) {
+    startDate.value = newStartDate;
+    endDate.value = newEndDate;
+    bodyPart.value = newBodyPart;
+    exerciseName.value = newExerciseName;
+  }
 
   // Fetch user data from Firestore and update the observables
   Future<void> fetchUserData() async {
@@ -57,6 +71,24 @@ class UserDataViewModel extends GetxController {
       }
     } catch (e) {
       print('Error saving workout log: $e');
+    }
+  }
+
+  Future<void> fetchWorkoutLogs() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        workoutLogsStream = _firestore
+            .collection('data')
+            .doc(userId)
+            .collection('workouts')
+            .orderBy('timestamp', descending: true)
+            .snapshots();
+        update(); // Notify listeners after updating the stream
+      }
+    } catch (e) {
+      print('Error fetching workout logs: $e');
     }
   }
 
@@ -143,6 +175,30 @@ class UserDataViewModel extends GetxController {
       }
     } catch (e) {
       print('Error adding workout details: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> fetchWorkoutHistory() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final userId = user.uid;
+        final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+            await _firestore
+                .collection('data')
+                .doc(userId)
+                .collection('workouts')
+                .orderBy('timestamp', descending: true)
+                .get();
+
+        return querySnapshot.docs.map((doc) => doc.data()).toList();
+      } else {
+        print('User is not logged in');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching workout history: $e');
+      return null;
     }
   }
 }

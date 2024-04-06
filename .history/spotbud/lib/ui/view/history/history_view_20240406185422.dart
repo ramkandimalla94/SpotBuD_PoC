@@ -6,38 +6,10 @@ import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 
-class HistoryView extends StatefulWidget {
-  @override
-  _HistoryViewState createState() => _HistoryViewState();
-}
-
-class _HistoryViewState extends State<HistoryView> {
+class HistoryView extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late Stream<QuerySnapshot> _workoutLogsStream;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchWorkoutLogs();
-  }
-
-  Future<void> _fetchWorkoutLogs() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        _workoutLogsStream = _firestore
-            .collection('data')
-            .doc(userId)
-            .collection('workouts')
-            .orderBy('timestamp', descending: true)
-            .snapshots();
-      }
-    } catch (e) {
-      print('Error fetching workout logs: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,72 +26,107 @@ class _HistoryViewState extends State<HistoryView> {
               color: AppColors.acccentColor),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _workoutLogsStream,
+      body: FutureBuilder(
+        future: _fetchWorkoutLogs(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: LoadingIndicator(),
-            );
-          } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text('No workout logs available.'),
             );
           } else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
             );
           } else {
-            final workoutLogs = snapshot.data!.docs;
-            List<DateTime> dates = _extractDates(workoutLogs);
-            return ListView.builder(
-              itemCount: dates.length,
-              itemBuilder: (context, index) {
-                final date = dates[index];
-                final dateFormatted = DateFormat('yyyy-MM-dd').format(date);
-                final workouts = _filterWorkoutsByDate(workoutLogs, date);
-
-                return ExpansionTile(
-                  trailing: Icon(
-                    Icons.arrow_drop_down,
-                    color: AppColors
-                        .acccentColor, // Change the color to your desired color
-                  ),
-                  title: DropdownMenuItem<DateTime>(
-                    value: date,
-                    child: Text(
-                      DateFormat('yyyy-MM-dd').format(date),
-                      style: AppTheme.secondaryText(
-                          size: 22,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.acccentColor),
-                    ),
-                  ),
-                  children: [
-                    for (var i = 0; i < workouts.length; i++)
-                      ExpansionTile(
-                        trailing: Icon(
-                          Icons.arrow_drop_down,
-                          color: AppColors.backgroundColor,
-                        ),
-                        title: Text(
-                          'Start time:' +
-                              (workouts[i]['startTime'] as String? ?? 'N/A'),
-                          style: AppTheme.secondaryText(
-                              size: 18,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.backgroundColor),
-                        ),
-                        children:
-                            _buildWorkoutDetails(workouts[i]['exercises']),
-                      ),
-                  ],
-                );
-              },
-            );
+            return _buildWorkoutHistoryWidget();
           }
         },
       ),
+    );
+  }
+
+  Future<void> _fetchWorkoutLogs() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        _workoutLogsStream = _firestore
+            .collection('data')
+            .doc(userId)
+            .collection('workouts')
+            .orderBy('timestamp', descending: true)
+            .snapshots();
+        return;
+      }
+      throw 'User not authenticated';
+    } catch (e) {
+      print('Error fetching workout logs: $e');
+      throw e;
+    }
+  }
+
+  Widget _buildWorkoutHistoryWidget() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _workoutLogsStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: LoadingIndicator(),
+          );
+        } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text('No workout logs available.'),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        } else {
+          final workoutLogs = snapshot.data!.docs;
+          final dates = _extractDates(workoutLogs);
+          return ListView.builder(
+            itemCount: dates.length,
+            itemBuilder: (context, index) {
+              final date = dates[index];
+              final workouts = _filterWorkoutsByDate(workoutLogs, date);
+              return ExpansionTile(
+                trailing: Icon(
+                  Icons.arrow_drop_down,
+                  color: AppColors.acccentColor,
+                ),
+                title: DropdownMenuItem<DateTime>(
+                  value: date,
+                  child: Text(
+                    DateFormat('yyyy-MM-dd').format(date),
+                    style: AppTheme.secondaryText(
+                      size: 22,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.acccentColor,
+                    ),
+                  ),
+                ),
+                children: workouts.map<Widget>((workout) {
+                  return ExpansionTile(
+                    trailing: Icon(
+                      Icons.arrow_drop_down,
+                      color: AppColors.backgroundColor,
+                    ),
+                    title: Text(
+                      'Start time: ${workout['startTime'] as String? ?? 'N/A'}',
+                      style: AppTheme.secondaryText(
+                        size: 18,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.backgroundColor,
+                      ),
+                    ),
+                    children: _buildWorkoutDetails(workout['exercises']),
+                  );
+                }).toList(),
+              );
+            },
+          );
+        }
+      },
     );
   }
 
@@ -135,7 +142,9 @@ class _HistoryViewState extends State<HistoryView> {
   }
 
   List<Map<String, dynamic>> _filterWorkoutsByDate(
-      List<DocumentSnapshot> logs, DateTime date) {
+    List<DocumentSnapshot> logs,
+    DateTime date,
+  ) {
     return logs
         .where((log) {
           final timestamp = log['timestamp'] as Timestamp;
@@ -154,9 +163,10 @@ class _HistoryViewState extends State<HistoryView> {
         Text(
           'No exercises recorded.',
           style: AppTheme.secondaryText(
-              size: 22,
-              fontWeight: FontWeight.w500,
-              color: AppColors.acccentColor),
+            size: 22,
+            fontWeight: FontWeight.w500,
+            color: AppColors.acccentColor,
+          ),
         )
       ];
     }
@@ -178,16 +188,18 @@ class _HistoryViewState extends State<HistoryView> {
           title: Text(
             'Reps: ${reps ?? 'N/A'}, Weight: ${weight ?? 'N/A'}',
             style: AppTheme.secondaryText(
-                size: 17,
-                fontWeight: FontWeight.w500,
-                color: AppColors.backgroundColor),
+              size: 17,
+              fontWeight: FontWeight.w500,
+              color: AppColors.backgroundColor,
+            ),
           ),
           subtitle: Text(
             'Notes: ${notes ?? 'N/A'}',
             style: AppTheme.secondaryText(
-                size: 15,
-                fontWeight: FontWeight.w500,
-                color: AppColors.backgroundColor),
+              size: 15,
+              fontWeight: FontWeight.w500,
+              color: AppColors.backgroundColor,
+            ),
           ),
         );
       }).toList();
@@ -200,9 +212,10 @@ class _HistoryViewState extends State<HistoryView> {
         title: Text(
           exerciseName,
           style: AppTheme.secondaryText(
-              size: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.acccentColor),
+            size: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.acccentColor,
+          ),
         ),
         children: setWidgets,
       );

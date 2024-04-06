@@ -16,6 +16,19 @@ class UserDataViewModel extends GetxController {
   // Define getter for startDate
   DateTime? get startDateValue => startDate.value;
 
+  // Method to update filters
+  void updateFilters({
+    DateTime? newStartDate,
+    DateTime? newEndDate,
+    String? newBodyPart,
+    String? newExerciseName,
+  }) {
+    startDate.value = newStartDate;
+    endDate.value = newEndDate;
+    bodyPart.value = newBodyPart;
+    exerciseName.value = newExerciseName;
+  }
+
   // Fetch user data from Firestore and update the observables
   Future<void> fetchUserData() async {
     try {
@@ -137,12 +150,44 @@ class UserDataViewModel extends GetxController {
       if (user != null) {
         String userId = user.uid;
         await _firestore.collection('data').doc(userId).update({
-          'workoutHistory': FieldValue.arrayUnion([workoutData]),
+          'workoutHistory': FieldValue.arrayUnion([
+            {
+              'starttime': workoutData[
+                  'starttime'], // Assuming 'starttime' is already a Timestamp
+              'endtime': workoutData[
+                  'endtime'], // Assuming 'endtime' is already a Timestamp
+              'bodypart': workoutData['bodypart'],
+            }
+          ]),
         });
         print('Workout details added successfully');
       }
     } catch (e) {
       print('Error adding workout details: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>?> fetchWorkoutHistory() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        final userId = user.uid;
+        final QuerySnapshot<Map<String, dynamic>> querySnapshot =
+            await _firestore
+                .collection('data')
+                .doc(userId)
+                .collection('workouts')
+                .orderBy('timestamp', descending: true)
+                .get();
+
+        return querySnapshot.docs.map((doc) => doc.data()).toList();
+      } else {
+        print('User is not logged in');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching workout history: $e');
+      return null;
     }
   }
 }

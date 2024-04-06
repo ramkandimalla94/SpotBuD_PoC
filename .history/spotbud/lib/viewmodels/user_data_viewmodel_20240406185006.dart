@@ -12,6 +12,7 @@ class UserDataViewModel extends GetxController {
   Rx<DateTime?> endDate = Rx<DateTime?>(null);
   Rx<String?> bodyPart = Rx<String?>(null);
   Rx<String?> exerciseName = Rx<String?>(null);
+  Stream<QuerySnapshot> workoutLogsStream = Stream<QuerySnapshot>.empty();
 
   // Define getter for startDate
   DateTime? get startDateValue => startDate.value;
@@ -57,6 +58,24 @@ class UserDataViewModel extends GetxController {
       }
     } catch (e) {
       print('Error saving workout log: $e');
+    }
+  }
+
+  Future<void> fetchWorkoutLogs() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        workoutLogsStream = _firestore
+            .collection('data')
+            .doc(userId)
+            .collection('workouts')
+            .orderBy('timestamp', descending: true)
+            .snapshots();
+        update(); // Notify listeners after updating the stream
+      }
+    } catch (e) {
+      print('Error fetching workout logs: $e');
     }
   }
 

@@ -65,6 +65,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                   ),
                 ],
               ),
+              //SizedBox(height: 5),
               Row(
                 children: [
                   Text(
@@ -77,6 +78,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         Icon(Icons.access_time, color: AppColors.acccentColor),
                     onPressed: () => _selectStartTime(context),
                   ),
+
+                  //SizedBox(height: 1),
+
                   Text(
                     'End Time: ${DateTimeUtils.getFormattedTime(DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedEndTime.hour, _selectedEndTime.minute))}',
                     style: TextStyle(color: Colors.white),
@@ -105,7 +109,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             Row(
                               children: [
                                 Text(
-                                  exercise.name,
+                                  exercise,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
@@ -215,6 +219,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
   Future<bool> _onBackPressed() async {
     if (controller.exercises.isNotEmpty) {
+      // Show a dialog if there are exercises and prompt to save workout
       var result = await Get.dialog(
         AlertDialog(
           title: Text('Save Workout?'),
@@ -236,9 +241,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
         ),
       );
 
-      return result ?? false;
+      return result ??
+          false; // Default to false (don't save) if dialog is dismissed
     }
-    return true;
+    return true; // No exercises, allow back navigation
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -322,31 +328,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
 
     // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
     Map<String, dynamic> workoutData = {
       'date': DateTimeUtils.getFormattedDate(_selectedDate),
       'startTime': DateTimeUtils.getFormattedTime(DateTime(
@@ -359,8 +340,27 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           ? controller.endTime.value
           : DateTimeUtils.getFormattedTime(
               DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
+      'exercises': [], // Initialize exercises list
     };
+
+    // Populate exercises data
+    List<Map<String, dynamic>> exercisesData = [];
+
+    for (var exercise in controller.exercises) {
+      final setsData = controller
+          .getSets(exercise)
+          .map((set) => {
+                'reps': set.reps,
+                'weight': set.weight,
+                'notes': set.notes,
+              })
+          .toList();
+      exercisesData.add({
+        'name': exercise,
+        'sets': setsData,
+      });
+    }
+    workoutData['exercises'] = exercisesData;
 
     // Save workout data to Firestore
     userDataViewModel.saveWorkoutLog(workoutData);
@@ -375,6 +375,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     // Reset the form
     controller.reset();
 
+    // Redirect to the main screen
     // Redirect to the main screen after a short delay
     Future.delayed(Duration(milliseconds: 500), () {
       Get.toNamed('/mainscreen');
@@ -387,7 +388,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       var bodyPart = result['bodyPart'];
       var machine = result['machine'];
       if (bodyPart != null && machine != null) {
-        var exercise = ExerciseData(name: '$bodyPart - $machine');
+        var exercise = '$bodyPart - $machine';
         controller.addExercise(exercise);
       }
     }
@@ -409,20 +410,20 @@ class DateTimeUtils {
 }
 
 class WorkoutLoggingFormController extends GetxController {
-  var exercises = <ExerciseData>[].obs;
+  var exercises = <String>[].obs;
   var endTime = ''.obs;
-  var sets = <ExerciseData, List<SetData>>{}.obs;
+  var sets = <String, List<SetData>>{}.obs;
 
-  void addExercise(ExerciseData exercise) {
+  void addExercise(String exercise) {
     exercises.add(exercise);
     sets[exercise] = [SetData(index: 1)];
   }
 
-  List<SetData> getSets(ExerciseData exercise) {
+  List<SetData> getSets(String exercise) {
     return sets[exercise] ?? [];
   }
 
-  void addSet({required ExerciseData exercise}) {
+  void addSet({required String exercise}) {
     final currentSets = sets[exercise] ?? [];
     if (currentSets.isNotEmpty) {
       final previousSet = currentSets.last;
@@ -442,13 +443,13 @@ class WorkoutLoggingFormController extends GetxController {
     sets[exercise] = currentSets;
   }
 
-  void removeSet(ExerciseData exercise, SetData set) {
+  void removeSet(String exercise, SetData set) {
     final currentSets = sets[exercise] ?? [];
     currentSets.remove(set);
     sets[exercise] = currentSets;
   }
 
-  void removeExercise(ExerciseData exercise) {
+  void removeExercise(String exercise) {
     exercises.remove(exercise);
     sets.remove(exercise);
   }
@@ -462,12 +463,6 @@ class WorkoutLoggingFormController extends GetxController {
     sets.clear();
     endTime.value = '';
   }
-}
-
-class ExerciseData {
-  final String name;
-
-  ExerciseData({required this.name});
 }
 
 class SetData {

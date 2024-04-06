@@ -65,6 +65,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                   ),
                 ],
               ),
+              //SizedBox(height: 5),
               Row(
                 children: [
                   Text(
@@ -77,6 +78,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         Icon(Icons.access_time, color: AppColors.acccentColor),
                     onPressed: () => _selectStartTime(context),
                   ),
+
+                  //SizedBox(height: 1),
+
                   Text(
                     'End Time: ${DateTimeUtils.getFormattedTime(DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedEndTime.hour, _selectedEndTime.minute))}',
                     style: TextStyle(color: Colors.white),
@@ -105,7 +109,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             Row(
                               children: [
                                 Text(
-                                  exercise.name,
+                                  exercise['name'],
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
@@ -123,7 +127,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                               ],
                             ),
                             SizedBox(height: 10),
-                            for (var set in controller.getSets(exercise))
+                            for (var set in exercise['sets'])
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
                                 child: Column(
@@ -132,7 +136,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                     Row(
                                       children: [
                                         Text(
-                                          'Set ${set.index}:',
+                                          'Set ${set['index']}:',
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         SizedBox(width: 10),
@@ -145,9 +149,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                             ),
                                             style:
                                                 TextStyle(color: Colors.white),
-                                            initialValue: set.reps,
+                                            initialValue: set['reps'],
                                             onChanged: (value) =>
-                                                set.reps = value.trim(),
+                                                set['reps'] = value.trim(),
                                           ),
                                         ),
                                         SizedBox(width: 10),
@@ -160,9 +164,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                             ),
                                             style:
                                                 TextStyle(color: Colors.white),
-                                            initialValue: set.weight,
+                                            initialValue: set['weight'],
                                             onChanged: (value) =>
-                                                set.weight = value.trim(),
+                                                set['weight'] = value.trim(),
                                           ),
                                         ),
                                         SizedBox(width: 10),
@@ -186,9 +190,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                         labelStyle:
                                             TextStyle(color: Colors.white),
                                       ),
-                                      initialValue: set.notes,
+                                      initialValue: set['notes'],
                                       onChanged: (value) =>
-                                          set.notes = value.trim(),
+                                          set['notes'] = value.trim(),
                                       maxLines: null,
                                       style: TextStyle(color: Colors.white),
                                     ),
@@ -215,6 +219,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
   Future<bool> _onBackPressed() async {
     if (controller.exercises.isNotEmpty) {
+      // Show a dialog if there are exercises and prompt to save workout
       var result = await Get.dialog(
         AlertDialog(
           title: Text('Save Workout?'),
@@ -236,9 +241,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
         ),
       );
 
-      return result ?? false;
+      return result ??
+          false; // Default to false (don't save) if dialog is dismissed
     }
-    return true;
+    return true; // No exercises, allow back navigation
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -290,9 +296,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
     // Perform validation for each set
     for (var exercise in controller.exercises) {
-      final sets = controller.getSets(exercise);
+      final sets = exercise['sets'];
       for (var set in sets) {
-        if (set.reps.isEmpty || set.weight.isEmpty) {
+        if (set['reps'].isEmpty || set['weight'].isEmpty) {
           Get.snackbar(
             'Error',
             'Please fill in both reps and weight for all sets.',
@@ -306,8 +312,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
 
     // Remove exercises with no sets
-    controller.exercises
-        .removeWhere((exercise) => controller.getSets(exercise).isEmpty);
+    controller.exercises.removeWhere((exercise) => exercise['sets'].isEmpty);
 
     // Check if there are no exercises with sets
     if (controller.exercises.isEmpty) {
@@ -322,48 +327,35 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
 
     // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
     Map<String, dynamic> workoutData = {
       'date': DateTimeUtils.getFormattedDate(_selectedDate),
-      'startTime': DateTimeUtils.getFormattedTime(DateTime(
+      'starttime': DateTimeUtils.getFormattedTime(DateTime(
           _selectedDate.year,
           _selectedDate.month,
           _selectedDate.day,
           _selectedStartTime.hour,
           _selectedStartTime.minute)),
-      'endTime': controller.endTime.value.isNotEmpty
+      'endtime': controller.endTime.value.isNotEmpty
           ? controller.endTime.value
           : DateTimeUtils.getFormattedTime(
               DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
+      'timestamp': FieldValue.serverTimestamp(),
+      'exercises': controller.exercises.map((exercise) {
+        return {
+          'name': exercise['name'],
+          'sets': exercise['sets'].map((set) {
+            return {
+              'reps': set['reps'],
+              'weight': set['weight'],
+              'notes': set['notes'],
+            };
+          }).toList(),
+        };
+      }).toList(),
     };
 
     // Save workout data to Firestore
-    userDataViewModel.saveWorkoutLog(workoutData);
+    userDataViewModel.addWorkoutDetails(workoutData);
 
     Get.snackbar(
       'Success',
@@ -375,6 +367,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     // Reset the form
     controller.reset();
 
+    // Redirect to the main screen
     // Redirect to the main screen after a short delay
     Future.delayed(Duration(milliseconds: 500), () {
       Get.toNamed('/mainscreen');
@@ -387,7 +380,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       var bodyPart = result['bodyPart'];
       var machine = result['machine'];
       if (bodyPart != null && machine != null) {
-        var exercise = ExerciseData(name: '$bodyPart - $machine');
+        var exercise = {'name': '$bodyPart - $machine', 'sets': []};
         controller.addExercise(exercise);
       }
     }
@@ -409,48 +402,27 @@ class DateTimeUtils {
 }
 
 class WorkoutLoggingFormController extends GetxController {
-  var exercises = <ExerciseData>[].obs;
+  var exercises = <Map<String, dynamic>>[].obs;
   var endTime = ''.obs;
-  var sets = <ExerciseData, List<SetData>>{}.obs;
 
-  void addExercise(ExerciseData exercise) {
+  void addExercise(Map<String, dynamic> exercise) {
     exercises.add(exercise);
-    sets[exercise] = [SetData(index: 1)];
   }
 
-  List<SetData> getSets(ExerciseData exercise) {
-    return sets[exercise] ?? [];
-  }
-
-  void addSet({required ExerciseData exercise}) {
-    final currentSets = sets[exercise] ?? [];
-    if (currentSets.isNotEmpty) {
-      final previousSet = currentSets.last;
-      if (previousSet.reps.isEmpty || previousSet.weight.isEmpty) {
-        Get.snackbar(
-          'Error',
-          'Please fill in both reps and weight for the current set to add a new set.',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-        return;
-      }
-    }
-    final newIndex = currentSets.isEmpty ? 1 : currentSets.last.index + 1;
-    currentSets.add(SetData(index: newIndex));
-    sets[exercise] = currentSets;
-  }
-
-  void removeSet(ExerciseData exercise, SetData set) {
-    final currentSets = sets[exercise] ?? [];
-    currentSets.remove(set);
-    sets[exercise] = currentSets;
-  }
-
-  void removeExercise(ExerciseData exercise) {
+  void removeExercise(Map<String, dynamic> exercise) {
     exercises.remove(exercise);
-    sets.remove(exercise);
+  }
+
+  void addSet({required Map<String, dynamic> exercise}) {
+    final currentSets = List<Map<String, dynamic>>.from(exercise['sets'] ?? []);
+    final newIndex = currentSets.length + 1;
+    currentSets.add({'index': newIndex, 'reps': '', 'weight': '', 'notes': ''});
+    exercise['sets'] = currentSets;
+  }
+
+  void removeSet(Map<String, dynamic> exercise, Map<String, dynamic> set) {
+    final currentSets = exercise['sets'];
+    currentSets.remove(set);
   }
 
   void setEndTime(String time) {
@@ -459,23 +431,6 @@ class WorkoutLoggingFormController extends GetxController {
 
   void reset() {
     exercises.clear();
-    sets.clear();
     endTime.value = '';
   }
-}
-
-class ExerciseData {
-  final String name;
-
-  ExerciseData({required this.name});
-}
-
-class SetData {
-  final int index;
-  String reps = '';
-  String weight = '';
-  String notes = '';
-
-  SetData(
-      {required this.index, this.reps = '', this.weight = '', this.notes = ''});
 }

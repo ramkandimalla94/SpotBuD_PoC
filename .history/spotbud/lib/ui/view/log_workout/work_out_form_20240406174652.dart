@@ -322,31 +322,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
 
     // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
     Map<String, dynamic> workoutData = {
       'date': DateTimeUtils.getFormattedDate(_selectedDate),
       'startTime': DateTimeUtils.getFormattedTime(DateTime(
@@ -359,8 +334,27 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           ? controller.endTime.value
           : DateTimeUtils.getFormattedTime(
               DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
+      'exercises': [], // Initialize exercises list
     };
+
+    // Populate exercises data
+    List<Map<String, dynamic>> exercisesData = [];
+
+    for (var exercise in controller.exercises) {
+      final setsData = controller
+          .getSets(exercise)
+          .map((set) => {
+                'reps': set.reps,
+                'weight': set.weight,
+                'notes': set.notes,
+              })
+          .toList();
+      exercisesData.add({
+        'name': exercise.name,
+        'sets': setsData,
+      });
+    }
+    workoutData['exercises'] = exercisesData;
 
     // Save workout data to Firestore
     userDataViewModel.saveWorkoutLog(workoutData);

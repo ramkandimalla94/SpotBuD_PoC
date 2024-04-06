@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
+import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
 class HistoryView extends StatefulWidget {
   @override
@@ -14,30 +16,10 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late Stream<QuerySnapshot> _workoutLogsStream;
+  late Stream<QuerySnapshot> _workoutLogsStream = Stream<QuerySnapshot>.empty();
+  late List<DateTime> _dates = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchWorkoutLogs();
-  }
-
-  Future<void> _fetchWorkoutLogs() async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        _workoutLogsStream = _firestore
-            .collection('data')
-            .doc(userId)
-            .collection('workouts')
-            .orderBy('timestamp', descending: true)
-            .snapshots();
-      }
-    } catch (e) {
-      print('Error fetching workout logs: $e');
-    }
-  }
+  final userDataController = Get.find<UserDataViewModel>();
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +53,11 @@ class _HistoryViewState extends State<HistoryView> {
             );
           } else {
             final workoutLogs = snapshot.data!.docs;
-            List<DateTime> dates = _extractDates(workoutLogs);
+            _dates = _extractDates(workoutLogs);
             return ListView.builder(
-              itemCount: dates.length,
+              itemCount: _dates.length,
               itemBuilder: (context, index) {
-                final date = dates[index];
+                final date = _dates[index];
                 final dateFormatted = DateFormat('yyyy-MM-dd').format(date);
                 final workouts = _filterWorkoutsByDate(workoutLogs, date);
 
@@ -100,11 +82,12 @@ class _HistoryViewState extends State<HistoryView> {
                       ExpansionTile(
                         trailing: Icon(
                           Icons.arrow_drop_down,
-                          color: AppColors.backgroundColor,
+                          color: AppColors
+                              .backgroundColor, // Change the color to your desired color
                         ),
                         title: Text(
-                          'Start time:' +
-                              (workouts[i]['startTime'] as String? ?? 'N/A'),
+                          'Start time:' + workouts[i]['startTime'] as String? ??
+                              'N/A',
                           style: AppTheme.secondaryText(
                               size: 18,
                               fontWeight: FontWeight.w500,
@@ -195,7 +178,8 @@ class _HistoryViewState extends State<HistoryView> {
       return ExpansionTile(
         trailing: Icon(
           Icons.arrow_drop_down,
-          color: AppColors.acccentColor,
+          color:
+              AppColors.acccentColor, // Change the color to your desired color
         ),
         title: Text(
           exerciseName,
