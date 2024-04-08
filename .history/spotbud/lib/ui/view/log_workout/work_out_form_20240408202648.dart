@@ -293,12 +293,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         var workoutData =
                             filteredDocs[index].data() as Map<String, dynamic>;
                         return ListTile(
-                          title: Text('Reps: ' +
+                          title: Text('Reps' +
                                   workoutData['exercises'][0]['sets'][0]
-                                      ['reps'] +
-                                  '  Weights: ' +
-                                  workoutData['exercises'][0]['sets'][0]
-                                      ['weight'] ??
+                                      ['reps'] ??
                               'Data Not Available'),
                           // Display other workout details here
                         );

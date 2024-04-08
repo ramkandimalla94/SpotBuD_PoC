@@ -296,7 +296,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                           title: Text('Reps: ' +
                                   workoutData['exercises'][0]['sets'][0]
                                       ['reps'] +
-                                  '  Weights: ' +
+                                  'Weights: ' +
                                   workoutData['exercises'][0]['sets'][0]
                                       ['weight'] ??
                               'Data Not Available'),
