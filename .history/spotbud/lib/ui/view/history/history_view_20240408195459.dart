@@ -201,14 +201,7 @@ class _HistoryViewState extends State<HistoryView> {
           child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Body Part',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Body Part'),
     );
   }
 

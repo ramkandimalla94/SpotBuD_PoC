@@ -1,12 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:spotbud/ui/view/log_workout/machine_selection_view.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
-import 'package:spotbud/ui/widgets/text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
 class WorkoutLoggingForm extends StatefulWidget {
@@ -15,10 +13,19 @@ class WorkoutLoggingForm extends StatefulWidget {
 }
 
 class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
-  final WorkoutLoggingFormController controller =
-      Get.put(WorkoutLoggingFormController());
+  late WorkoutLoggingFormController controller;
 
-  final UserDataViewModel userDataViewModel = Get.find();
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(WorkoutLoggingFormController());
+  }
+
+  @override
+  void dispose() {
+    Get.delete<WorkoutLoggingFormController>();
+    super.dispose();
+  }
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedStartTime = TimeOfDay.now();
@@ -92,23 +99,11 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                 ],
               ),
               SizedBox(height: 20),
-              Center(
-                child: Row(
-                  children: [
-                    buildWorkoutButton(
-                      width: 175,
-                      text: 'Add Exercise',
-                      onPressed: () => _openBodyPartSelection(),
-                    ),
-                    // //SizedBox(width: 20),
-                    // buildWorkoutButton(
-                    //   width: 175,
-                    //   text: 'History',
-                    //   onPressed: () => _showExerciseHistoryDialog(),
-                    // ),
-                  ],
-                ),
+              buildWorkoutButton(
+                text: 'Add Exercise',
+                onPressed: () => _openBodyPartSelection(),
               ),
+              SizedBox(height: 20),
               Obx(() => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -128,19 +123,19 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                 Spacer(),
                                 IconButton(
                                   icon: Icon(
+                                    Icons.info_outline,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () =>
+                                      _openPreviousLogData(exercise),
+                                ),
+                                IconButton(
+                                  icon: Icon(
                                     Icons.cancel,
                                     color: Colors.white,
                                   ),
                                   onPressed: () =>
                                       controller.removeExercise(exercise),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.info,
-                                    color: Colors.white,
-                                  ),
-                                  onPressed: () =>
-                                      _showExerciseHistoryDialog(exercise.name),
                                 ),
                               ],
                             ),
@@ -235,201 +230,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     );
   }
 
-  Future<void> _showExerciseHistoryDialog(String machineName) async {
-    // Get the current user ID
-    String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId != null) {
-      // Extract machine name from exercise name
-      List<String> parts = machineName.split(' - ');
-      if (parts.length != 2) {
-        print('Invalid machine name format: $machineName');
-        return;
-      }
-      String machine = parts[1]; // Get the part after ' - '
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Exercise History - $machineName'),
-            content: Container(
-              width: double.maxFinite,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('data')
-                    .doc(userId)
-                    .collection('workouts')
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: LoadingIndicator());
-                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No workout history available.'));
-                  } else if (snapshot.hasError) {
-                    print('Error fetching workout history: ${snapshot.error}');
-                    return Center(
-                        child: Text('Error fetching workout history.'));
-                  } else {
-                    var filteredDocs = snapshot.data!.docs.where((doc) {
-                      var exercises = doc['exercises'];
-                      if (exercises != null) {
-                        return exercises
-                            .any((exercise) => exercise['machine'] == machine);
-                      }
-                      return false;
-                    }).toList();
-
-                    if (filteredDocs.isEmpty) {
-                      return Center(
-                          child: Text(
-                              'No workout history available for $machine.'));
-                    }
-
-                    return ListView.builder(
-                      itemCount: filteredDocs.length,
-                      itemBuilder: (context, index) {
-                        var workoutData =
-                            filteredDocs[index].data() as Map<String, dynamic>;
-                        return ListTile(
-                          title: Text(workoutData['exercises'][0]['sets'][0]
-                                  ['reps'] ??
-                              'Data Not Available'),
-                          // Display other workout details here
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // Handle case where user is not logged in
-      print('User is not logged in');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> getLoggedDetailsByMachine(
-      String machineName) async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-            .instance
-            .collection('data')
-            .doc(userId)
-            .collection('workouts')
-            .where('exercises', arrayContains: {'machine': machineName}).get();
-
-        List<Map<String, dynamic>> loggedDetails = [];
-        snapshot.docs.forEach((doc) {
-          loggedDetails.add(doc.data());
-        });
-        return loggedDetails;
-      } else {
-        throw Exception('User is not logged in');
-      }
-    } catch (e) {
-      throw Exception('Error fetching logged details: $e');
-    }
-  }
-
-  void _openExerciseHistoryDialog(String machineName) async {
-    // Get the current user ID
-    String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId != null) {
-      // Extract machine name from exercise name
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Exercise History - $machineName'),
-            content: Container(
-              width: double.maxFinite,
-              child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('data')
-                    .doc(userId)
-                    .collection('workouts')
-                    .orderBy('timestamp',
-                        descending:
-                            true) // Order by timestamp in descending order
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: LoadingIndicator());
-                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No workout history available.'));
-                  } else if (snapshot.hasError) {
-                    print('Error fetching workout history: ${snapshot.error}');
-                    return Center(
-                        child: Text('Error fetching workout history.'));
-                  } else {
-                    // Filter the documents based on the exercise
-                    var filteredDocs = snapshot.data!.docs.where((doc) {
-                      var exercises = doc['exercises'];
-                      if (exercises != null) {
-                        // Check if any exercise in the document matches the specific exercise
-                        return exercises.any(
-                            (exercise) => exercise['machine'] == machineName);
-                      }
-                      return false;
-                    }).toList();
-
-                    if (filteredDocs.isEmpty) {
-                      return Center(
-                          child: Text(
-                              'No workout history available for $machineName.'));
-                    }
-
-                    return ListView.builder(
-                      itemCount: filteredDocs.length,
-                      itemBuilder: (context, index) {
-                        var workoutData =
-                            filteredDocs[index].data() as Map<String, dynamic>;
-                        return ListTile(
-                          title: Text(
-                              workoutData['notes'] ?? 'Data Not Available'),
-                          // Display other workout details here
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Close'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // Handle case where user is not logged in
-      print('User is not logged in');
-    }
-  }
-
   Future<bool> _onBackPressed() async {
     if (controller.exercises.isNotEmpty) {
       var result = await Get.dialog(
@@ -494,7 +294,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
   }
 
   void _saveWorkout() {
-    if (controller.exercises.isEmpty) {
+       if (controller.exercises.isEmpty) {
       Get.snackbar(
         'Error',
         'Please add at least one exercise before saving.',
@@ -503,99 +303,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
         colorText: Colors.white,
       );
       return;
-    }
-
-    // Perform validation for each set
-    for (var exercise in controller.exercises) {
-      final sets = controller.getSets(exercise);
-      for (var set in sets) {
-        if (set.reps.isEmpty || set.weight.isEmpty) {
-          Get.snackbar(
-            'Error',
-            'Please fill in both reps and weight for all sets.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.black,
-            colorText: Colors.white,
-          );
-          return;
-        }
-      }
-    }
-
-    // Remove exercises with no sets
-    controller.exercises
-        .removeWhere((exercise) => controller.getSets(exercise).isEmpty);
-
-    // Check if there are no exercises with sets
-    if (controller.exercises.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please add at least one exercise with sets before saving.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.black,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
-    Map<String, dynamic> workoutData = {
-      'date': DateTimeUtils.getFormattedDate(_selectedDate),
-      'startTime': DateTimeUtils.getFormattedTime(DateTime(
-          _selectedDate.year,
-          _selectedDate.month,
-          _selectedDate.day,
-          _selectedStartTime.hour,
-          _selectedStartTime.minute)),
-      'endTime': controller.endTime.value.isNotEmpty
-          ? controller.endTime.value
-          : DateTimeUtils.getFormattedTime(
-              DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
-    };
-
-    // Save workout data to Firestore
-    userDataViewModel.saveWorkoutLog(workoutData);
-
-    Get.snackbar(
-      'Success',
-      'Workout saved successfully.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.blue,
-      colorText: Colors.white,
-    );
-    // Reset the form
-    controller.reset();
-
-    // Redirect to the main screen after a short delay
-    Future.delayed(Duration(milliseconds: 500), () {
-      Get.toNamed('/mainscreen');
-    });
+    // Code for saving workout
   }
 
   void _openBodyPartSelection() async {
@@ -608,6 +316,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
         controller.addExercise(exercise);
       }
     }
+  }
+
+  void _openPreviousLogData(ExerciseData exercise) {
+    // Code for displaying previous log data
   }
 }
 
@@ -627,7 +339,6 @@ class DateTimeUtils {
 
 class WorkoutLoggingFormController extends GetxController {
   var exercises = <ExerciseData>[].obs;
-  var endTime = ''.obs;
   var sets = <ExerciseData, List<SetData>>{}.obs;
 
   void addExercise(ExerciseData exercise) {
@@ -668,16 +379,6 @@ class WorkoutLoggingFormController extends GetxController {
   void removeExercise(ExerciseData exercise) {
     exercises.remove(exercise);
     sets.remove(exercise);
-  }
-
-  void setEndTime(String time) {
-    endTime.value = time;
-  }
-
-  void reset() {
-    exercises.clear();
-    sets.clear();
-    endTime.value = '';
   }
 }
 

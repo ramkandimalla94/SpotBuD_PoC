@@ -118,7 +118,6 @@ class _HistoryViewState extends State<HistoryView> {
           } else {
             final workoutLogs = snapshot.data!.docs;
             List<DateTime> dates = _extractDates(workoutLogs);
-            List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
             return Column(
               children: [
                 Row(
@@ -132,9 +131,9 @@ class _HistoryViewState extends State<HistoryView> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: filteredDates.length,
+                    itemCount: dates.length,
                     itemBuilder: (context, index) {
-                      final date = filteredDates[index];
+                      final date = dates[index];
                       final dateFormatted =
                           DateFormat('yyyy-MM-dd').format(date);
                       final workouts = _filterWorkoutsByDate(workoutLogs, date);
@@ -201,14 +200,7 @@ class _HistoryViewState extends State<HistoryView> {
           child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Body Part',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Body Part'),
     );
   }
 
@@ -230,28 +222,11 @@ class _HistoryViewState extends State<HistoryView> {
       items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-          ),
+          child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Machine',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Machine'),
     );
-  }
-
-  List<DateTime> _filteredDates(
-      List<DateTime> allDates, List<DocumentSnapshot> logs) {
-    return allDates.where((date) {
-      final filteredWorkouts = _filterWorkoutsByDate(logs, date);
-      return filteredWorkouts.isNotEmpty;
-    }).toList();
   }
 
   List<DateTime> _extractDates(List<DocumentSnapshot> logs) {

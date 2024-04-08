@@ -24,6 +24,7 @@ class _HistoryViewState extends State<HistoryView> {
   void initState() {
     super.initState();
     _fetchWorkoutLogs();
+    _resetFilters();
   }
 
   void _resetFilters() {
@@ -52,10 +53,8 @@ class _HistoryViewState extends State<HistoryView> {
             .collection('workouts')
             .get();
 
-        setState(() {
-          _loggedBodyParts = _extractLoggedBodyParts(snapshot.docs);
-          _loggedMachines = _extractLoggedMachines(snapshot.docs);
-        });
+        _loggedBodyParts = _extractLoggedBodyParts(snapshot.docs);
+        _loggedMachines = _extractLoggedMachines(snapshot.docs);
       }
     } catch (e) {
       print('Error fetching workout logs: $e');
@@ -111,6 +110,10 @@ class _HistoryViewState extends State<HistoryView> {
             return Center(
               child: LoadingIndicator(),
             );
+          } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No workout logs available.'),
+            );
           } else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
@@ -118,7 +121,6 @@ class _HistoryViewState extends State<HistoryView> {
           } else {
             final workoutLogs = snapshot.data!.docs;
             List<DateTime> dates = _extractDates(workoutLogs);
-            List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
             return Column(
               children: [
                 Row(
@@ -126,15 +128,16 @@ class _HistoryViewState extends State<HistoryView> {
                     Expanded(child: _buildBodyPartFilter()),
                     SizedBox(width: 10),
                     Expanded(
-                      child: _buildMachineFilter(_loggedMachines),
+                      child: _buildMachineFilter(
+                          _loggedMachines, _loggedBodyParts),
                     ),
                   ],
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: filteredDates.length,
+                    itemCount: dates.length,
                     itemBuilder: (context, index) {
-                      final date = filteredDates[index];
+                      final date = dates[index];
                       final dateFormatted =
                           DateFormat('yyyy-MM-dd').format(date);
                       final workouts = _filterWorkoutsByDate(workoutLogs, date);
@@ -201,23 +204,18 @@ class _HistoryViewState extends State<HistoryView> {
           child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Body Part',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Body Part'),
     );
   }
 
-  Widget _buildMachineFilter(List<String> loggedMachines) {
+  Widget _buildMachineFilter(
+      List<String> loggedMachines, List<String> loggedBodyParts) {
     List<String> machinesToShow = _selectedBodyPart == null
         ? loggedMachines
         : loggedMachines.where((machine) {
-            return _loggedBodyParts.contains(_selectedBodyPart) &&
-                loggedMachines.contains(machine);
+            // Check if the machine is related to the selected body part
+            return loggedBodyParts.contains(_selectedBodyPart!) &&
+                _loggedMachines.contains(machine);
           }).toList();
 
     return DropdownButton<String>(
@@ -230,28 +228,11 @@ class _HistoryViewState extends State<HistoryView> {
       items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-          ),
+          child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Machine',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Machine'),
     );
-  }
-
-  List<DateTime> _filteredDates(
-      List<DateTime> allDates, List<DocumentSnapshot> logs) {
-    return allDates.where((date) {
-      final filteredWorkouts = _filterWorkoutsByDate(logs, date);
-      return filteredWorkouts.isNotEmpty;
-    }).toList();
   }
 
   List<DateTime> _extractDates(List<DocumentSnapshot> logs) {

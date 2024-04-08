@@ -240,14 +240,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
-      // Extract machine name from exercise name
-      List<String> parts = machineName.split(' - ');
-      if (parts.length != 2) {
-        print('Invalid machine name format: $machineName');
-        return;
-      }
-      String machine = parts[1]; // Get the part after ' - '
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -275,8 +267,8 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                     var filteredDocs = snapshot.data!.docs.where((doc) {
                       var exercises = doc['exercises'];
                       if (exercises != null) {
-                        return exercises
-                            .any((exercise) => exercise['machine'] == machine);
+                        return exercises.any(
+                            (exercise) => exercise['machine'] == machineName);
                       }
                       return false;
                     }).toList();
@@ -284,7 +276,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                     if (filteredDocs.isEmpty) {
                       return Center(
                           child: Text(
-                              'No workout history available for $machine.'));
+                              'No workout history available for $machineName.'));
                     }
 
                     return ListView.builder(
@@ -293,9 +285,8 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         var workoutData =
                             filteredDocs[index].data() as Map<String, dynamic>;
                         return ListTile(
-                          title: Text(workoutData['exercises'][0]['sets'][0]
-                                  ['reps'] ??
-                              'Data Not Available'),
+                          title:
+                              Text(workoutData['Date'] ?? 'Data Not Available'),
                           // Display other workout details here
                         );
                       },

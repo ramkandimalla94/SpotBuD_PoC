@@ -201,14 +201,7 @@ class _HistoryViewState extends State<HistoryView> {
           child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Body Part',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Body Part'),
     );
   }
 
@@ -232,17 +225,11 @@ class _HistoryViewState extends State<HistoryView> {
           value: value,
           child: Text(
             value,
+            style: AppTheme.primaryText(color: AppColors.acccentColor),
           ),
         );
       }).toList(),
-      hint: Text(
-        'Select Machine',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Machine'),
     );
   }
 

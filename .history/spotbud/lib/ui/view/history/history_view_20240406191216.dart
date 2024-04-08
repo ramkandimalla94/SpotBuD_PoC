@@ -26,13 +26,6 @@ class _HistoryViewState extends State<HistoryView> {
     _fetchWorkoutLogs();
   }
 
-  void _resetFilters() {
-    setState(() {
-      _selectedBodyPart = null;
-      _selectedMachine = null;
-    });
-  }
-
   Future<void> _fetchWorkoutLogs() async {
     try {
       User? user = _auth.currentUser;
@@ -52,10 +45,16 @@ class _HistoryViewState extends State<HistoryView> {
             .collection('workouts')
             .get();
 
-        setState(() {
-          _loggedBodyParts = _extractLoggedBodyParts(snapshot.docs);
-          _loggedMachines = _extractLoggedMachines(snapshot.docs);
-        });
+        _loggedBodyParts = _extractLoggedBodyParts(snapshot.docs);
+        _loggedMachines = _extractLoggedMachines(snapshot.docs);
+
+        // Set initial selected body part and machine
+        if (_loggedBodyParts.isNotEmpty) {
+          _selectedBodyPart = _loggedBodyParts[0];
+        }
+        if (_loggedMachines.isNotEmpty) {
+          _selectedMachine = _loggedMachines[0];
+        }
       }
     } catch (e) {
       print('Error fetching workout logs: $e');
@@ -98,43 +97,39 @@ class _HistoryViewState extends State<HistoryView> {
         title: Text(
           'Workout History',
           style: AppTheme.secondaryText(
-            size: 22,
-            fontWeight: FontWeight.w500,
-            color: AppColors.acccentColor,
-          ),
+              size: 22,
+              fontWeight: FontWeight.w500,
+              color: AppColors.acccentColor),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _workoutLogsStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: LoadingIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            final workoutLogs = snapshot.data!.docs;
-            List<DateTime> dates = _extractDates(workoutLogs);
-            List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
-            return Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(child: _buildBodyPartFilter()),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: _buildMachineFilter(_loggedMachines),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredDates.length,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildFilters(),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _workoutLogsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: LoadingIndicator(),
+                  );
+                } else if (snapshot.data == null ||
+                    snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text('No workout logs available.'),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  final workoutLogs = snapshot.data!.docs;
+                  List<DateTime> dates = _extractDates(workoutLogs);
+                  return ListView.builder(
+                    itemCount: dates.length,
                     itemBuilder: (context, index) {
-                      final date = filteredDates[index];
+                      final date = dates[index];
                       final dateFormatted =
                           DateFormat('yyyy-MM-dd').format(date);
                       final workouts = _filterWorkoutsByDate(workoutLogs, date);
@@ -144,12 +139,14 @@ class _HistoryViewState extends State<HistoryView> {
                           Icons.arrow_drop_down,
                           color: AppColors.acccentColor,
                         ),
-                        title: Text(
-                          DateFormat('yyyy-MM-dd').format(date),
-                          style: AppTheme.secondaryText(
-                            size: 22,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.acccentColor,
+                        title: DropdownMenuItem<DateTime>(
+                          value: date,
+                          child: Text(
+                            DateFormat('yyyy-MM-dd').format(date),
+                            style: AppTheme.secondaryText(
+                                size: 22,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.acccentColor),
                           ),
                         ),
                         children: [
@@ -164,10 +161,9 @@ class _HistoryViewState extends State<HistoryView> {
                                     (workouts[i]['startTime'] as String? ??
                                         'N/A'),
                                 style: AppTheme.secondaryText(
-                                  size: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.backgroundColor,
-                                ),
+                                    size: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.backgroundColor),
                               ),
                               children: _buildWorkoutDetails(
                                   workouts[i]['exercises']),
@@ -175,13 +171,23 @@ class _HistoryViewState extends State<HistoryView> {
                         ],
                       );
                     },
-                  ),
-                ),
-              ],
-            );
-          }
-        },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Row(
+      children: [
+        _buildBodyPartFilter(),
+        SizedBox(width: 10),
+        _buildMachineFilter(),
+      ],
     );
   }
 
@@ -191,8 +197,6 @@ class _HistoryViewState extends State<HistoryView> {
       onChanged: (newValue) {
         setState(() {
           _selectedBodyPart = newValue;
-          // Reset selected machine when body part changes
-          _selectedMachine = null;
         });
       },
       items: _loggedBodyParts.map<DropdownMenuItem<String>>((String value) {
@@ -201,25 +205,11 @@ class _HistoryViewState extends State<HistoryView> {
           child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Body Part',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Body Part'),
     );
   }
 
-  Widget _buildMachineFilter(List<String> loggedMachines) {
-    List<String> machinesToShow = _selectedBodyPart == null
-        ? loggedMachines
-        : loggedMachines.where((machine) {
-            return _loggedBodyParts.contains(_selectedBodyPart) &&
-                loggedMachines.contains(machine);
-          }).toList();
-
+  Widget _buildMachineFilter() {
     return DropdownButton<String>(
       value: _selectedMachine,
       onChanged: (newValue) {
@@ -227,31 +217,14 @@ class _HistoryViewState extends State<HistoryView> {
           _selectedMachine = newValue;
         });
       },
-      items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
+      items: _loggedMachines.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-          ),
+          child: Text(value),
         );
       }).toList(),
-      hint: Text(
-        'Select Machine',
-        style: AppTheme.primaryText(
-          color: AppColors.acccentColor,
-          size: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      hint: Text('Select Machine'),
     );
-  }
-
-  List<DateTime> _filteredDates(
-      List<DateTime> allDates, List<DocumentSnapshot> logs) {
-    return allDates.where((date) {
-      final filteredWorkouts = _filterWorkoutsByDate(logs, date);
-      return filteredWorkouts.isNotEmpty;
-    }).toList();
   }
 
   List<DateTime> _extractDates(List<DocumentSnapshot> logs) {
@@ -265,41 +238,18 @@ class _HistoryViewState extends State<HistoryView> {
     return dates.toList()..sort((a, b) => b.compareTo(a));
   }
 
-  List<DocumentSnapshot<Object?>> _filterWorkoutsByDate(
-      List<DocumentSnapshot<Object?>> logs, DateTime date) {
-    return logs.where((log) {
-      final timestamp = log['timestamp'] as Timestamp;
-      final logDate =
-          DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
-      return DateTime(logDate.year, logDate.month, logDate.day) ==
-          DateTime(date.year, date.month, date.day);
-    }).where((log) {
-      // Filter based on selected body part
-      if (_selectedBodyPart != null) {
-        final List<dynamic>? exercises = log['exercises'];
-        if (exercises != null) {
-          return exercises
-              .any((exercise) => exercise['bodyPart'] == _selectedBodyPart);
-        } else {
-          return false;
-        }
-      } else {
-        return true;
-      }
-    }).where((log) {
-      // Filter based on selected machine
-      if (_selectedMachine != null) {
-        final List<dynamic>? exercises = log['exercises'];
-        if (exercises != null) {
-          return exercises
-              .any((exercise) => exercise['machine'] == _selectedMachine);
-        } else {
-          return false;
-        }
-      } else {
-        return true;
-      }
-    }).toList();
+  List<Map<String, dynamic>> _filterWorkoutsByDate(
+      List<DocumentSnapshot> logs, DateTime date) {
+    return logs
+        .where((log) {
+          final timestamp = log['timestamp'] as Timestamp;
+          final logDate =
+              DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
+          return DateTime(logDate.year, logDate.month, logDate.day) ==
+              DateTime(date.year, date.month, date.day);
+        })
+        .map((log) => log.data() as Map<String, dynamic>)
+        .toList();
   }
 
   List<Widget> _buildWorkoutDetails(List<dynamic>? exercises) {
