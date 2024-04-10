@@ -128,7 +128,7 @@ class _ProfileViewState extends State<ProfileView> {
           Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: buildLoginButton(
+            child: buildWorkoutButton(
               text: "Log Out",
               onPressed: () {
                 _logout(context);

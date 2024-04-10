@@ -93,7 +93,7 @@ class _HomeViewState extends State<HomeView> {
                   height: 100, // Adjust height as needed
                   width: 100, // Adjust width as needed
                 ),
-                SizedBox(width: 20),
+                SizedBox(width: 10),
               ],
             ),
             Padding(

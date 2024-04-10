@@ -180,8 +180,6 @@ class MachineSelectionScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 8.0),
                     Obx(() => Checkbox(
-                          checkColor: AppColors.acccentColor,
-                          activeColor: AppColors.primaryColor,
                           value: controller.singleLegOrArm.value,
                           onChanged: (value) {
                             controller.singleLegOrArm.value = value ?? false;

@@ -39,39 +39,11 @@ class UserDataViewModel extends GetxController {
           feet.value = data['feet'] ?? 0;
           inches.value = data['inches'] ?? 0;
           gender.value = Gender.values[data['gender'] ?? Gender.Male.index];
-          hasInitialData.value = data['hasInitialData'] ??
-              false; // Fetch hasInitialData from Firestore
+          hasInitialData.value = true;
         }
       }
     } catch (e) {
       print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> saveBodyDetails(double weight, int feet, int inches,
-      Gender gender, bool hasInitialData) async {
-    try {
-      User? user = _auth.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-        await _firestore.collection('data').doc(userId).update({
-          'weight': weight,
-          'feet': feet,
-          'inches': inches,
-          'gender': gender.index, // Save index of the selected gender
-          'hasInitialData': hasInitialData, // Save hasInitialData to Firestore
-        });
-        // Update observables
-        this.weight.value = weight;
-        this.feet.value = feet;
-        this.inches.value = inches;
-        this.gender.value = gender;
-        this.hasInitialData.value =
-            hasInitialData; // Update hasInitialData observable
-        print('User data saved successfully');
-      }
-    } catch (e) {
-      print('Error saving user data: $e');
     }
   }
 
@@ -130,6 +102,31 @@ class UserDataViewModel extends GetxController {
       }
     } catch (e) {
       print('Error fetching user data: $e');
+    }
+  }
+
+  Future<void> saveBodyDetails(
+      double weight, int feet, int inches, Gender gender) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        await _firestore.collection('data').doc(userId).update({
+          'weight': weight,
+          'feet': feet,
+          'inches': inches,
+          'gender': gender.index, // Save index of the selected gender
+        });
+        // Update observables
+        this.weight.value = weight;
+        this.feet.value = feet;
+        this.inches.value = inches;
+        this.gender.value = gender;
+        hasInitialData.value = true;
+        print('User data saved successfully');
+      }
+    } catch (e) {
+      print('Error saving user data: $e');
     }
   }
 

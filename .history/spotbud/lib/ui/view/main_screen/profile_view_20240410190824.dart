@@ -1,35 +1,7 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:spotbud/ui/widgets/assets.dart';
-import 'package:spotbud/ui/widgets/button.dart';
-import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
-import 'package:spotbud/ui/widgets/text.dart';
-import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
-
-class ProfileView extends StatefulWidget {
-  @override
-  _ProfileViewState createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
+class ProfileView extends StatelessWidget {
+  final UserDataViewModel _userDataViewModel = Get.find();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
-  }
-
-  Future<void> _fetchUserData() async {
-    await _userDataViewModel.fetchUserData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,19 +50,38 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Obx(
-                      () => Text(
-                        'Email: ${_userDataViewModel.email.value}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      ),
+                    // Fetch and display email from FirebaseAuth currentUser
+                    FutureBuilder<User?>(
+                      future: Future.value(_auth.currentUser),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasData && snapshot.data != null) {
+                            String? email = snapshot.data!.email;
+                            return Text(
+                              'Email: $email',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: AppColors.secondaryColor,
+                              ),
+                            );
+                          } else {
+                            return Text(
+                              'Email: Not available',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.red,
+                              ),
+                            );
+                          }
+                        } else {
+                          return LoadingIndicator();
+                        }
+                      },
                     ),
                     SizedBox(height: 10),
                     Obx(
                       () => Text(
-                        'Height: ${_userDataViewModel.feet.value} ft ${_userDataViewModel.inches.value} in',
+                        'Height: ${_userDataViewModel.heightFeet.value} ft ${_userDataViewModel.heightInches.value} in',
                         style: TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
@@ -108,18 +99,15 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Obx(() {
-                      String genderString = _userDataViewModel.gender.value
-                          .toString()
-                          .split('.')[1];
-                      return Text(
-                        'Gender: $genderString',
+                    Obx(
+                      () => Text(
+                        'Gender: ${_userDataViewModel.gender.value}',
                         style: TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
                         ),
-                      );
-                    })
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -128,7 +116,7 @@ class _ProfileViewState extends State<ProfileView> {
           Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: buildLoginButton(
+            child: buildWorkoutButton(
               text: "Log Out",
               onPressed: () {
                 _logout(context);

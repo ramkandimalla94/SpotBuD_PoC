@@ -136,7 +136,6 @@ class MachineSelectionScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.0),
                 DropdownButtonFormField<String>(
-                  dropdownColor: AppColors.acccentColor,
                   value: selectedExerciseType,
                   decoration: InputDecoration(
                     labelText: 'Exercise Type',
@@ -180,8 +179,6 @@ class MachineSelectionScreen extends StatelessWidget {
                     ),
                     SizedBox(width: 8.0),
                     Obx(() => Checkbox(
-                          checkColor: AppColors.acccentColor,
-                          activeColor: AppColors.primaryColor,
                           value: controller.singleLegOrArm.value,
                           onChanged: (value) {
                             controller.singleLegOrArm.value = value ?? false;

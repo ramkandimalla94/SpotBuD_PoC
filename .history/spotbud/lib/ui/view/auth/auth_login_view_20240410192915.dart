@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/auth_viewmodel.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
@@ -127,59 +126,44 @@ class LoginView extends StatelessWidget {
                 children: [
                   Container(
                     height: 70,
-                    child: Obx(() {
-                      return viewModel.isLoading.value
-                          ? LoadingIndicator() // Show circular progress indicator if loading
-                          : IconButton(
-                              icon: Image.asset(AppAssets.google),
-                              onPressed: () {
-                                // Set loading state while fetching user data
-                                viewModel.setLoading(true);
-
-                                // Fetch user data before sign-in
-                                userModel.fetchUserData().then((_) {
-                                  // Sign-in with Google after fetching user data
-                                  viewModel
-                                      .signInWithGoogle()
-                                      .then((userCredential) {
-                                    // Reset loading state after sign-in attempt
-                                    viewModel.setLoading(false);
-
-                                    if (userCredential != null) {
-                                      if (userModel.hasInitialData.value) {
-                                        // If the user has provided details, redirect to the home screen
-                                        Get.toNamed('/mainscreen');
-                                      } else {
-                                        // If the user hasn't provided details, redirect to the body detail page
-                                        Get.toNamed('/authbodydetail');
-                                      }
-                                    } else {
-                                      Get.snackbar(
-                                        'Sign-In Error',
-                                        'Failed to sign in. Please try again later.',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: Colors.red,
-                                        colorText: Colors.white,
-                                      ); // Handle sign-in failure
-                                    }
-                                  });
-                                }).catchError((error) {
-                                  // Reset loading state if an error occurs during fetching user data
-                                  viewModel.setLoading(false);
-
-                                  // Error handling if fetching user data fails
-                                  print('Error fetching user data: $error');
-                                  Get.snackbar(
-                                    'Error',
-                                    'Failed to fetch user data. Please try again later.',
-                                    snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor: Colors.red,
-                                    colorText: Colors.white,
-                                  );
-                                });
-                              },
-                            );
-                    }),
+                    child: IconButton(
+                      icon: Image.asset(AppAssets.google),
+                      onPressed: () {
+                        // Fetch user data before sign-in
+                        userModel.fetchUserData().then((_) {
+                          // Sign-in with Google after fetching user data
+                          viewModel.signInWithGoogle().then((userCredential) {
+                            if (userCredential != null) {
+                              if (userModel.hasInitialData.value) {
+                                // If the user has provided details, redirect to the home screen
+                                Get.toNamed('/mainscreen');
+                              } else {
+                                // If the user hasn't provided details, redirect to the body detail page
+                                Get.toNamed('/authbodydetail');
+                              }
+                            } else {
+                              Get.snackbar(
+                                'Sign-In Error',
+                                'Failed to sign in. Please try again later.',
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                              ); // Handle sign-in failure
+                            }
+                          });
+                        }).catchError((error) {
+                          // Error handling if fetching user data fails
+                          print('Error fetching user data: $error');
+                          Get.snackbar(
+                            'Error',
+                            'Failed to fetch user data. Please try again later.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                          );
+                        });
+                      },
+                    ),
                   ),
                 ],
               )

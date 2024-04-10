@@ -11,25 +11,10 @@ import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
-class ProfileView extends StatefulWidget {
-  @override
-  _ProfileViewState createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
+class ProfileView extends StatelessWidget {
+  final UserDataViewModel _nameViewModel = Get.find();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
-  }
-
-  Future<void> _fetchUserData() async {
-    await _userDataViewModel.fetchUserData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,61 +42,72 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                         Spacer(),
                         IconButton(
-                          onPressed: () {
-                            Get.toNamed('/bodydetail');
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            color: AppColors.backgroundColor,
-                          ),
-                        )
+                            onPressed: () {
+                              Get.toNamed('/bodydetail');
+                            },
+                            icon: Icon(
+                              Icons.edit,
+                              color: AppColors.backgroundColor,
+                            ))
                       ],
                     ),
                     SizedBox(height: 60),
-                    Obx(
-                      () => Text(
-                        'Name: ${_userDataViewModel.firstName.value} ${_userDataViewModel.lastName.value}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      ),
+                    Obx(() => Text(
+                          'Name: ${_nameViewModel.firstName.value} ${_nameViewModel.lastName.value}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.secondaryColor,
+                          ),
+                        )),
+                    SizedBox(height: 10),
+                    // Fetch and display email from FirebaseAuth currentUser
+                    FutureBuilder<User?>(
+                      future: Future.value(_auth.currentUser),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasData && snapshot.data != null) {
+                            String? email = snapshot.data!.email;
+                            return Text(
+                              'Email: $email',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: AppColors.secondaryColor,
+                              ),
+                            );
+                          } else {
+                            return Text(
+                              'Email: Not available',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.red,
+                              ),
+                            );
+                          }
+                        } else {
+                          return LoadingIndicator();
+                        }
+                      },
                     ),
                     SizedBox(height: 10),
-                    Obx(
-                      () => Text(
-                        'Email: ${_userDataViewModel.email.value}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      ),
-                    ),
+                    Obx(() => Text(
+                          'Height: ${_nameViewModel.feet.value} ft ${_nameViewModel.inches.value} in',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.secondaryColor,
+                          ),
+                        )),
                     SizedBox(height: 10),
-                    Obx(
-                      () => Text(
-                        'Height: ${_userDataViewModel.feet.value} ft ${_userDataViewModel.inches.value} in',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Obx(
-                      () => Text(
-                        'Weight: ${_userDataViewModel.weight.value} kg',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      ),
-                    ),
+                    Obx(() => Text(
+                          'Weight: ${_nameViewModel.weight.value} kg',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.secondaryColor,
+                          ),
+                        )),
                     SizedBox(height: 10),
                     Obx(() {
-                      String genderString = _userDataViewModel.gender.value
-                          .toString()
-                          .split('.')[1];
+                      String genderString =
+                          _nameViewModel.gender.value.toString().split('.')[1];
                       return Text(
                         'Gender: $genderString',
                         style: TextStyle(
@@ -126,14 +122,14 @@ class _ProfileViewState extends State<ProfileView> {
             ),
           ),
           Spacer(),
+
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: buildLoginButton(
-              text: "Log Out",
-              onPressed: () {
-                _logout(context);
-              },
-            ),
+            child: buildWorkoutButton(
+                text: "Log Out",
+                onPressed: () {
+                  _logout(context);
+                }),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 20),

@@ -10,16 +10,13 @@ import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
-
 class ProfileView extends StatefulWidget {
   @override
   _ProfileViewState createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final UserDataViewModel _userDataViewModel = Get.find();
 
   @override
   void initState() {
@@ -108,18 +105,15 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Obx(() {
-                      String genderString = _userDataViewModel.gender.value
-                          .toString()
-                          .split('.')[1];
-                      return Text(
-                        'Gender: $genderString',
+                    Obx(
+                      () => Text(
+                        'Gender: ${_userDataViewModel.gender.value}',
                         style: TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
                         ),
-                      );
-                    })
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -128,7 +122,7 @@ class _ProfileViewState extends State<ProfileView> {
           Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: buildLoginButton(
+            child: buildWorkoutButton(
               text: "Log Out",
               onPressed: () {
                 _logout(context);
@@ -147,6 +141,12 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
+  Future<void> _logout(BuildContext context) async {
+    // Logout implementation
+  }
+}
+
 
   Future<void> _logout(BuildContext context) async {
     try {

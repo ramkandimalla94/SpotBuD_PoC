@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/customalert.dart';
 import 'package:spotbud/viewmodels/auth_viewmodel.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
@@ -102,7 +101,7 @@ class SignUpView extends StatelessWidget {
               ),
               SizedBox(height: 40),
               Obx(() => authViewModel.isLoading.value
-                  ? LoadingIndicator()
+                  ? CircularProgressIndicator()
                   : buildLoginButton(
                       text: 'Sign Up',
                       onPressed: () async {

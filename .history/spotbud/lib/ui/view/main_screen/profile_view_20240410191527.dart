@@ -108,18 +108,17 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Obx(() {
-                      String genderString = _userDataViewModel.gender.value
-                          .toString()
-                          .split('.')[1];
+                    Obx(
+                       String genderString =
+                          _nameViewModel.gender.value.toString().split('.')[1];
                       return Text(
                         'Gender: $genderString',
                         style: TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
-                        ),
-                      );
-                    })
+                        ),,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -128,7 +127,7 @@ class _ProfileViewState extends State<ProfileView> {
           Spacer(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: buildLoginButton(
+            child: buildWorkoutButton(
               text: "Log Out",
               onPressed: () {
                 _logout(context);
