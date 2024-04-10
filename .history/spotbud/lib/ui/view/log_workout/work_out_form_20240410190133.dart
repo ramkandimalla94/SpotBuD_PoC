@@ -411,12 +411,12 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           title: Text(
             'Save Workout?',
             style: AppTheme.secondaryText(
-                size: 25,
+                size: 20,
                 color: AppColors.acccentColor,
                 fontWeight: FontWeight.bold),
           ),
           content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
+            'Do you want to save the workout before leaving?',
             style: AppTheme.secondaryText(
                 size: 15,
                 color: AppColors.backgroundColor,
@@ -427,25 +427,13 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
               onPressed: () {
                 Get.back(result: true); // Discard workout
               },
-              child: Text(
-                'Discard',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Discard'),
             ),
             TextButton(
               onPressed: () {
                 Get.back(result: false); // Cancel and stay on the log screen
               },
-              child: Text(
-                'Cancel',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Cancel'),
             ),
           ],
         ),

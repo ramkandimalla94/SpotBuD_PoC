@@ -191,7 +191,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          'kg', // Assuming the unit is always lbs
+                                          'lbs', // Assuming the unit is always lbs
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         IconButton(
@@ -251,7 +251,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       String machine = parts[1]; // Get the part after ' - '
 
       showModalBottomSheet(
-        backgroundColor: AppColors.primaryColor,
         context: context,
         builder: (BuildContext context) {
           return Container(
@@ -294,15 +293,8 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                           filteredDocs[index].data() as Map<String, dynamic>;
                       List<dynamic> exercises = workoutData['exercises'];
                       String date = workoutData['date'];
-                      String time = workoutData['startTime'];
                       return ExpansionTile(
-                        title: Text(
-                          date + '    Time: ' + time,
-                          style: AppTheme.secondaryText(
-                              size: 20,
-                              color: AppColors.acccentColor,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        title: Text(date),
                         initiallyExpanded: index == 0, // Expand the first tile
                         children: exercises.map<Widget>((exercise) {
                           List<dynamic> sets = exercise['sets'];
@@ -311,13 +303,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             String weight =
                                 set['weight'] ?? 'Data Not Available';
                             return ListTile(
-                              title: Text(
-                                'Reps: $reps  Weights: $weight kg',
-                                style: AppTheme.secondaryText(
-                                    size: 15,
-                                    color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              title: Text('Reps: $reps  Weights: $weight'),
                               // You can display other set details here
                             );
                           }).toList();
@@ -326,7 +312,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ...setWidgets,
-                              //Divider(), // Add a divider between exercises
+                              Divider(), // Add a divider between exercises
                             ],
                           );
                         }).toList(),
@@ -345,107 +331,24 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
   }
 
-  Future<Map<String, String>?> fetchLatestSetDetails(String machineName) async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String userId = user.uid;
-
-        // Fetch the latest workout containing the specified machine
-        QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-            .instance
-            .collection('data')
-            .doc(userId)
-            .collection('workouts')
-            .orderBy('timestamp', descending: true)
-            .limit(1)
-            .get();
-
-        if (snapshot.docs.isNotEmpty) {
-          // Get the latest workout data
-          var workoutData = snapshot.docs.first.data();
-          // Get the exercises from the latest workout
-          List<dynamic> exercises = workoutData['exercises'];
-
-          // Find the exercise containing the specified machine
-          var exerciseContainingMachine = exercises.firstWhere(
-              (exercise) => exercise['machine'] == machineName,
-              orElse: () => null);
-
-          if (exerciseContainingMachine != null) {
-            // Get the sets for the specified exercise
-            List<dynamic> sets = exerciseContainingMachine['sets'];
-            // Get the latest set
-            var latestSet = sets.isNotEmpty ? sets[0] : null;
-
-            if (latestSet != null) {
-              // Get the reps and weight from the latest set
-              String reps = latestSet['reps'] ?? 'Data Not Available';
-              String weight = latestSet['weight'] ?? 'Data Not Available';
-              // Return the reps and weight
-              return {'reps': reps, 'weight': weight};
-            } else {
-              print('No sets available for $machineName');
-            }
-          } else {
-            print(
-                'Exercise containing $machineName not found in the latest workout');
-          }
-        } else {
-          print('No workout data available for $machineName');
-        }
-      } else {
-        throw Exception('User is not logged in');
-      }
-    } catch (e) {
-      print('Error fetching latest set details: $e');
-    }
-    return null; // Return null if there's an error or no data
-  }
-
   Future<bool> _onBackPressed() async {
     if (controller.exercises.isNotEmpty) {
       var result = await Get.dialog(
         AlertDialog(
-          backgroundColor: AppColors.primaryColor,
-          title: Text(
-            'Save Workout?',
-            style: AppTheme.secondaryText(
-                size: 25,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
-            style: AppTheme.secondaryText(
-                size: 15,
-                color: AppColors.backgroundColor,
-                fontWeight: FontWeight.bold),
-          ),
+          title: Text('Save Workout?'),
+          content: Text('Do you want to save the workout before leaving?'),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(result: true); // Discard workout
               },
-              child: Text(
-                'Discard',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Discard'),
             ),
             TextButton(
               onPressed: () {
                 Get.back(result: false); // Cancel and stay on the log screen
               },
-              child: Text(
-                'Cancel',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Cancel'),
             ),
           ],
         ),
@@ -603,20 +506,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       var machine = result['machine'];
       if (bodyPart != null && machine != null) {
         var exercise = ExerciseData(name: '$bodyPart - $machine');
-
-        // Fetch the latest set details for the selected machine
-        var latestSetDetails = await fetchLatestSetDetails(machine);
-
-        // Add the exercise
         controller.addExercise(exercise);
-
-        // If fetched data is available, set it as hint text
-        if (latestSetDetails != null) {
-          controller.getSets(exercise).first.reps =
-              latestSetDetails['reps'] ?? '';
-          controller.getSets(exercise).first.weight =
-              latestSetDetails['weight'] ?? '';
-        }
       }
     }
   }
@@ -665,16 +555,8 @@ class WorkoutLoggingFormController extends GetxController {
         return;
       }
     }
-
-    // Create a new set and initialize it with the values of the previous set
     final newIndex = currentSets.isEmpty ? 1 : currentSets.last.index + 1;
-    final newSet = SetData(index: newIndex);
-    if (currentSets.isNotEmpty) {
-      final previousSet = currentSets.last;
-      newSet.reps = previousSet.reps;
-      newSet.weight = previousSet.weight;
-    }
-    currentSets.add(newSet);
+    currentSets.add(SetData(index: newIndex));
     sets[exercise] = currentSets;
   }
 

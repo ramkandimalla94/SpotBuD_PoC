@@ -407,45 +407,20 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     if (controller.exercises.isNotEmpty) {
       var result = await Get.dialog(
         AlertDialog(
-          backgroundColor: AppColors.primaryColor,
-          title: Text(
-            'Save Workout?',
-            style: AppTheme.secondaryText(
-                size: 25,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
-            style: AppTheme.secondaryText(
-                size: 15,
-                color: AppColors.backgroundColor,
-                fontWeight: FontWeight.bold),
-          ),
+          title: Text('Save Workout?'),
+          content: Text('Do you want to save the workout before leaving?'),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(result: true); // Discard workout
               },
-              child: Text(
-                'Discard',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Discard'),
             ),
             TextButton(
               onPressed: () {
                 Get.back(result: false); // Cancel and stay on the log screen
               },
-              child: Text(
-                'Cancel',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Cancel'),
             ),
           ],
         ),

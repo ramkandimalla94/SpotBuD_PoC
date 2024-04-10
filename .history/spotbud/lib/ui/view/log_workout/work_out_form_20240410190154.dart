@@ -416,7 +416,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                 fontWeight: FontWeight.bold),
           ),
           content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
+            'Do you want to save the workout before leaving?',
             style: AppTheme.secondaryText(
                 size: 15,
                 color: AppColors.backgroundColor,

@@ -191,7 +191,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          'kg', // Assuming the unit is always lbs
+                                          'lbs', // Assuming the unit is always lbs
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         IconButton(
@@ -251,7 +251,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       String machine = parts[1]; // Get the part after ' - '
 
       showModalBottomSheet(
-        backgroundColor: AppColors.primaryColor,
         context: context,
         builder: (BuildContext context) {
           return Container(
@@ -294,15 +293,8 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                           filteredDocs[index].data() as Map<String, dynamic>;
                       List<dynamic> exercises = workoutData['exercises'];
                       String date = workoutData['date'];
-                      String time = workoutData['startTime'];
                       return ExpansionTile(
-                        title: Text(
-                          date + '    Time: ' + time,
-                          style: AppTheme.secondaryText(
-                              size: 20,
-                              color: AppColors.acccentColor,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        title: Text(date),
                         initiallyExpanded: index == 0, // Expand the first tile
                         children: exercises.map<Widget>((exercise) {
                           List<dynamic> sets = exercise['sets'];
@@ -311,13 +303,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             String weight =
                                 set['weight'] ?? 'Data Not Available';
                             return ListTile(
-                              title: Text(
-                                'Reps: $reps  Weights: $weight kg',
-                                style: AppTheme.secondaryText(
-                                    size: 15,
-                                    color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              title: Text('Reps: $reps  Weights: $weight'),
                               // You can display other set details here
                             );
                           }).toList();
@@ -326,7 +312,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ...setWidgets,
-                              //Divider(), // Add a divider between exercises
+                              Divider(), // Add a divider between exercises
                             ],
                           );
                         }).toList(),
@@ -345,107 +331,133 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     }
   }
 
-  Future<Map<String, String>?> fetchLatestSetDetails(String machineName) async {
+  Future<List<Map<String, dynamic>>> getLoggedDetailsByMachine(
+      String machineName) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         String userId = user.uid;
-
-        // Fetch the latest workout containing the specified machine
         QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
             .instance
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .orderBy('timestamp', descending: true)
-            .limit(1)
-            .get();
+            .where('exercises', arrayContains: {'machine': machineName}).get();
 
-        if (snapshot.docs.isNotEmpty) {
-          // Get the latest workout data
-          var workoutData = snapshot.docs.first.data();
-          // Get the exercises from the latest workout
-          List<dynamic> exercises = workoutData['exercises'];
-
-          // Find the exercise containing the specified machine
-          var exerciseContainingMachine = exercises.firstWhere(
-              (exercise) => exercise['machine'] == machineName,
-              orElse: () => null);
-
-          if (exerciseContainingMachine != null) {
-            // Get the sets for the specified exercise
-            List<dynamic> sets = exerciseContainingMachine['sets'];
-            // Get the latest set
-            var latestSet = sets.isNotEmpty ? sets[0] : null;
-
-            if (latestSet != null) {
-              // Get the reps and weight from the latest set
-              String reps = latestSet['reps'] ?? 'Data Not Available';
-              String weight = latestSet['weight'] ?? 'Data Not Available';
-              // Return the reps and weight
-              return {'reps': reps, 'weight': weight};
-            } else {
-              print('No sets available for $machineName');
-            }
-          } else {
-            print(
-                'Exercise containing $machineName not found in the latest workout');
-          }
-        } else {
-          print('No workout data available for $machineName');
-        }
+        List<Map<String, dynamic>> loggedDetails = [];
+        snapshot.docs.forEach((doc) {
+          loggedDetails.add(doc.data());
+        });
+        return loggedDetails;
       } else {
         throw Exception('User is not logged in');
       }
     } catch (e) {
-      print('Error fetching latest set details: $e');
+      throw Exception('Error fetching logged details: $e');
     }
-    return null; // Return null if there's an error or no data
+  }
+
+  void _openExerciseHistoryDialog(String machineName) async {
+    // Get the current user ID
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
+      // Extract machine name from exercise name
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Exercise History - $machineName'),
+            content: Container(
+              width: double.maxFinite,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('data')
+                    .doc(userId)
+                    .collection('workouts')
+                    .orderBy('timestamp',
+                        descending:
+                            true) // Order by timestamp in descending order
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: LoadingIndicator());
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text('No workout history available.'));
+                  } else if (snapshot.hasError) {
+                    print('Error fetching workout history: ${snapshot.error}');
+                    return Center(
+                        child: Text('Error fetching workout history.'));
+                  } else {
+                    // Filter the documents based on the exercise
+                    var filteredDocs = snapshot.data!.docs.where((doc) {
+                      var exercises = doc['exercises'];
+                      if (exercises != null) {
+                        // Check if any exercise in the document matches the specific exercise
+                        return exercises.any(
+                            (exercise) => exercise['machine'] == machineName);
+                      }
+                      return false;
+                    }).toList();
+
+                    if (filteredDocs.isEmpty) {
+                      return Center(
+                          child: Text(
+                              'No workout history available for $machineName.'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: filteredDocs.length,
+                      itemBuilder: (context, index) {
+                        var workoutData =
+                            filteredDocs[index].data() as Map<String, dynamic>;
+                        return ListTile(
+                          title: Text(
+                              workoutData['notes'] ?? 'Data Not Available'),
+                          // Display other workout details here
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Close'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Handle case where user is not logged in
+      print('User is not logged in');
+    }
   }
 
   Future<bool> _onBackPressed() async {
     if (controller.exercises.isNotEmpty) {
       var result = await Get.dialog(
         AlertDialog(
-          backgroundColor: AppColors.primaryColor,
-          title: Text(
-            'Save Workout?',
-            style: AppTheme.secondaryText(
-                size: 25,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
-            style: AppTheme.secondaryText(
-                size: 15,
-                color: AppColors.backgroundColor,
-                fontWeight: FontWeight.bold),
-          ),
+          title: Text('Save Workout?'),
+          content: Text('Do you want to save the workout before leaving?'),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(result: true); // Discard workout
               },
-              child: Text(
-                'Discard',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Discard'),
             ),
             TextButton(
               onPressed: () {
                 Get.back(result: false); // Cancel and stay on the log screen
               },
-              child: Text(
-                'Cancel',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Cancel'),
             ),
           ],
         ),
@@ -603,21 +615,71 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       var machine = result['machine'];
       if (bodyPart != null && machine != null) {
         var exercise = ExerciseData(name: '$bodyPart - $machine');
-
-        // Fetch the latest set details for the selected machine
-        var latestSetDetails = await fetchLatestSetDetails(machine);
-
-        // Add the exercise
-        controller.addExercise(exercise);
-
-        // If fetched data is available, set it as hint text
-        if (latestSetDetails != null) {
-          controller.getSets(exercise).first.reps =
-              latestSetDetails['reps'] ?? '';
-          controller.getSets(exercise).first.weight =
-              latestSetDetails['weight'] ?? '';
+        // Fetch the latest logged data for the selected exercise from Firebase
+        try {
+          var loggedDetails = await getLoggedDetailsByMachine1('machine');
+          if (loggedDetails.isNotEmpty) {
+            // Extract the reps and weight from the latest logged data
+            var latestLoggedData = loggedDetails.first;
+            var previousReps =
+                latestLoggedData['exercises'][0]['sets'][0]['reps'];
+            var previousWeight =
+                latestLoggedData['exercises'][0]['sets'][0]['weight'];
+            // Display the previous reps and weight as hint text for the first set
+            Get.defaultDialog(
+              title: 'Previous Log',
+              content: Column(
+                children: [
+                  Text('Previous Reps: $previousReps'),
+                  Text('Previous Weight: $previousWeight'),
+                ],
+              ),
+              confirm: ElevatedButton(
+                onPressed: () {
+                  // After displaying the previous log, add the exercise
+                  controller.addExercise(exercise);
+                  Get.back(); // Close the dialog
+                },
+                child: Text('Add Exercise'),
+              ),
+            );
+            return;
+          }
+        } catch (e) {
+          print('Error fetching logged details: $e');
         }
+        // If there are no previous logs, simply add the exercise
+        controller.addExercise(exercise);
       }
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getLoggedDetailsByMachine1(
+      String machineName) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String userId = user.uid;
+        QuerySnapshot<Map<String, dynamic>> snapshot =
+            await FirebaseFirestore.instance
+                .collection('data')
+                .doc(userId)
+                .collection('workouts')
+                .where('exercises', arrayContains: {'machine': machineName})
+                .orderBy('timestamp', descending: true)
+                .limit(1) // Fetch only the latest logged data
+                .get();
+
+        List<Map<String, dynamic>> loggedDetails = [];
+        snapshot.docs.forEach((doc) {
+          loggedDetails.add(doc.data());
+        });
+        return loggedDetails;
+      } else {
+        throw Exception('User is not logged in');
+      }
+    } catch (e) {
+      throw Exception('Error fetching logged details: $e');
     }
   }
 }
@@ -665,16 +727,8 @@ class WorkoutLoggingFormController extends GetxController {
         return;
       }
     }
-
-    // Create a new set and initialize it with the values of the previous set
     final newIndex = currentSets.isEmpty ? 1 : currentSets.last.index + 1;
-    final newSet = SetData(index: newIndex);
-    if (currentSets.isNotEmpty) {
-      final previousSet = currentSets.last;
-      newSet.reps = previousSet.reps;
-      newSet.weight = previousSet.weight;
-    }
-    currentSets.add(newSet);
+    currentSets.add(SetData(index: newIndex));
     sets[exercise] = currentSets;
   }
 

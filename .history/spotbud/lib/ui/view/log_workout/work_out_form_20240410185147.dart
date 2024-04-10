@@ -191,7 +191,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                                         ),
                                         SizedBox(width: 10),
                                         Text(
-                                          'kg', // Assuming the unit is always lbs
+                                          'lbs', // Assuming the unit is always lbs
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         IconButton(
@@ -294,10 +294,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                           filteredDocs[index].data() as Map<String, dynamic>;
                       List<dynamic> exercises = workoutData['exercises'];
                       String date = workoutData['date'];
-                      String time = workoutData['startTime'];
                       return ExpansionTile(
                         title: Text(
-                          date + '    Time: ' + time,
+                          date,
                           style: AppTheme.secondaryText(
                               size: 20,
                               color: AppColors.acccentColor,
@@ -311,13 +310,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             String weight =
                                 set['weight'] ?? 'Data Not Available';
                             return ListTile(
-                              title: Text(
-                                'Reps: $reps  Weights: $weight kg',
-                                style: AppTheme.secondaryText(
-                                    size: 15,
-                                    color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              title: Text('Reps: $reps  Weights: $weight'),
                               // You can display other set details here
                             );
                           }).toList();
@@ -325,8 +318,11 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              SizedBox(
+                                height: 10,
+                              ),
                               ...setWidgets,
-                              //Divider(), // Add a divider between exercises
+                              Divider(), // Add a divider between exercises
                             ],
                           );
                         }).toList(),
@@ -407,45 +403,20 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     if (controller.exercises.isNotEmpty) {
       var result = await Get.dialog(
         AlertDialog(
-          backgroundColor: AppColors.primaryColor,
-          title: Text(
-            'Save Workout?',
-            style: AppTheme.secondaryText(
-                size: 25,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
-            style: AppTheme.secondaryText(
-                size: 15,
-                color: AppColors.backgroundColor,
-                fontWeight: FontWeight.bold),
-          ),
+          title: Text('Save Workout?'),
+          content: Text('Do you want to save the workout before leaving?'),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(result: true); // Discard workout
               },
-              child: Text(
-                'Discard',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Discard'),
             ),
             TextButton(
               onPressed: () {
                 Get.back(result: false); // Cancel and stay on the log screen
               },
-              child: Text(
-                'Cancel',
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    color: AppColors.acccentColor,
-                    fontWeight: FontWeight.bold),
-              ),
+              child: Text('Cancel'),
             ),
           ],
         ),
@@ -665,16 +636,8 @@ class WorkoutLoggingFormController extends GetxController {
         return;
       }
     }
-
-    // Create a new set and initialize it with the values of the previous set
     final newIndex = currentSets.isEmpty ? 1 : currentSets.last.index + 1;
-    final newSet = SetData(index: newIndex);
-    if (currentSets.isNotEmpty) {
-      final previousSet = currentSets.last;
-      newSet.reps = previousSet.reps;
-      newSet.weight = previousSet.weight;
-    }
-    currentSets.add(newSet);
+    currentSets.add(SetData(index: newIndex));
     sets[exercise] = currentSets;
   }
 

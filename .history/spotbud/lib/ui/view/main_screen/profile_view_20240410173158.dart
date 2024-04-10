@@ -105,17 +105,13 @@ class ProfileView extends StatelessWidget {
                           ),
                         )),
                     SizedBox(height: 10),
-                    Obx(() {
-                      String genderString =
-                          _nameViewModel.gender.value.toString().split('.')[1];
-                      return Text(
-                        'Gender: $genderString',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: AppColors.secondaryColor,
-                        ),
-                      );
-                    })
+                    Obx(() => Text(
+                          'Gender: ${_nameViewModel.gender}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: AppColors.secondaryColor,
+                          ),
+                        )),
                   ],
                 ),
               ),
