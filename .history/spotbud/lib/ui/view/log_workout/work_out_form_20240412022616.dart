@@ -267,24 +267,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: LoadingIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                      child: Text(
-                    'No workout history available.',
-                    style: AppTheme.secondaryText(
-                        size: 15,
-                        color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold),
-                  ));
+                  return Center(child: Text('No workout history available.'));
                 } else if (snapshot.hasError) {
                   print('Error fetching workout history: ${snapshot.error}');
-                  return Center(
-                      child: Text(
-                    'Error fetching workout history.',
-                    style: AppTheme.secondaryText(
-                        size: 15,
-                        color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold),
-                  ));
+                  return Center(child: Text('Error fetching workout history.'));
                 } else {
                   var filteredDocs = snapshot.data!.docs.where((doc) {
                     var exercises = doc['exercises'];
