@@ -130,13 +130,13 @@ class SignUpView extends StatelessWidget {
                               await authViewModel.sendEmailVerification();
 
                               // Show success message
-                              // CustomAlertBox(
-                              //   message: 'You have successfully signed up!',
-                              //   onButtonPressed: () {
-                              //     Get.to(VerifyScreen());
-                              //   },
-                              //   title: 'Sign Up Successful',
-                              // );
+                              CustomAlertBox(
+                                message: 'You have successfully signed up!',
+                                onButtonPressed: () {
+                                  Get.to(VerifyScreen());
+                                },
+                                title: 'Sign Up Successful',
+                              );
                               Get.snackbar(
                                 'Sign Up Successful',
                                 'You have successfully signed up!',

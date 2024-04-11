@@ -69,6 +69,7 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -306,22 +307,11 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
                   text: 'Save',
                 ),
               ),
-              Row(
-                children: [
-                  Spacer(),
-                  TextButton(
-                      child: Text(
-                        'skip for now',
-                        style: AppTheme.secondaryText(
-                            color: AppColors.backgroundColor,
-                            size: 20,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      onPressed: () {
-                        Get.toNamed('mainscreen');
-                      }),
-                ],
-              )
+              buildLoginButton(
+                  text: 'skip for now',
+                  onPressed: () {
+                    Get.to(MainScreen());
+                  })
             ],
           ),
         ),

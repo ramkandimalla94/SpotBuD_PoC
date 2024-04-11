@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:spotbud/ui/view/auth/auth_verification.dart';
 
 class AuthViewModel extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -573,18 +572,12 @@ class AuthViewModel extends GetxController {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
 
-      // Check if the user's email is verified
-      if (userCredential.user != null && userCredential.user!.emailVerified) {
-        // Save user data to Firestore if login is successful
-        // await saveUserDataFromEmailPassword(userCredential.user!);
+      // Save user data to Firestore if login is successful
+      // if (userCredential.user != null) {
+      //   await saveUserDataFromEmailPassword(userCredential.user!);
+      // }
 
-        // Return UserCredential if login is successful
-        return userCredential;
-      } else {
-        // If the email is not verified, redirect to the verify screen
-        Get.offAll(VerifyScreen());
-        return null;
-      }
+      return userCredential; // Return UserCredential if login is successful
     } catch (e) {
       print("Error signing in: $e");
       return null; // Return null if login fails
@@ -1127,8 +1120,17 @@ class AuthViewModel extends GetxController {
         password: password,
       );
 
-      // Send email verification
-      await sendEmailVerification();
+      // Check if the user's email is verified
+      User? user = userCredential.user;
+      if (user != null && user.emailVerified) {
+        // Navigate to the main screen or dashboard
+        // Here you can navigate to the main screen of your app
+        // Get.toNamed('/home');
+      } else {
+        // If the email is not verified, inform the user to verify their email
+        // Show a message or navigate to a screen asking the user to verify their email
+        // Get.toNamed('/verify_email');
+      }
 
       return userCredential;
     } catch (e) {

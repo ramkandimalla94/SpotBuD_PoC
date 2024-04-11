@@ -127,16 +127,15 @@ class SignUpView extends StatelessWidget {
                                   firstName: firstName,
                                   lastName: lastName,
                                   user: user);
-                              await authViewModel.sendEmailVerification();
 
                               // Show success message
-                              // CustomAlertBox(
-                              //   message: 'You have successfully signed up!',
-                              //   onButtonPressed: () {
-                              //     Get.to(VerifyScreen());
-                              //   },
-                              //   title: 'Sign Up Successful',
-                              // );
+                              CustomAlertBox(
+                                message: 'You have successfully signed up!',
+                                onButtonPressed: () {
+                                  Get.to(VerifyScreen());
+                                },
+                                title: 'Sign Up Successful',
+                              );
                               Get.snackbar(
                                 'Sign Up Successful',
                                 'You have successfully signed up!',
@@ -144,7 +143,7 @@ class SignUpView extends StatelessWidget {
                                 backgroundColor: Colors.green,
                                 colorText: Colors.white,
                               );
-                              Get.to(VerifyScreen());
+                              Get.toNamed('/authbodydetail');
 
                               // Reset loading state
                               authViewModel.setLoading(false);

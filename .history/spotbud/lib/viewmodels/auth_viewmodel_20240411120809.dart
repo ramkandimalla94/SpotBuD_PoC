@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:spotbud/ui/view/auth/auth_verification.dart';
 
 class AuthViewModel extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -573,18 +572,12 @@ class AuthViewModel extends GetxController {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
 
-      // Check if the user's email is verified
-      if (userCredential.user != null && userCredential.user!.emailVerified) {
-        // Save user data to Firestore if login is successful
-        // await saveUserDataFromEmailPassword(userCredential.user!);
+      // Save user data to Firestore if login is successful
+      // if (userCredential.user != null) {
+      //   await saveUserDataFromEmailPassword(userCredential.user!);
+      // }
 
-        // Return UserCredential if login is successful
-        return userCredential;
-      } else {
-        // If the email is not verified, redirect to the verify screen
-        Get.offAll(VerifyScreen());
-        return null;
-      }
+      return userCredential; // Return UserCredential if login is successful
     } catch (e) {
       print("Error signing in: $e");
       return null; // Return null if login fails
@@ -1118,8 +1111,7 @@ class AuthViewModel extends GetxController {
     }
   }
 
-  Future<UserCredential?> signUpWithEmailPassword(
-      String email, String password) async {
+  Future<User> signUpWithEmailPassword(String email, String password) async {
     try {
       UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(

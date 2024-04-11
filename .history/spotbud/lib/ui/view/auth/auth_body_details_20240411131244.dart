@@ -69,6 +69,7 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

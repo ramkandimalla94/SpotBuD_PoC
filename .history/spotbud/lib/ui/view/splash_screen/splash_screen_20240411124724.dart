@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen>
                 '/mainscreen'); // Replace '/mainscreen' with your home screen route
           } else {
             // User is signed in but email is not verified, redirect to verification page
-            Get.offNamed('/login');
+            Get.off(VerifyScreen());
           }
         } else {
           // No user is signed in, navigate to login screen
