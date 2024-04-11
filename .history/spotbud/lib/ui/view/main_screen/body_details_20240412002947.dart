@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for TextInputFormatter
 import 'package:get/get.dart';
 import 'package:spotbud/core/models/gender.dart';
-import 'package:spotbud/ui/view/main_screen/main_screen.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
-class AuthUserInfoPage extends StatefulWidget {
+class UserInfoPage extends StatefulWidget {
   @override
   _UserInfoPageState createState() => _UserInfoPageState();
 }
 
-class _UserInfoPageState extends State<AuthUserInfoPage> {
+class _UserInfoPageState extends State<UserInfoPage> {
   final RxDouble weightLbs = 0.0.obs;
   final RxDouble weightKg = 0.0.obs;
   final Rx<WeightUnit> selectedUnit = WeightUnit.lbs.obs;
@@ -55,8 +54,8 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
         iconTheme: IconThemeData(color: AppColors.backgroundColor),
+        backgroundColor: AppColors.primaryColor,
         title: Text(
           'User Information',
           style: AppTheme.secondaryText(
@@ -64,7 +63,6 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
             color: AppColors.backgroundColor,
           ),
         ),
-        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
@@ -298,30 +296,19 @@ class _UserInfoPageState extends State<AuthUserInfoPage> {
                       );
                     } else {
                       // All fields are filled, proceed with saving
-                      userDataViewModel.saveBodyDetails(weightKg.value, feet,
-                          inches, userDataViewModel.gender.value, true);
+                      userDataViewModel.saveBodyDetails(
+                        weightKg.value,
+                        feet,
+                        inches,
+                        userDataViewModel.gender.value,
+                        true,
+                      );
                       Get.toNamed('/mainscreen');
                     }
                   },
                   text: 'Save',
                 ),
               ),
-              Row(
-                children: [
-                  Spacer(),
-                  TextButton(
-                      child: Text(
-                        'skip for now',
-                        style: AppTheme.secondaryText(
-                            color: AppColors.backgroundColor,
-                            size: 20,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      onPressed: () {
-                        Get.toNamed('mainscreen');
-                      }),
-                ],
-              )
             ],
           ),
         ),
