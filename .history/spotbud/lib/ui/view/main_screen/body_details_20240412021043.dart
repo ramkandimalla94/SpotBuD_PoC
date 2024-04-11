@@ -312,7 +312,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                         return DropdownMenuItem<Lifestyle>(
                           value: lifestyle,
                           child: Text(
-                            _getDisplayText(lifestyle),
+                            lifestyle.toString().split('.').last,
                             style: TextStyle(color: AppColors.backgroundColor),
                           ),
                         );
@@ -321,7 +321,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   ),
                 ],
               ),
-
               // Save button
               Center(
                 child: buildLoginButton(
@@ -364,21 +363,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
       ),
     );
-  }
-
-  String _getDisplayText(Lifestyle lifestyle) {
-    switch (lifestyle) {
-      case Lifestyle.Sedentary:
-        return 'Sedentary';
-      case Lifestyle.LightlyActive:
-        return 'Lightly Active';
-      case Lifestyle.ModeratelyActive:
-        return 'Moderately Active';
-      case Lifestyle.VeryActive:
-        return 'Very Active';
-      default:
-        return '';
-    }
   }
 
   // Method to update weight in kg

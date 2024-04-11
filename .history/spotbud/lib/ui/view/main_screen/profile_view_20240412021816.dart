@@ -47,7 +47,7 @@ class _ProfileViewState extends State<ProfileView> {
                   children: [
                     SizedBox(height: 40),
                     Text(
-                      'Profile ',
+                      'Welcome ',
                       style: AppTheme.primaryText(
                         size: 32,
                         color: AppColors.acccentColor,

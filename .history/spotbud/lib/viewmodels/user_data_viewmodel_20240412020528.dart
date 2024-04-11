@@ -53,7 +53,7 @@ class UserDataViewModel extends GetxController {
   }
 
   Future<void> saveBodyDetails(double weight, int feet, int inches,
-      Gender gender, Lifestyle lifestyle, bool hasInitialData) async {
+      Gender gender, bool hasInitialData) async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
@@ -71,7 +71,6 @@ class UserDataViewModel extends GetxController {
         this.feet.value = feet;
         this.inches.value = inches;
         this.gender.value = gender;
-        this.lifestyle.value = lifestyle;
         this.hasInitialData.value =
             hasInitialData; // Update hasInitialData observable
         print('User data saved successfully');

@@ -40,8 +40,6 @@ class UserDataViewModel extends GetxController {
           weight.value = (data['weight'] ?? 0.0).toDouble();
           feet.value = data['feet'] ?? 0;
           inches.value = data['inches'] ?? 0;
-          lifestyle.value =
-              Lifestyle.values[data['lifestyle'] ?? Lifestyle.Sedentary.index];
           gender.value = Gender.values[data['gender'] ?? Gender.Male.index];
           hasInitialData.value = data['hasInitialData'] ??
               false; // Fetch hasInitialData from Firestore
@@ -53,7 +51,7 @@ class UserDataViewModel extends GetxController {
   }
 
   Future<void> saveBodyDetails(double weight, int feet, int inches,
-      Gender gender, Lifestyle lifestyle, bool hasInitialData) async {
+      Gender gender, bool hasInitialData) async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
@@ -64,14 +62,12 @@ class UserDataViewModel extends GetxController {
           'inches': inches,
           'gender': gender.index, // Save index of the selected gender
           'hasInitialData': hasInitialData, // Save hasInitialData to Firestore
-          'lifestyle': lifestyle.index,
         });
         // Update observables
         this.weight.value = weight;
         this.feet.value = feet;
         this.inches.value = inches;
         this.gender.value = gender;
-        this.lifestyle.value = lifestyle;
         this.hasInitialData.value =
             hasInitialData; // Update hasInitialData observable
         print('User data saved successfully');

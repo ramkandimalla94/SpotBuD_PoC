@@ -47,14 +47,13 @@ class _ProfileViewState extends State<ProfileView> {
                   children: [
                     SizedBox(height: 40),
                     Text(
-                      'Profile ',
+                      'Welcome ',
                       style: AppTheme.primaryText(
                         size: 32,
                         color: AppColors.acccentColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 40),
                     Row(
                       children: [
                         Text(
@@ -77,7 +76,7 @@ class _ProfileViewState extends State<ProfileView> {
                         )
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 60),
                     Obx(
                       () => Text(
                         'Name: ${_userDataViewModel.firstName.value} ${_userDataViewModel.lastName.value}',

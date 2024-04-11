@@ -71,7 +71,6 @@ class UserDataViewModel extends GetxController {
         this.feet.value = feet;
         this.inches.value = inches;
         this.gender.value = gender;
-        this.lifestyle.value = lifestyle;
         this.hasInitialData.value =
             hasInitialData; // Update hasInitialData observable
         print('User data saved successfully');
