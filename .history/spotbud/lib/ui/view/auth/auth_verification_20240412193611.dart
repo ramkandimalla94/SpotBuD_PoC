@@ -84,7 +84,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   // Navigate to sign-up screen
                 },
                 child: Text(
-                  'Go Back to Login',
+                  'Entered wrong details ',
                   style: TextStyle(color: Colors.white),
                 ),
               ),

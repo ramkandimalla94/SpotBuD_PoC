@@ -81,7 +81,7 @@ class SignUpView extends StatelessWidget {
                     return 'Password must be at least 8 characters long';
                   } else if (!RegExp(r'(?=.*[0-9])(?=.*[!@#$%^&*])')
                       .hasMatch(value)) {
-                    return 'Require a number and special symbol.';
+                    return 'Must contain at least one number and one special symbol';
                   }
                   return null;
                 },

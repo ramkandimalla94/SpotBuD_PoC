@@ -55,15 +55,21 @@ Widget buildStyledInput({
                   ? Icon(prefixIcon, color: AppColors.acccentColor)
                   : null,
               errorStyle: TextStyle(
-                fontSize: 15,
                 color: Colors.red, // Changed error text color to red
                 fontWeight: FontWeight.bold, // Made error text bold
               ),
             ),
           ),
         ),
+        SizedBox(height: 5), // Add spacing between input field and validator
+        Text(
+          validator != null ? validator('') ?? '' : '',
+          style: TextStyle(
+            color: Colors.red, // Error text color
+            fontWeight: FontWeight.bold, // Bold error text
+          ),
+        ),
       ],
     ),
   );
 }
-//shobhi1111cho@gmail.com

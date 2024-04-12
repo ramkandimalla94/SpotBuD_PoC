@@ -41,6 +41,7 @@ Widget buildStyledInput({
             ],
           ),
           child: TextFormField(
+            maxLines: null,
             // Changed from TextField to TextFormField
             controller: controller,
             style: TextStyle(color: Colors.white),
@@ -55,7 +56,7 @@ Widget buildStyledInput({
                   ? Icon(prefixIcon, color: AppColors.acccentColor)
                   : null,
               errorStyle: TextStyle(
-                fontSize: 15,
+                fontSize: 9.5,
                 color: Colors.red, // Changed error text color to red
                 fontWeight: FontWeight.bold, // Made error text bold
               ),
@@ -66,4 +67,3 @@ Widget buildStyledInput({
     ),
   );
 }
-//shobhi1111cho@gmail.com

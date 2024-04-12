@@ -47,6 +47,7 @@ Widget buildStyledInput({
             obscureText: obscureText,
             autofocus: autofocus,
             validator: validator, // Validator function added
+            maxLines: null,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hintText,
@@ -55,7 +56,6 @@ Widget buildStyledInput({
                   ? Icon(prefixIcon, color: AppColors.acccentColor)
                   : null,
               errorStyle: TextStyle(
-                fontSize: 15,
                 color: Colors.red, // Changed error text color to red
                 fontWeight: FontWeight.bold, // Made error text bold
               ),
@@ -66,4 +66,3 @@ Widget buildStyledInput({
     ),
   );
 }
-//shobhi1111cho@gmail.com
