@@ -237,13 +237,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _saveWorkout(),
-        label: Text('Save Workout'),
-        icon: Icon(Icons.check),
-        backgroundColor: AppColors.acccentColor, // Use your desired color
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -432,57 +425,57 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     return null; // Return null if there's an error or no data
   }
 
-  Map<String, dynamic>? _tempWorkoutData;
   Future<bool> _onBackPressed() async {
-    // Temporarily save the workout data when user presses back button
-    _tempWorkoutData = _temporarilySaveWorkoutData();
-    return true;
-  }
+    if (controller.exercises.isNotEmpty) {
+      var result = await Get.dialog(
+        AlertDialog(
+          backgroundColor: AppColors.primaryColor,
+          title: Text(
+            'Save Workout?',
+            style: AppTheme.secondaryText(
+                size: 25,
+                color: AppColors.acccentColor,
+                fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Do you want to save the workout before leaving? \n \nThe Data will be lost if not saved',
+            style: AppTheme.secondaryText(
+                size: 15,
+                color: AppColors.backgroundColor,
+                fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(result: true); // Discard workout
+              },
+              child: Text(
+                'Discard',
+                style: AppTheme.secondaryText(
+                    size: 20,
+                    color: AppColors.acccentColor,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back(result: false); // Cancel and stay on the log screen
+              },
+              child: Text(
+                'Cancel',
+                style: AppTheme.secondaryText(
+                    size: 20,
+                    color: AppColors.acccentColor,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
 
-  Map<String, dynamic>? _temporarilySaveWorkoutData() {
-    // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
+      return result ?? false;
     }
-
-    // Prepare workout data
-    Map<String, dynamic> workoutData = {
-      'date': DateTimeUtils.getFormattedDate(_selectedDate),
-      'startTime': DateTimeUtils.getFormattedTime(DateTime(
-          _selectedDate.year,
-          _selectedDate.month,
-          _selectedDate.day,
-          _selectedStartTime.hour,
-          _selectedStartTime.minute)),
-      'endTime': controller.endTime.value.isNotEmpty
-          ? controller.endTime.value
-          : DateTimeUtils.getFormattedTime(
-              DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
-    };
-
-    // Temporarily save workout data
-    return workoutData;
+    return true;
   }
 
   Future<void> _selectDate(BuildContext context) async {

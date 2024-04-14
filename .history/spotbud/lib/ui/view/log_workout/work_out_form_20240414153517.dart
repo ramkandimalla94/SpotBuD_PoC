@@ -432,7 +432,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     return null; // Return null if there's an error or no data
   }
 
-  Map<String, dynamic>? _tempWorkoutData;
   Future<bool> _onBackPressed() async {
     // Temporarily save the workout data when user presses back button
     _tempWorkoutData = _temporarilySaveWorkoutData();

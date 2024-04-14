@@ -432,57 +432,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     return null; // Return null if there's an error or no data
   }
 
-  Map<String, dynamic>? _tempWorkoutData;
   Future<bool> _onBackPressed() async {
     // Temporarily save the workout data when user presses back button
     _tempWorkoutData = _temporarilySaveWorkoutData();
     return true;
-  }
-
-  Map<String, dynamic>? _temporarilySaveWorkoutData() {
-    // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight': set.weight,
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
-    Map<String, dynamic> workoutData = {
-      'date': DateTimeUtils.getFormattedDate(_selectedDate),
-      'startTime': DateTimeUtils.getFormattedTime(DateTime(
-          _selectedDate.year,
-          _selectedDate.month,
-          _selectedDate.day,
-          _selectedStartTime.hour,
-          _selectedStartTime.minute)),
-      'endTime': controller.endTime.value.isNotEmpty
-          ? controller.endTime.value
-          : DateTimeUtils.getFormattedTime(
-              DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
-    };
-
-    // Temporarily save workout data
-    return workoutData;
   }
 
   Future<void> _selectDate(BuildContext context) async {
