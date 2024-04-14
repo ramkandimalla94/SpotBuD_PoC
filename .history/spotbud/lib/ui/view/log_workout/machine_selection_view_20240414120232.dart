@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
@@ -25,7 +24,6 @@ class MachineSelectionScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            color: AppColors.acccentColor,
             onPressed: () => _showSearchBar(context),
             icon: Icon(Icons.search, color: AppColors.acccentColor),
           ),
@@ -87,10 +85,7 @@ class MachineSelectionScreen extends StatelessWidget {
   void _showSearchBar(BuildContext context) {
     showSearch(
       context: context,
-      delegate: MachineSearchDelegate(
-        controller.machinesByBodyPart,
-        controller.recentSearches,
-      ),
+      delegate: MachineSearchDelegate(controller.machinesByBodyPart),
     );
   }
 
@@ -260,20 +255,8 @@ class MachineSelectionScreen extends StatelessWidget {
 
 class MachineSearchDelegate extends SearchDelegate<String> {
   final Map<String, List<String>> machinesByBodyPart;
-  final List<String> recentSearches;
 
-  MachineSearchDelegate(this.machinesByBodyPart, this.recentSearches);
-
-  @override
-  ThemeData appBarTheme(BuildContext context) {
-    return ThemeData(
-      primaryColor: AppColors.primaryColor,
-      appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.acccentColor, // Set app bar background color
-      ),
-      // Set background color
-    );
-  }
+  MachineSearchDelegate(this.machinesByBodyPart);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -282,10 +265,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
         onPressed: () {
           query = '';
         },
-        icon: Icon(
-          Icons.clear,
-          color: AppColors.primaryColor,
-        ),
+        icon: Icon(Icons.clear),
       ),
     ];
   }
@@ -296,16 +276,20 @@ class MachineSearchDelegate extends SearchDelegate<String> {
       onPressed: () {
         close(context, '');
       },
-      icon: Icon(
-        Icons.arrow_back,
-        color: AppColors.primaryColor,
-      ),
+      icon: Icon(Icons.arrow_back),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    // Filter suggestions based on the query
+    // Your logic to display search results
+    return Container(
+      color: AppColors.primaryColor,
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
     final List<String> suggestions = [];
     machinesByBodyPart.forEach((key, value) {
       suggestions.addAll(value);
@@ -316,118 +300,25 @@ class MachineSearchDelegate extends SearchDelegate<String> {
             suggestion.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
-    // Display filtered suggestions as search results
-    return Container(
-      color: AppColors.primaryColor,
-      child: ListView.builder(
-        itemCount: filteredSuggestions.length,
-        itemBuilder: (context, index) {
-          final suggestion = filteredSuggestions[index];
-          return ListTile(
-            tileColor: AppColors.primaryColor,
-            title: Text(
-              suggestion,
-              style: AppTheme.secondaryText(
-                  size: 20,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.secondaryColor),
-            ),
-            onTap: () {
-              _handleSelection(context, suggestion);
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    if (query.isEmpty) {
-      // Display recent searches if the search bar is empty
-      if (recentSearches.isEmpty) {
-        return Container(
-          color: AppColors.primaryColor,
-        );
-        // Display an empty container if no recent searches
-      } else {
-        return Container(
-          color: AppColors.primaryColor,
-          child: ListView.builder(
-            itemCount: recentSearches.length,
-            itemBuilder: (context, index) {
-              final suggestion = recentSearches[index];
-              return ListTile(
-                tileColor: AppColors.primaryColor,
-                title: Text(
-                  suggestion,
-                  style: AppTheme.secondaryText(
-                      size: 20,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.secondaryColor),
-                ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
-                ),
-                onTap: () {
-                  _handleSelection(context, suggestion);
-                },
-              );
-            },
+    return ListView.builder(
+      itemCount: filteredSuggestions.length,
+      itemBuilder: (context, index) {
+        final suggestion = filteredSuggestions[index];
+        return ListTile(
+          tileColor: AppColors.primaryColor,
+          title: Text(
+            suggestion,
+            style: AppTheme.secondaryText(
+                size: 20,
+                fontWeight: FontWeight.w500,
+                color: AppColors.secondaryColor),
           ),
-        );
-      }
-    } else {
-      // Display search results based on the query
-      final List<String> suggestions = [];
-      machinesByBodyPart.forEach((key, value) {
-        suggestions.addAll(value);
-      });
-
-      final List<String> filteredSuggestions = suggestions
-          .where((suggestion) =>
-              suggestion.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-
-      return Container(
-        color: AppColors.primaryColor,
-        child: ListView.builder(
-          itemCount: filteredSuggestions.length,
-          itemBuilder: (context, index) {
-            final suggestion = filteredSuggestions[index];
-            return ListTile(
-              tileColor: AppColors.primaryColor,
-              title: Text(
-                suggestion,
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.secondaryColor),
-              ),
-              onTap: () {
-                _handleSelection(context, suggestion);
-              },
-            );
+          onTap: () {
+            close(context, suggestion);
           },
-        ),
-      );
-    }
-  }
-
-  void _handleSelection(BuildContext context, String suggestion) {
-    // Close the search and return the selected suggestion
-    close(context, suggestion);
-
-    // Perform the same action as tapping on any machine
-    final bodyPart = machinesByBodyPart.entries
-        .firstWhere((entry) => entry.value.contains(suggestion))
-        .key;
-    Get.back(result: {'bodyPart': bodyPart, 'machine': suggestion});
-
-    // Add to recent searches
-    MachineSelectionController controller = Get.find();
-    controller.addToRecentSearches(suggestion);
+        );
+      },
+    );
   }
 }
 
@@ -436,32 +327,11 @@ class MachineSelectionController extends GetxController {
   var machinesByBodyPart = <String, List<String>>{}.obs;
   var loading = false.obs;
   var singleLegOrArm = false.obs;
-  var recentSearches = <String>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     _loadData();
-    _loadRecentSearches();
-  }
-
-  void _loadRecentSearches() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      final List<String>? savedSearches = prefs.getStringList('recentSearches');
-      recentSearches.assignAll(savedSearches ?? []);
-    } catch (e) {
-      print('Error loading recent searches: $e');
-    }
-  }
-
-  void _saveRecentSearches() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setStringList('recentSearches', recentSearches.toList());
-    } catch (e) {
-      print('Error saving recent searches: $e');
-    }
   }
 
   void _loadData() async {
@@ -573,17 +443,6 @@ class MachineSelectionController extends GetxController {
       }
     } catch (e) {
       print('Error adding custom exercise: $e');
-    }
-  }
-
-  void addToRecentSearches(String query) {
-    if (!recentSearches.contains(query)) {
-      recentSearches.insert(0, query);
-      // Limit the recent searches to, say, 5
-      if (recentSearches.length > 5) {
-        recentSearches.removeLast();
-      }
-      _saveRecentSearches();
     }
   }
 }

@@ -25,7 +25,7 @@ class MachineSelectionScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            color: AppColors.acccentColor,
+            color: AppColors.primaryColor,
             onPressed: () => _showSearchBar(context),
             icon: Icon(Icons.search, color: AppColors.acccentColor),
           ),
@@ -265,17 +265,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
   MachineSearchDelegate(this.machinesByBodyPart, this.recentSearches);
 
   @override
-  ThemeData appBarTheme(BuildContext context) {
-    return ThemeData(
-      primaryColor: AppColors.primaryColor,
-      appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.acccentColor, // Set app bar background color
-      ),
-      // Set background color
-    );
-  }
-
-  @override
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
@@ -284,7 +273,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
         },
         icon: Icon(
           Icons.clear,
-          color: AppColors.primaryColor,
+          color: AppColors.acccentColor,
         ),
       ),
     ];
@@ -298,46 +287,16 @@ class MachineSearchDelegate extends SearchDelegate<String> {
       },
       icon: Icon(
         Icons.arrow_back,
-        color: AppColors.primaryColor,
+        color: AppColors.acccentColor,
       ),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    // Filter suggestions based on the query
-    final List<String> suggestions = [];
-    machinesByBodyPart.forEach((key, value) {
-      suggestions.addAll(value);
-    });
-
-    final List<String> filteredSuggestions = suggestions
-        .where((suggestion) =>
-            suggestion.toLowerCase().contains(query.toLowerCase()))
-        .toList();
-
-    // Display filtered suggestions as search results
-    return Container(
-      color: AppColors.primaryColor,
-      child: ListView.builder(
-        itemCount: filteredSuggestions.length,
-        itemBuilder: (context, index) {
-          final suggestion = filteredSuggestions[index];
-          return ListTile(
-            tileColor: AppColors.primaryColor,
-            title: Text(
-              suggestion,
-              style: AppTheme.secondaryText(
-                  size: 20,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.secondaryColor),
-            ),
-            onTap: () {
-              _handleSelection(context, suggestion);
-            },
-          );
-        },
-      ),
+    // Your logic to display search results
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor,
     );
   }
 
@@ -346,14 +305,12 @@ class MachineSearchDelegate extends SearchDelegate<String> {
     if (query.isEmpty) {
       // Display recent searches if the search bar is empty
       if (recentSearches.isEmpty) {
-        return Container(
-          color: AppColors.primaryColor,
-        );
-        // Display an empty container if no recent searches
+        return SizedBox
+            .shrink(); // Display an empty container if no recent searches
       } else {
-        return Container(
-          color: AppColors.primaryColor,
-          child: ListView.builder(
+        return Scaffold(
+          backgroundColor: AppColors.primaryColor,
+          body: ListView.builder(
             itemCount: recentSearches.length,
             itemBuilder: (context, index) {
               final suggestion = recentSearches[index];
@@ -365,10 +322,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
                       size: 20,
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryColor),
-                ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
                 ),
                 onTap: () {
                   _handleSelection(context, suggestion);
@@ -390,27 +343,24 @@ class MachineSearchDelegate extends SearchDelegate<String> {
               suggestion.toLowerCase().contains(query.toLowerCase()))
           .toList();
 
-      return Container(
-        color: AppColors.primaryColor,
-        child: ListView.builder(
-          itemCount: filteredSuggestions.length,
-          itemBuilder: (context, index) {
-            final suggestion = filteredSuggestions[index];
-            return ListTile(
-              tileColor: AppColors.primaryColor,
-              title: Text(
-                suggestion,
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.secondaryColor),
-              ),
-              onTap: () {
-                _handleSelection(context, suggestion);
-              },
-            );
-          },
-        ),
+      return ListView.builder(
+        itemCount: filteredSuggestions.length,
+        itemBuilder: (context, index) {
+          final suggestion = filteredSuggestions[index];
+          return ListTile(
+            tileColor: AppColors.primaryColor,
+            title: Text(
+              suggestion,
+              style: AppTheme.secondaryText(
+                  size: 20,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.secondaryColor),
+            ),
+            onTap: () {
+              _handleSelection(context, suggestion);
+            },
+          );
+        },
       );
     }
   }

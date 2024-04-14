@@ -366,10 +366,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryColor),
                 ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
-                ),
                 onTap: () {
                   _handleSelection(context, suggestion);
                 },

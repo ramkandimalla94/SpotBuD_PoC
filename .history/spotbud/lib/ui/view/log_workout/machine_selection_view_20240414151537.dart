@@ -269,7 +269,8 @@ class MachineSearchDelegate extends SearchDelegate<String> {
     return ThemeData(
       primaryColor: AppColors.primaryColor,
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.acccentColor, // Set app bar background color
+        color: AppColors.acccentColor,
+        backgroundColor: AppColors.primaryColor, // Set app bar background color
       ),
       // Set background color
     );
@@ -284,7 +285,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
         },
         icon: Icon(
           Icons.clear,
-          color: AppColors.primaryColor,
+          color: AppColors.acccentColor,
         ),
       ),
     ];
@@ -298,7 +299,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
       },
       icon: Icon(
         Icons.arrow_back,
-        color: AppColors.primaryColor,
+        color: AppColors.acccentColor,
       ),
     );
   }
@@ -365,10 +366,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
                       size: 20,
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryColor),
-                ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
                 ),
                 onTap: () {
                   _handleSelection(context, suggestion);

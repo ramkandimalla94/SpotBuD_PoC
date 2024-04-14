@@ -25,7 +25,6 @@ class MachineSelectionScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            color: AppColors.acccentColor,
             onPressed: () => _showSearchBar(context),
             icon: Icon(Icons.search, color: AppColors.acccentColor),
           ),
@@ -263,15 +262,28 @@ class MachineSearchDelegate extends SearchDelegate<String> {
   final List<String> recentSearches;
 
   MachineSearchDelegate(this.machinesByBodyPart, this.recentSearches);
-
   @override
-  ThemeData appBarTheme(BuildContext context) {
-    return ThemeData(
-      primaryColor: AppColors.primaryColor,
-      appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.acccentColor, // Set app bar background color
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor, // Set the background color
+      appBar: AppBar(
+        backgroundColor: AppColors.primaryColor,
+        iconTheme: IconThemeData(color: AppColors.acccentColor),
+        title: Text(
+          'Search Exercises',
+          style: AppTheme.secondaryText(
+              fontWeight: FontWeight.w500, color: AppColors.acccentColor),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              query = '';
+            },
+            icon: Icon(Icons.clear, color: AppColors.acccentColor),
+          ),
+        ],
       ),
-      // Set background color
+      body: buildSuggestions(context),
     );
   }
 
@@ -284,7 +296,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
         },
         icon: Icon(
           Icons.clear,
-          color: AppColors.primaryColor,
+          color: AppColors.acccentColor,
         ),
       ),
     ];
@@ -298,28 +310,61 @@ class MachineSearchDelegate extends SearchDelegate<String> {
       },
       icon: Icon(
         Icons.arrow_back,
-        color: AppColors.primaryColor,
+        color: AppColors.acccentColor,
       ),
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    // Filter suggestions based on the query
-    final List<String> suggestions = [];
-    machinesByBodyPart.forEach((key, value) {
-      suggestions.addAll(value);
-    });
+    // Your logic to display search results
+    return Scaffold(
+      backgroundColor: AppColors.primaryColor,
+    );
+  }
 
-    final List<String> filteredSuggestions = suggestions
-        .where((suggestion) =>
-            suggestion.toLowerCase().contains(query.toLowerCase()))
-        .toList();
+  @override
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      // Display recent searches if the search bar is empty
+      if (recentSearches.isEmpty) {
+        return SizedBox
+            .shrink(); // Display an empty container if no recent searches
+      } else {
+        return ListView.builder(
+          itemCount: recentSearches.length,
+          itemBuilder: (context, index) {
+            final suggestion = recentSearches[index];
+            return ListTile(
+              tileColor: AppColors.primaryColor,
+              title: Text(
+                suggestion,
+                style: AppTheme.secondaryText(
+                    size: 20,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.secondaryColor),
+              ),
+              onTap: () {
+                _handleSelection(context, suggestion);
+              },
+            );
+          },
+        );
+      }
+    } else {
+      // Display search results based on the query
+      final List<String> suggestions = [];
+      machinesByBodyPart.forEach((key, value) {
+        suggestions.addAll(value);
+      });
 
-    // Display filtered suggestions as search results
-    return Container(
-      color: AppColors.primaryColor,
-      child: ListView.builder(
+      final List<String> filteredSuggestions = suggestions
+          .where((suggestion) =>
+              suggestion.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+
+      return ListView.builder(
         itemCount: filteredSuggestions.length,
         itemBuilder: (context, index) {
           final suggestion = filteredSuggestions[index];
@@ -337,80 +382,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
             },
           );
         },
-      ),
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    if (query.isEmpty) {
-      // Display recent searches if the search bar is empty
-      if (recentSearches.isEmpty) {
-        return Container(
-          color: AppColors.primaryColor,
-        );
-        // Display an empty container if no recent searches
-      } else {
-        return Container(
-          color: AppColors.primaryColor,
-          child: ListView.builder(
-            itemCount: recentSearches.length,
-            itemBuilder: (context, index) {
-              final suggestion = recentSearches[index];
-              return ListTile(
-                tileColor: AppColors.primaryColor,
-                title: Text(
-                  suggestion,
-                  style: AppTheme.secondaryText(
-                      size: 20,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.secondaryColor),
-                ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
-                ),
-                onTap: () {
-                  _handleSelection(context, suggestion);
-                },
-              );
-            },
-          ),
-        );
-      }
-    } else {
-      // Display search results based on the query
-      final List<String> suggestions = [];
-      machinesByBodyPart.forEach((key, value) {
-        suggestions.addAll(value);
-      });
-
-      final List<String> filteredSuggestions = suggestions
-          .where((suggestion) =>
-              suggestion.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-
-      return Container(
-        color: AppColors.primaryColor,
-        child: ListView.builder(
-          itemCount: filteredSuggestions.length,
-          itemBuilder: (context, index) {
-            final suggestion = filteredSuggestions[index];
-            return ListTile(
-              tileColor: AppColors.primaryColor,
-              title: Text(
-                suggestion,
-                style: AppTheme.secondaryText(
-                    size: 20,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.secondaryColor),
-              ),
-              onTap: () {
-                _handleSelection(context, suggestion);
-              },
-            );
-          },
-        ),
       );
     }
   }

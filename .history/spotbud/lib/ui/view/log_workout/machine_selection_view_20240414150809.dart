@@ -263,15 +263,46 @@ class MachineSearchDelegate extends SearchDelegate<String> {
   final List<String> recentSearches;
 
   MachineSearchDelegate(this.machinesByBodyPart, this.recentSearches);
-
   @override
   ThemeData appBarTheme(BuildContext context) {
     return ThemeData(
       primaryColor: AppColors.primaryColor,
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.acccentColor, // Set app bar background color
+        backgroundColor: AppColors.primaryColor, // Set app bar background color
       ),
       // Set background color
+    );
+  }
+
+  PreferredSize buildAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize:
+          Size.fromHeight(kToolbarHeight), // Set the height of the AppBar
+      child: AppBar(
+        backgroundColor: AppColors.primaryColor,
+        iconTheme: IconThemeData(color: AppColors.acccentColor),
+        title: Text(
+          'Search', // Change to your desired title
+          style: TextStyle(
+            color: AppColors.acccentColor, // Text color
+            fontSize: 20, // Text size
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Clear the search query
+              query = '';
+            },
+            icon: Icon(
+              Icons.clear,
+              color: AppColors.acccentColor,
+            ),
+          ),
+        ],
+        centerTitle: false, // Align title to the left
+        titleSpacing: 0, // Reduce spacing around the title
+      ),
     );
   }
 
@@ -284,7 +315,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
         },
         icon: Icon(
           Icons.clear,
-          color: AppColors.primaryColor,
+          color: AppColors.acccentColor,
         ),
       ),
     ];
@@ -298,7 +329,7 @@ class MachineSearchDelegate extends SearchDelegate<String> {
       },
       icon: Icon(
         Icons.arrow_back,
-        color: AppColors.primaryColor,
+        color: AppColors.acccentColor,
       ),
     );
   }
@@ -365,10 +396,6 @@ class MachineSearchDelegate extends SearchDelegate<String> {
                       size: 20,
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryColor),
-                ),
-                leading: Icon(
-                  Icons.history,
-                  color: AppColors.backgroundColor,
                 ),
                 onTap: () {
                   _handleSelection(context, suggestion);
