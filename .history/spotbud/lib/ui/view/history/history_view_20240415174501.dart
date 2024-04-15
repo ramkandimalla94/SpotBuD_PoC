@@ -131,17 +131,14 @@ class _HistoryViewState extends State<HistoryView> {
             List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Row(
-                    children: [
-                      Expanded(child: _buildBodyPartFilter()),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: _buildMachineFilter(_loggedMachines),
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Expanded(child: _buildBodyPartFilter()),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildMachineFilter(_loggedMachines),
+                    ),
+                  ],
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -200,7 +197,6 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildBodyPartFilter() {
     return DropdownButton<String>(
-      dropdownColor: AppColors.primaryColor,
       value: _selectedBodyPart,
       onChanged: (newValue) {
         setState(() {
@@ -212,10 +208,7 @@ class _HistoryViewState extends State<HistoryView> {
       items: _loggedBodyParts.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-            style: TextStyle(color: AppColors.backgroundColor),
-          ),
+          child: Text(value),
         );
       }).toList(),
       hint: Text(
@@ -238,7 +231,6 @@ class _HistoryViewState extends State<HistoryView> {
           }).toList();
 
     return DropdownButton<String>(
-      dropdownColor: AppColors.primaryColor,
       value: _selectedMachine,
       onChanged: (newValue) {
         setState(() {
@@ -250,7 +242,6 @@ class _HistoryViewState extends State<HistoryView> {
           value: value,
           child: Text(
             value,
-            style: TextStyle(color: AppColors.backgroundColor),
           ),
         );
       }).toList(),

@@ -132,7 +132,7 @@ class _HistoryViewState extends State<HistoryView> {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       Expanded(child: _buildBodyPartFilter()),

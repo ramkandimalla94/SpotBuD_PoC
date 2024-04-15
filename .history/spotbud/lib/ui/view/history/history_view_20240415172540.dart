@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
-import 'package:get/get.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
 class HistoryView extends StatefulWidget {
@@ -17,23 +17,17 @@ class _HistoryViewState extends State<HistoryView> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late Stream<QuerySnapshot> _workoutLogsStream;
+
+  final UserDataViewModel userDataViewModel = Get.find();
   String? _selectedBodyPart;
   String? _selectedMachine;
   List<String> _loggedBodyParts = [];
   List<String> _loggedMachines = [];
-  bool _isKgsPreferred = true; // Default preference is kilograms
 
   @override
   void initState() {
     super.initState();
     _fetchWorkoutLogs();
-    _checkWeightPreference();
-  }
-
-  Future<void> _checkWeightPreference() async {
-    // Fetch user's weight preference from UserViewModel using Get.find()
-    final userDataViewModel = Get.find<UserDataViewModel>();
-    _isKgsPreferred = userDataViewModel.isKgsPreferred.value;
   }
 
   void _resetFilters() {
@@ -131,17 +125,14 @@ class _HistoryViewState extends State<HistoryView> {
             List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Row(
-                    children: [
-                      Expanded(child: _buildBodyPartFilter()),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: _buildMachineFilter(_loggedMachines),
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Expanded(child: _buildBodyPartFilter()),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: _buildMachineFilter(_loggedMachines),
+                    ),
+                  ],
                 ),
                 Expanded(
                   child: ListView.builder(
@@ -200,7 +191,6 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildBodyPartFilter() {
     return DropdownButton<String>(
-      dropdownColor: AppColors.primaryColor,
       value: _selectedBodyPart,
       onChanged: (newValue) {
         setState(() {
@@ -212,10 +202,7 @@ class _HistoryViewState extends State<HistoryView> {
       items: _loggedBodyParts.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-            style: TextStyle(color: AppColors.backgroundColor),
-          ),
+          child: Text(value),
         );
       }).toList(),
       hint: Text(
@@ -238,7 +225,6 @@ class _HistoryViewState extends State<HistoryView> {
           }).toList();
 
     return DropdownButton<String>(
-      dropdownColor: AppColors.primaryColor,
       value: _selectedMachine,
       onChanged: (newValue) {
         setState(() {
@@ -250,7 +236,6 @@ class _HistoryViewState extends State<HistoryView> {
           value: value,
           child: Text(
             value,
-            style: TextStyle(color: AppColors.backgroundColor),
           ),
         );
       }).toList(),
@@ -349,7 +334,7 @@ class _HistoryViewState extends State<HistoryView> {
 
         return ListTile(
           title: Text(
-            'Reps: ${reps ?? 'N/A'}, Weight: ${_convertWeight(weight)}',
+            'Reps: ${reps ?? 'N/A'}, Weight: ${weight ?? 'N/A'}',
             style: AppTheme.secondaryText(
                 size: 17,
                 fontWeight: FontWeight.w500,
@@ -380,21 +365,5 @@ class _HistoryViewState extends State<HistoryView> {
         children: setWidgets,
       );
     }).toList();
-  }
-
-  String _convertWeight(String? weight) {
-    if (_isKgsPreferred) {
-      // If preferred weight unit is kilograms, return weight as it is
-      return '$weight kg';
-    } else {
-      // Convert weight from kilograms to pounds
-      final double? kg = double.tryParse(weight ?? '');
-      if (kg != null) {
-        final double lbs = kg * 2.20462;
-        return lbs.toStringAsFixed(2) + ' lbs';
-      } else {
-        return 'N/A';
-      }
-    }
   }
 }
