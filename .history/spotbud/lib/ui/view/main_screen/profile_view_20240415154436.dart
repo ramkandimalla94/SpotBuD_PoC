@@ -36,10 +36,10 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
                 child: Column(
@@ -190,26 +190,26 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: buildLoginButton(
-                text: "Log Out",
-                onPressed: () {
-                  _logout(context);
-                },
-              ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: buildLoginButton(
+              text: "Log Out",
+              onPressed: () {
+                _logout(context);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Image.asset(
-                AppAssets.logogolden,
-                width: 250,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Image.asset(
+              AppAssets.logogolden,
+              width: 250,
             ),
-            const SizedBox(height: 20), // Add some space between text and logo
-          ],
-        ),
+          ),
+          const SizedBox(height: 20), // Add some space between text and logo
+        ],
       ),
     );
   }

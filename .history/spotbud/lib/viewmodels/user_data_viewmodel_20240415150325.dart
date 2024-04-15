@@ -46,7 +46,6 @@ class UserDataViewModel extends GetxController {
           gender.value = Gender.values[data['gender'] ?? Gender.Male.index];
           hasInitialData.value = data['hasInitialData'] ??
               false; // Fetch hasInitialData from Firestore
-          isKgsPreferred.value = data['isKgsPreferred'] ?? true;
         }
       }
     } catch (e) {
@@ -150,30 +149,6 @@ class UserDataViewModel extends GetxController {
     }
   }
 
-  String getDisplayWeightUnit() {
-    return isKgsPreferred.value ? 'kg' : 'lbs';
-  }
-
-  double convertWeightIfNeeded(double weight) {
-    if (isKgsPreferred.value) {
-      // Convert weight from lbs to kg if the unit is false
-      return convertToKg(weight);
-    } else {
-      // Return the weight as is if the unit is true
-      return weight;
-    }
-  }
-
-  double convertToKg(double lbsWeight) {
-    // Conversion factor from lbs to kg
-    const double lbsToKg = 0.453592;
-
-    // Convert lbs to kg
-    double kgWeight = lbsWeight * lbsToKg;
-
-    // Round to two decimal places
-    return double.parse((kgWeight).toStringAsFixed(2));
-  }
   // Save user data to Firestore
 
   // Add workout details to Firestore

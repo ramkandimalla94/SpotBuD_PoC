@@ -65,7 +65,7 @@ class AuthViewModel extends GetxController {
           'inches': 0, // Initialize inches with zero
           'gender': 0,
           'hasInitialData': false,
-          'isKgsPreferred': true,
+          'isKgsPreferred': false,
           'customMachine': [
             {
               "bodypart": "Chest",

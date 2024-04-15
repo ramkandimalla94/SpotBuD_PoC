@@ -529,9 +529,8 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           final String machine = exerciseData['machine'];
           final ExerciseData exercise =
               ExerciseData(name: '$bodyPart - $machine');
-
-          controller.addExercise(exercise);
           controller.getSets(exercise).clear();
+          controller.addExercise(exercise);
           final List<dynamic> setsData = exerciseData['sets'];
           for (var setData in setsData) {
             final int index = setsData.indexOf(setData) + 1;

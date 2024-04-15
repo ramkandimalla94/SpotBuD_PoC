@@ -24,11 +24,11 @@ class _HomeViewState extends State<HomeView> {
   late String gifPath = '';
 
   final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserData();
     _nameViewModel.fetchUserNames();
     updateDateTime();
     // Update time every minute

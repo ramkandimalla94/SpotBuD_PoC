@@ -26,7 +26,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
   void initState() {
     super.initState();
     _retrieveTempWorkoutData();
-    //_populateFormFields();
   }
 
   DateTime _selectedDate = DateTime.now();
@@ -442,14 +441,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
   }
 
   final String _tempWorkoutDataKey = 'temp_workout_data';
-  Map<String, dynamic>? _tempWorkoutData;
-
   Future<bool> _onBackPressed() async {
-    _tempWorkoutData = _prepareWorkoutData();
-    if (_tempWorkoutData != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString(_tempWorkoutDataKey, jsonEncode(_tempWorkoutData!));
-    }
+    // Temporarily save the workout data when user presses back button
+    _temporarilySaveWorkoutData();
+    // print(_tempWorkoutData);
     return true;
   }
 
@@ -514,35 +509,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     if (tempData != null) {
       setState(() {
         _tempWorkoutData = jsonDecode(tempData);
-        _selectedDate = DateTime.parse(_tempWorkoutData!['date']);
-        _selectedStartTime =
-            _parseTimeStringToTimeOfDay(_tempWorkoutData!['startTime']);
-        _selectedEndTime =
-            _parseTimeStringToTimeOfDay(_tempWorkoutData!['endTime']);
-        // Clear existing exercises and sets
-        controller.exercises.clear();
-        controller.sets.clear();
-        // Populate exercises and sets from retrieved data
-        final List<dynamic> exercisesData = _tempWorkoutData!['exercises'];
-        for (var exerciseData in exercisesData) {
-          final String bodyPart = exerciseData['bodyPart'];
-          final String machine = exerciseData['machine'];
-          final ExerciseData exercise =
-              ExerciseData(name: '$bodyPart - $machine');
-
-          controller.addExercise(exercise);
-          controller.getSets(exercise).clear();
-          final List<dynamic> setsData = exerciseData['sets'];
-          for (var setData in setsData) {
-            final int index = setsData.indexOf(setData) + 1;
-            final String reps = setData['reps'] ?? '';
-            final String weight = setData['weight'] ?? '';
-            final String notes = setData['notes'] ?? '';
-            final SetData set =
-                SetData(index: index, reps: reps, weight: weight, notes: notes);
-            controller.getSets(exercise).add(set);
-          }
-        }
       });
     }
   }
@@ -686,49 +652,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     Future.delayed(const Duration(milliseconds: 500), () {
       Get.toNamed('/mainscreen');
     });
-  }
-
-  // void _populateFormFields() {
-  //   if (_tempWorkoutData != null) {
-  //     setState(() {
-  //       // Extract data from _tempWorkoutData and populate form fields
-  //       _selectedDate = DateTime.parse(_tempWorkoutData!['date']);
-
-  //       // Parse start and end time strings to TimeOfDay objects
-  //       _selectedStartTime =
-  //           _parseTimeStringToTimeOfDay(_tempWorkoutData!['startTime']);
-  //       _selectedEndTime =
-  //           _parseTimeStringToTimeOfDay(_tempWorkoutData!['endTime']);
-
-  //       // Populate exercises and sets data
-  //       final List<dynamic> exercisesData = _tempWorkoutData!['exercises'];
-  //       for (var exerciseData in exercisesData) {
-  //         final String bodyPart = exerciseData['bodyPart'];
-  //         final String machine = exerciseData['machine'];
-  //         final ExerciseData exercise =
-  //             ExerciseData(name: '$bodyPart - $machine');
-  //         controller.addExercise(exercise);
-
-  //         final List<dynamic> setsData = exerciseData['sets'];
-  //         for (var setData in setsData) {
-  //           final int index = setsData.indexOf(setData) + 1;
-  //           final String reps = setData['reps'] ?? '';
-  //           final String weight = setData['weight'] ?? '';
-  //           final String notes = setData['notes'] ?? '';
-  //           final SetData set =
-  //               SetData(index: index, reps: reps, weight: weight, notes: notes);
-  //           controller.getSets(exercise).add(set);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }
-
-  TimeOfDay _parseTimeStringToTimeOfDay(String timeString) {
-    final List<String> parts = timeString.split(':');
-    final int hour = int.parse(parts[0]);
-    final int minute = int.parse(parts[1]);
-    return TimeOfDay(hour: hour, minute: minute);
   }
 
   void _openBodyPartSelection() async {

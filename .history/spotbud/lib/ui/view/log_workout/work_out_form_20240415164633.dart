@@ -531,7 +531,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
               ExerciseData(name: '$bodyPart - $machine');
 
           controller.addExercise(exercise);
-          controller.getSets(exercise).clear();
           final List<dynamic> setsData = exerciseData['sets'];
           for (var setData in setsData) {
             final int index = setsData.indexOf(setData) + 1;
@@ -778,7 +777,7 @@ class WorkoutLoggingFormController extends GetxController {
 
   void addExercise(ExerciseData exercise) {
     exercises.add(exercise);
-    sets[exercise] = [SetData(index: 1)];
+    // sets[exercise] = [SetData(index: 1)];
   }
 
   List<SetData> getSets(ExerciseData exercise) {

@@ -25,21 +25,21 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   void initState() {
     super.initState();
-    // _fetchUserData();
+    _fetchUserData();
   }
 
-  // Future<void> _fetchUserData() async {
-  //   await _userDataViewModel.fetchUserData();
-  // }
+  Future<void> _fetchUserData() async {
+    await _userDataViewModel.fetchUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
                 child: Column(
@@ -110,7 +110,7 @@ class _ProfileViewState extends State<ProfileView> {
                     const SizedBox(height: 10),
                     Obx(
                       () => Text(
-                        'Weight: ${_userDataViewModel.convertWeightIfNeeded(_userDataViewModel.weight.value)} ${_userDataViewModel.getDisplayWeightUnit()}',
+                        'Weight: ${_userDataViewModel.weight.value} ${_isKgsPreferred ? "kg" : "lbs"}',
                         style: const TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
@@ -176,7 +176,7 @@ class _ProfileViewState extends State<ProfileView> {
                           activeColor: AppColors.acccentColor,
                         ),
                         SizedBox(
-                            width: 2), // Add spacing between switch and label
+                            width: 10), // Add spacing between switch and label
                         Text(
                           'kgs',
                           style: TextStyle(
@@ -190,26 +190,26 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: buildLoginButton(
-                text: "Log Out",
-                onPressed: () {
-                  _logout(context);
-                },
-              ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: buildLoginButton(
+              text: "Log Out",
+              onPressed: () {
+                _logout(context);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Image.asset(
-                AppAssets.logogolden,
-                width: 250,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Image.asset(
+              AppAssets.logogolden,
+              width: 250,
             ),
-            const SizedBox(height: 20), // Add some space between text and logo
-          ],
-        ),
+          ),
+          const SizedBox(height: 20), // Add some space between text and logo
+        ],
       ),
     );
   }
@@ -233,7 +233,6 @@ class _ProfileViewState extends State<ProfileView> {
   Future<void> saveWeightUnitPreference(bool isKgsPreferred) async {
     try {
       User? user = _auth.currentUser;
-      if (_isKgsPreferred) {}
       if (user != null) {
         String userId = user.uid;
         await _firestore.collection('data').doc(userId).update({

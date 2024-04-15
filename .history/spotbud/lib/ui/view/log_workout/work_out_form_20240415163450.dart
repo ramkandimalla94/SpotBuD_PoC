@@ -26,7 +26,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
   void initState() {
     super.initState();
     _retrieveTempWorkoutData();
-    //_populateFormFields();
+    _populateFormFields();
   }
 
   DateTime _selectedDate = DateTime.now();
@@ -508,12 +508,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     return workoutData;
   }
 
-  void _retrieveTempWorkoutData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? tempData = prefs.getString(_tempWorkoutDataKey);
-    if (tempData != null) {
+  void _populateFormFields() {
+    if (_tempWorkoutData != null) {
       setState(() {
-        _tempWorkoutData = jsonDecode(tempData);
         _selectedDate = DateTime.parse(_tempWorkoutData!['date']);
         _selectedStartTime =
             _parseTimeStringToTimeOfDay(_tempWorkoutData!['startTime']);
@@ -529,9 +526,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
           final String machine = exerciseData['machine'];
           final ExerciseData exercise =
               ExerciseData(name: '$bodyPart - $machine');
-
           controller.addExercise(exercise);
-          controller.getSets(exercise).clear();
           final List<dynamic> setsData = exerciseData['sets'];
           for (var setData in setsData) {
             final int index = setsData.indexOf(setData) + 1;
@@ -687,42 +682,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       Get.toNamed('/mainscreen');
     });
   }
-
-  // void _populateFormFields() {
-  //   if (_tempWorkoutData != null) {
-  //     setState(() {
-  //       // Extract data from _tempWorkoutData and populate form fields
-  //       _selectedDate = DateTime.parse(_tempWorkoutData!['date']);
-
-  //       // Parse start and end time strings to TimeOfDay objects
-  //       _selectedStartTime =
-  //           _parseTimeStringToTimeOfDay(_tempWorkoutData!['startTime']);
-  //       _selectedEndTime =
-  //           _parseTimeStringToTimeOfDay(_tempWorkoutData!['endTime']);
-
-  //       // Populate exercises and sets data
-  //       final List<dynamic> exercisesData = _tempWorkoutData!['exercises'];
-  //       for (var exerciseData in exercisesData) {
-  //         final String bodyPart = exerciseData['bodyPart'];
-  //         final String machine = exerciseData['machine'];
-  //         final ExerciseData exercise =
-  //             ExerciseData(name: '$bodyPart - $machine');
-  //         controller.addExercise(exercise);
-
-  //         final List<dynamic> setsData = exerciseData['sets'];
-  //         for (var setData in setsData) {
-  //           final int index = setsData.indexOf(setData) + 1;
-  //           final String reps = setData['reps'] ?? '';
-  //           final String weight = setData['weight'] ?? '';
-  //           final String notes = setData['notes'] ?? '';
-  //           final SetData set =
-  //               SetData(index: index, reps: reps, weight: weight, notes: notes);
-  //           controller.getSets(exercise).add(set);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }
 
   TimeOfDay _parseTimeStringToTimeOfDay(String timeString) {
     final List<String> parts = timeString.split(':');

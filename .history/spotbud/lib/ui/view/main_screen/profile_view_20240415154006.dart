@@ -28,6 +28,26 @@ class _ProfileViewState extends State<ProfileView> {
     // _fetchUserData();
   }
 
+  double _convertWeightIfNeeded(double weight) {
+    if (!_userDataViewModel.isKgsPreferred.value) {
+      // Convert weight from lbs to kg if the unit is false
+      return convertToKg(weight);
+    } else {
+      // Return the weight as is if the unit is true
+      return weight;
+    }
+  }
+
+  double convertToKg(double lbsWeight) {
+    // Conversion factor from lbs to kg
+    const double lbsToKg = 0.453592;
+
+    // Convert lbs to kg
+    double kgWeight = lbsWeight * lbsToKg;
+
+    // Round to two decimal places
+    return double.parse((kgWeight).toStringAsFixed(2));
+  }
   // Future<void> _fetchUserData() async {
   //   await _userDataViewModel.fetchUserData();
   // }
@@ -36,10 +56,10 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
                 child: Column(
@@ -110,7 +130,7 @@ class _ProfileViewState extends State<ProfileView> {
                     const SizedBox(height: 10),
                     Obx(
                       () => Text(
-                        'Weight: ${_userDataViewModel.convertWeightIfNeeded(_userDataViewModel.weight.value)} ${_userDataViewModel.getDisplayWeightUnit()}',
+                        'Weight: ${_convertWeightIfNeeded(_userDataViewModel.weight.value)} ${_userDataViewModel.getDisplayWeightUnit()}',
                         style: const TextStyle(
                           fontSize: 20,
                           color: AppColors.secondaryColor,
@@ -190,26 +210,26 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: buildLoginButton(
-                text: "Log Out",
-                onPressed: () {
-                  _logout(context);
-                },
-              ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: buildLoginButton(
+              text: "Log Out",
+              onPressed: () {
+                _logout(context);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Image.asset(
-                AppAssets.logogolden,
-                width: 250,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Image.asset(
+              AppAssets.logogolden,
+              width: 250,
             ),
-            const SizedBox(height: 20), // Add some space between text and logo
-          ],
-        ),
+          ),
+          const SizedBox(height: 20), // Add some space between text and logo
+        ],
       ),
     );
   }
