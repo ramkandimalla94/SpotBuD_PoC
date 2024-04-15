@@ -295,27 +295,23 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                   return const Center(child: LoadingIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
-                    child: Text(
-                      'No workout history available.',
-                      style: AppTheme.secondaryText(
+                      child: Text(
+                    'No workout history available.',
+                    style: AppTheme.secondaryText(
                         size: 15,
                         color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
+                        fontWeight: FontWeight.bold),
+                  ));
                 } else if (snapshot.hasError) {
                   print('Error fetching workout history: ${snapshot.error}');
                   return Center(
-                    child: Text(
-                      'Error fetching workout history.',
-                      style: AppTheme.secondaryText(
+                      child: Text(
+                    'Error fetching workout history.',
+                    style: AppTheme.secondaryText(
                         size: 15,
                         color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
+                        fontWeight: FontWeight.bold),
+                  ));
                 } else {
                   var filteredDocs = snapshot.data!.docs.where((doc) {
                     var exercises = doc['exercises'];
@@ -328,15 +324,13 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
                   if (filteredDocs.isEmpty) {
                     return Center(
-                      child: Text(
-                        'No workout history available for $machine.',
-                        style: AppTheme.secondaryText(
+                        child: Text(
+                      'No workout history available for $machine.',
+                      style: AppTheme.secondaryText(
                           size: 15,
                           color: AppColors.backgroundColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
+                          fontWeight: FontWeight.bold),
+                    ));
                   }
 
                   return ListView.builder(
@@ -351,10 +345,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         title: Text(
                           date + '    Time: ' + time,
                           style: AppTheme.secondaryText(
-                            size: 20,
-                            color: AppColors.acccentColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              size: 20,
+                              color: AppColors.acccentColor,
+                              fontWeight: FontWeight.bold),
                         ),
                         initiallyExpanded: index == 0, // Expand the first tile
                         children: exercises.map<Widget>((exercise) {
@@ -363,34 +356,16 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             String reps = set['reps'] ?? 'Data Not Available';
                             String weight =
                                 set['weight'] ?? 'Data Not Available';
-                            if (userDataViewModel.isKgsPreferred.value) {
-                              return ListTile(
-                                title: Text(
-                                  'Reps: $reps  Weights: $weight kg',
-                                  style: AppTheme.secondaryText(
+                            return ListTile(
+                              title: Text(
+                                'Reps: $reps  Weights: $weight kg',
+                                style: AppTheme.secondaryText(
                                     size: 15,
                                     color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                // You can display other set details here
-                              );
-                            } else {
-                              // Convert kg to lbs
-                              double weightInKg = double.parse(weight);
-                              double weightInLbs = weightInKg * 2.20462;
-                              return ListTile(
-                                title: Text(
-                                  'Reps: $reps  Weights: ${weightInLbs.toStringAsFixed(2)} lbs',
-                                  style: AppTheme.secondaryText(
-                                    size: 15,
-                                    color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                // You can display other set details here
-                              );
-                            }
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              // You can display other set details here
+                            );
                           }).toList();
 
                           return Column(
@@ -617,125 +592,124 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       });
   }
 
-  Future<void> _saveWorkout() async {
-    if (controller.exercises.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please add at least one exercise before saving.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.black,
-        colorText: Colors.white,
-      );
-      return;
-    }
+ import 'package:shared_preferences/shared_preferences.dart';
 
-    // Perform validation for each set
-    for (var exercise in controller.exercises) {
-      final sets = controller.getSets(exercise);
-      for (var set in sets) {
-        if (set.reps.isEmpty || set.weight.isEmpty) {
-          Get.snackbar(
-            'Error',
-            'Please fill in both reps and weight for all sets.',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.black,
-            colorText: Colors.white,
-          );
-          return;
-        }
-      }
-    }
-
-    // Remove exercises with no sets
-    controller.exercises
-        .removeWhere((exercise) => controller.getSets(exercise).isEmpty);
-
-    // Check if there are no exercises with sets
-    if (controller.exercises.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please add at least one exercise with sets before saving.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.black,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    // Prepare workout data
-    List<Map<String, dynamic>> exercisesData = [];
-
-    // Get user's preference for weight unit
-    bool isKgsPreferred = userDataViewModel.isKgsPreferred.value;
-
-    for (var exercise in controller.exercises) {
-      final setsData = controller
-          .getSets(exercise)
-          .map((set) => {
-                'reps': set.reps,
-                'weight':
-                    isKgsPreferred ? set.weight : _convertLbsToKg(set.weight),
-                'notes': set.notes,
-              })
-          .toList();
-
-      // Split exercise name into body part and machine
-      final nameParts = exercise.name.split(' - ');
-      final bodyPart = nameParts[0];
-      final machine = nameParts[1];
-
-      exercisesData.add({
-        'bodyPart': bodyPart,
-        'machine': machine,
-        'sets': setsData,
-      });
-    }
-
-    // Prepare workout data
-    Map<String, dynamic> workoutData = {
-      'date': DateTimeUtils.getFormattedDate(_selectedDate),
-      'startTime': DateTimeUtils.getFormattedTime(DateTime(
-          _selectedDate.year,
-          _selectedDate.month,
-          _selectedDate.day,
-          _selectedStartTime.hour,
-          _selectedStartTime.minute)),
-      'endTime': controller.endTime.value.isNotEmpty
-          ? controller.endTime.value
-          : DateTimeUtils.getFormattedTime(
-              DateTime.now()), // Current time if end time is empty
-      'exercises': exercisesData, // Set the exercises data
-    };
-
-    // Save workout data to Firestore
-    userDataViewModel.saveWorkoutLog(workoutData);
-
+Future<void> _saveWorkout() async {
+  if (controller.exercises.isEmpty) {
     Get.snackbar(
-      'Success',
-      'Workout saved successfully.',
+      'Error',
+      'Please add at least one exercise before saving.',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.blue,
+      backgroundColor: AppColors.black,
       colorText: Colors.white,
     );
-    // Reset the form
-    controller.reset();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove(_tempWorkoutDataKey);
-    // Redirect to the main screen after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      Get.toNamed('/mainscreen');
+    return;
+  }
+
+  // Perform validation for each set
+  for (var exercise in controller.exercises) {
+    final sets = controller.getSets(exercise);
+    for (var set in sets) {
+      if (set.reps.isEmpty || set.weight.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Please fill in both reps and weight for all sets.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.black,
+          colorText: Colors.white,
+        );
+        return;
+      }
+    }
+  }
+
+  // Remove exercises with no sets
+  controller.exercises.removeWhere((exercise) => controller.getSets(exercise).isEmpty);
+
+  // Check if there are no exercises with sets
+  if (controller.exercises.isEmpty) {
+    Get.snackbar(
+      'Error',
+      'Please add at least one exercise with sets before saving.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: AppColors.black,
+      colorText: Colors.white,
+    );
+    return;
+  }
+
+  // Prepare workout data
+  List<Map<String, dynamic>> exercisesData = [];
+
+  // Get user's preference for weight unit
+  bool isKgsPreferred = userDataViewModel.isKgsPreferred;
+
+  for (var exercise in controller.exercises) {
+    final setsData = controller
+        .getSets(exercise)
+        .map((set) => {
+              'reps': set.reps,
+              'weight': isKgsPreferred ? set.weight : _convertLbsToKg(set.weight),
+              'notes': set.notes,
+            })
+        .toList();
+
+    // Split exercise name into body part and machine
+    final nameParts = exercise.name.split(' - ');
+    final bodyPart = nameParts[0];
+    final machine = nameParts[1];
+
+    exercisesData.add({
+      'bodyPart': bodyPart,
+      'machine': machine,
+      'sets': setsData,
     });
   }
 
+  // Prepare workout data
+  Map<String, dynamic> workoutData = {
+    'date': DateTimeUtils.getFormattedDate(_selectedDate),
+    'startTime': DateTimeUtils.getFormattedTime(DateTime(
+        _selectedDate.year,
+        _selectedDate.month,
+        _selectedDate.day,
+        _selectedStartTime.hour,
+        _selectedStartTime.minute)),
+    'endTime': controller.endTime.value.isNotEmpty
+        ? controller.endTime.value
+        : DateTimeUtils.getFormattedTime(
+            DateTime.now()), // Current time if end time is empty
+    'exercises': exercisesData, // Set the exercises data
+  };
+
+  // Save workout data to Firestore
+  userDataViewModel.saveWorkoutLog(workoutData);
+
+  Get.snackbar(
+    'Success',
+    'Workout saved successfully.',
+    snackPosition: SnackPosition.BOTTOM,
+    backgroundColor: AppColors.blue,
+    colorText: Colors.white,
+  );
+  // Reset the form
+  controller.reset();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove(_tempWorkoutDataKey);
+  // Redirect to the main screen after a short delay
+  Future.delayed(const Duration(milliseconds: 500), () {
+    Get.toNamed('/mainscreen');
+  });
+}
+
 // Function to convert weight from pounds to kilograms
-  String _convertLbsToKg(String lbs) {
-    // Assuming the weight is always in pounds
-    double weightInLbs = double.parse(lbs);
-    double weightInKg =
-        weightInLbs * 0.453592; // Conversion factor from lbs to kg
-    return weightInKg
-        .toStringAsFixed(2); // Return weight in kg rounded to 2 decimal places
-  }
+String _convertLbsToKg(String lbs) {
+  // Assuming the weight is always in pounds
+  double weightInLbs = double.parse(lbs);
+  double weightInKg = weightInLbs * 0.453592; // Conversion factor from lbs to kg
+  return weightInKg.toStringAsFixed(2); // Return weight in kg rounded to 2 decimal places
+}
+
 
   TimeOfDay _parseTimeStringToTimeOfDay(String timeString) {
     final List<String> parts = timeString.split(':');
@@ -760,21 +734,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
         // If fetched data is available, set it as hint text
         if (latestSetDetails != null) {
-          var reps = latestSetDetails['reps'] ?? '';
-          var weight = latestSetDetails['weight'] ?? '';
-
-          // Convert weight based on user preference
-          if (userDataViewModel.isKgsPreferred.value) {
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight = weight;
-          } else {
-            // Convert kg to lbs
-            double weightInKg = double.parse(weight);
-            double weightInLbs = weightInKg * 2.20462;
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight =
-                weightInLbs.toStringAsFixed(2);
-          }
+          controller.getSets(exercise).first.reps =
+              latestSetDetails['reps'] ?? '';
+          controller.getSets(exercise).first.weight =
+              latestSetDetails['weight'] ?? '';
         }
       }
     }

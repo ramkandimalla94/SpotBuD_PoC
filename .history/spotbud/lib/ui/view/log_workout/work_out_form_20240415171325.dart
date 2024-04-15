@@ -295,27 +295,23 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                   return const Center(child: LoadingIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
-                    child: Text(
-                      'No workout history available.',
-                      style: AppTheme.secondaryText(
+                      child: Text(
+                    'No workout history available.',
+                    style: AppTheme.secondaryText(
                         size: 15,
                         color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
+                        fontWeight: FontWeight.bold),
+                  ));
                 } else if (snapshot.hasError) {
                   print('Error fetching workout history: ${snapshot.error}');
                   return Center(
-                    child: Text(
-                      'Error fetching workout history.',
-                      style: AppTheme.secondaryText(
+                      child: Text(
+                    'Error fetching workout history.',
+                    style: AppTheme.secondaryText(
                         size: 15,
                         color: AppColors.backgroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
+                        fontWeight: FontWeight.bold),
+                  ));
                 } else {
                   var filteredDocs = snapshot.data!.docs.where((doc) {
                     var exercises = doc['exercises'];
@@ -328,15 +324,13 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
                   if (filteredDocs.isEmpty) {
                     return Center(
-                      child: Text(
-                        'No workout history available for $machine.',
-                        style: AppTheme.secondaryText(
+                        child: Text(
+                      'No workout history available for $machine.',
+                      style: AppTheme.secondaryText(
                           size: 15,
                           color: AppColors.backgroundColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
+                          fontWeight: FontWeight.bold),
+                    ));
                   }
 
                   return ListView.builder(
@@ -351,10 +345,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         title: Text(
                           date + '    Time: ' + time,
                           style: AppTheme.secondaryText(
-                            size: 20,
-                            color: AppColors.acccentColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              size: 20,
+                              color: AppColors.acccentColor,
+                              fontWeight: FontWeight.bold),
                         ),
                         initiallyExpanded: index == 0, // Expand the first tile
                         children: exercises.map<Widget>((exercise) {
@@ -363,34 +356,16 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                             String reps = set['reps'] ?? 'Data Not Available';
                             String weight =
                                 set['weight'] ?? 'Data Not Available';
-                            if (userDataViewModel.isKgsPreferred.value) {
-                              return ListTile(
-                                title: Text(
-                                  'Reps: $reps  Weights: $weight kg',
-                                  style: AppTheme.secondaryText(
+                            return ListTile(
+                              title: Text(
+                                'Reps: $reps  Weights: $weight kg',
+                                style: AppTheme.secondaryText(
                                     size: 15,
                                     color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                // You can display other set details here
-                              );
-                            } else {
-                              // Convert kg to lbs
-                              double weightInKg = double.parse(weight);
-                              double weightInLbs = weightInKg * 2.20462;
-                              return ListTile(
-                                title: Text(
-                                  'Reps: $reps  Weights: ${weightInLbs.toStringAsFixed(2)} lbs',
-                                  style: AppTheme.secondaryText(
-                                    size: 15,
-                                    color: AppColors.backgroundColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                // You can display other set details here
-                              );
-                            }
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              // You can display other set details here
+                            );
                           }).toList();
 
                           return Column(
@@ -760,21 +735,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
         // If fetched data is available, set it as hint text
         if (latestSetDetails != null) {
-          var reps = latestSetDetails['reps'] ?? '';
-          var weight = latestSetDetails['weight'] ?? '';
-
-          // Convert weight based on user preference
-          if (userDataViewModel.isKgsPreferred.value) {
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight = weight;
-          } else {
-            // Convert kg to lbs
-            double weightInKg = double.parse(weight);
-            double weightInLbs = weightInKg * 2.20462;
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight =
-                weightInLbs.toStringAsFixed(2);
-          }
+          controller.getSets(exercise).first.reps =
+              latestSetDetails['reps'] ?? '';
+          controller.getSets(exercise).first.weight =
+              latestSetDetails['weight'] ?? '';
         }
       }
     }

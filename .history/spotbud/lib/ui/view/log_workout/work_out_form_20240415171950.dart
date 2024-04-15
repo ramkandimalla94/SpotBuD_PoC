@@ -760,21 +760,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
         // If fetched data is available, set it as hint text
         if (latestSetDetails != null) {
-          var reps = latestSetDetails['reps'] ?? '';
-          var weight = latestSetDetails['weight'] ?? '';
-
-          // Convert weight based on user preference
-          if (userDataViewModel.isKgsPreferred.value) {
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight = weight;
-          } else {
-            // Convert kg to lbs
-            double weightInKg = double.parse(weight);
-            double weightInLbs = weightInKg * 2.20462;
-            controller.getSets(exercise).first.reps = reps;
-            controller.getSets(exercise).first.weight =
-                weightInLbs.toStringAsFixed(2);
-          }
+          controller.getSets(exercise).first.reps =
+              latestSetDetails['reps'] ?? '';
+          controller.getSets(exercise).first.weight =
+              latestSetDetails['weight'] ?? '';
         }
       }
     }
