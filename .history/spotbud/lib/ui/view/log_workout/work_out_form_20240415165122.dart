@@ -53,7 +53,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
             icon: const Icon(
               CupertinoIcons.trash,
             ),
-            onPressed: () => controller.reset(),
+            onPressed: () => _saveWorkout(),
           ),
           IconButton(
             icon: const Icon(
