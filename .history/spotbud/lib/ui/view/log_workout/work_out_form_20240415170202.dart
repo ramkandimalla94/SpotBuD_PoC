@@ -396,50 +396,49 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
       if (user != null) {
         String userId = user.uid;
 
-        // Fetch the latest workout containing the specified machine
+        // Fetch all workouts containing the specified machine
         QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
             .instance
             .collection('data')
             .doc(userId)
             .collection('workouts')
+            .where('exercises', arrayContains: {'machine': machineName})
             .orderBy('timestamp', descending: true)
-            .limit(14)
+            .limit(1)
             .get();
 
         if (snapshot.docs.isNotEmpty) {
-          // Iterate through each workout to find the one containing the specified machine
-          for (var doc in snapshot.docs) {
-            var workoutData = doc.data();
-            // Get the exercises from the current workout
-            List<dynamic> exercises = workoutData['exercises'];
+          // Get the latest workout data
+          var workoutData = snapshot.docs.first.data();
+          // Get the exercises from the latest workout
+          List<dynamic> exercises = workoutData['exercises'];
 
-            // Find the exercise containing the specified machine
-            var exerciseContainingMachine = exercises.firstWhere(
-                (exercise) => exercise['machine'] == machineName,
-                orElse: () => null);
+          // Find the exercise containing the specified machine
+          var exerciseContainingMachine = exercises.firstWhere(
+              (exercise) => exercise['machine'] == machineName,
+              orElse: () => null);
 
-            if (exerciseContainingMachine != null) {
-              // Get the sets for the specified exercise
-              List<dynamic> sets = exerciseContainingMachine['sets'];
-              // Get the latest set
-              var latestSet = sets.isNotEmpty ? sets[0] : null;
+          if (exerciseContainingMachine != null) {
+            // Get the sets for the specified exercise
+            List<dynamic> sets = exerciseContainingMachine['sets'];
+            // Get the latest set
+            var latestSet = sets.isNotEmpty ? sets[0] : null;
 
-              if (latestSet != null) {
-                // Get the reps and weight from the latest set
-                String reps = latestSet['reps'] ?? 'Data Not Available';
-                String weight = latestSet['weight'] ?? 'Data Not Available';
-                // Return the reps and weight
-                return {'reps': reps, 'weight': weight};
-              } else {
-                print('No sets available for $machineName');
-              }
+            if (latestSet != null) {
+              // Get the reps and weight from the latest set
+              String reps = latestSet['reps'] ?? 'Data Not Available';
+              String weight = latestSet['weight'] ?? 'Data Not Available';
+              // Return the reps and weight
+              return {'reps': reps, 'weight': weight};
             } else {
-              print(
-                  'Exercise containing $machineName not found in this workout');
+              print('No sets available for $machineName');
             }
+          } else {
+            print(
+                'Exercise containing $machineName not found in the latest workout');
           }
         } else {
-          print('No workout data available');
+          print('No workout data available for $machineName');
         }
       } else {
         throw Exception('User is not logged in');
