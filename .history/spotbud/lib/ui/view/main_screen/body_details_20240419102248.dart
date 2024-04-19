@@ -384,13 +384,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
   // Method to update weight in kg
   void updateWeightKg(double newWeightLbs) {
     weightLbs.value = newWeightLbs;
-    weightKg.value = (newWeightLbs / 2.20462).roundToDouble();
+    weightKg.value = newWeightLbs * 0.453592;
   }
 
   // Method to update weight in lbs
   void updateWeightLbs(double newWeightKg) {
     weightKg.value = newWeightKg;
-    weightLbs.value = (newWeightKg * 2.20462).roundToDouble();
+    weightLbs.value = newWeightKg * 2.20462;
   }
 
   // Method to update height in meters and centimeters

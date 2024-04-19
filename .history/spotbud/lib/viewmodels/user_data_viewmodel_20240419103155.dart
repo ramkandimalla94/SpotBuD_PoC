@@ -160,7 +160,7 @@ class UserDataViewModel extends GetxController {
       return weight;
     } else {
       // Return the weight as is if the unit is true
-      return convertToLbs(weight);
+      return convertToKg(weight);
     }
   }
 
@@ -174,18 +174,7 @@ class UserDataViewModel extends GetxController {
     // Round to two decimal places
     return double.parse((kgWeight).toStringAsFixed(2));
   }
-
   // Save user data to Firestore
-  double convertToLbs(double kgWeight) {
-    // Conversion factor from kg to lbs
-    const double kgToLbs = 2.20462;
-
-    // Convert kg to lbs
-    double lbsWeight = kgWeight * kgToLbs;
-
-    // Round to two decimal places
-    return double.parse((lbsWeight).toStringAsFixed(2));
-  }
 
   // Add workout details to Firestore
   Future<void> addWorkoutDetails(Map<String, dynamic> workoutData) async {

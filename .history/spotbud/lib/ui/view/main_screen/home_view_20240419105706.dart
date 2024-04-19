@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/view/log_workout/work_out_form.dart';
-import 'package:spotbud/ui/view/main_screen/workout_analytics.dart';
+import 'package:spotbud/ui/view/main_screen/workout_analytics';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';

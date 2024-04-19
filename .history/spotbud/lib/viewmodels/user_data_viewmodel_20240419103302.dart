@@ -157,10 +157,10 @@ class UserDataViewModel extends GetxController {
   double convertWeightIfNeeded(double weight) {
     if (isKgsPreferred.value) {
       // Convert weight from lbs to kg if the unit is false
-      return weight;
+      return convertToKg(weight);
     } else {
       // Return the weight as is if the unit is true
-      return convertToLbs(weight);
+      return weight;
     }
   }
 

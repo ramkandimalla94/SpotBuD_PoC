@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:spotbud/models/workout.dart';
+import 'package:spotbud/controllers/workout_controller.dart';
+
+class ExerciseAnalyticsScreen extends StatelessWidget {
+  final WorkoutController workoutController = Get.find();
+  final String selectedExercise;
+
+  ExerciseAnalyticsScreen({required this.selectedExercise});
+
+  @override
+  Widget build(BuildContext context) {
+    // Filter workouts for the selected exercise
+    List<Workout> filteredWorkouts =
+        workoutController.workouts.where((workout) {
+      return workout.sets.any((set) => set.exerciseName == selectedExercise);
+    }).toList();
+
+    // Calculate total sets and reps
+    int totalSets = 0;
+    int totalReps = 0;
+    double totalWeight = 0.0;
+    double maxWeight = 0.0;
+
+    // Iterate through filtered workouts
+    for (var workout in filteredWorkouts) {
+      for (var set in workout.sets) {
+        if (set.exerciseName == selectedExercise) {
+          totalSets++;
+          totalReps += set.reps;
+          totalWeight += set.weight;
+          if (set.weight > maxWeight) {
+            maxWeight = set.weight;
+          }
+        }
+      }
+    }
+
+    // Calculate average weight
+    double averageWeight = totalSets > 0 ? totalWeight / totalSets : 0.0;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Exercise Analytics'),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Analytics for $selectedExercise',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Text('Total Sets: $totalSets'),
+            Text('Total Reps: $totalReps'),
+            Text('Average Weight: ${averageWeight.toStringAsFixed(2)}'),
+            Text('Max Weight: ${maxWeight.toStringAsFixed(2)}'),
+            // Add more analytics widgets here
+          ],
+        ),
+      ),
+    );
+  }
+}
