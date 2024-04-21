@@ -684,20 +684,16 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     );
   }
 
-  Map<String, Map<String, int>> _calculateSetsByBodyPart() {
-    Map<String, Map<String, int>> setsByBodyPart = {};
+  Map<String, int> _calculateSetsByBodyPart() {
+    Map<String, int> setsByBodyPart = {};
 
     for (var workout in workoutController.workouts) {
       for (var exercise in workout.exercises) {
         String bodyPart = exercise.bodyPart;
-        String exerciseName = exercise.machine;
         int numSets = exercise.sets.length;
 
-        // Initialize setsByBodyPart if not exist
-        setsByBodyPart[bodyPart] ??= {};
-        // Increment the count for the exercise
-        setsByBodyPart[bodyPart]![exerciseName] =
-            (setsByBodyPart[bodyPart]![exerciseName] ?? 0) + numSets;
+        // Increment the count for the body part
+        setsByBodyPart[bodyPart] = (setsByBodyPart[bodyPart] ?? 0) + numSets;
       }
     }
 
@@ -706,26 +702,23 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
   Widget _buildPieChart() {
     if (selectedBodyPart == 'Overall') {
-      // Calculate total sets
-      int totalSets = 0;
-      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
-      for (var entry in setsByBodyPart.entries) {
-        totalSets += entry.value.values.reduce((a, b) => a + b);
-      }
+      // Calculate sets by body part
+      Map<String, int> setsByBodyPart = _calculateSetsByBodyPart();
 
       // Convert setsByBodyPart to pie chart data
       List<PieChartSectionData> pieChartSections =
           setsByBodyPart.entries.map((entry) {
         String bodyPart = entry.key;
-        int bodyPartTotalSets = entry.value.values
-            .reduce((a, b) => a + b); // Total sets for body part
-        double percentage = (bodyPartTotalSets / totalSets) * 100;
+        int numSets = entry.value;
+
+        // Calculate percentage
+        double percentage =
+            numSets / setsByBodyPart.values.reduce((a, b) => a + b);
 
         return PieChartSectionData(
           color: getRandomColor(), // Get random color
-          value: percentage, // Percentage of total sets
-          title:
-              '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
+          value: percentage * 100, // Convert to percentage
+          title: '$bodyPart (${(percentage * 100).toStringAsFixed(2)}%)',
           titleStyle: TextStyle(color: getRandomColor()),
 
           radius: 100,
@@ -747,31 +740,23 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       );
     } else {
       // Calculate sets by selected body part
-      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
+      Map<String, int> setsByBodyPart = _calculateSetsByBodyPart();
 
-      // Get sets for selected body part
-      Map<String, int>? setsForSelectedPart = setsByBodyPart[selectedBodyPart];
+      // Get the number of sets for the selected body part
+      int setsForSelectedPart = setsByBodyPart[selectedBodyPart] ?? 0;
 
       // Convert setsForSelectedPart to pie chart data
-      List<PieChartSectionData> pieChartSections = [];
-      if (setsForSelectedPart != null) {
-        int totalSets = setsForSelectedPart.values.reduce((a, b) => a + b);
+      List<PieChartSectionData> pieChartSections = [
+        PieChartSectionData(
+          color: getRandomColor(), // Get random color
+          value: setsForSelectedPart
+              .toDouble(), // Use number of sets for selected part
+          title: '$selectedBodyPart ($setsForSelectedPart sets)',
+          titleStyle: TextStyle(color: getRandomColor()),
 
-        pieChartSections = setsForSelectedPart.entries.map((entry) {
-          String exerciseName = entry.key;
-          int sets = entry.value;
-          double percentage = (sets / totalSets) * 100;
-
-          return PieChartSectionData(
-            color: getRandomColor(), // Get random color
-            value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
-            titleStyle: TextStyle(color: getRandomColor()),
-
-            radius: 100,
-          );
-        }).toList();
-      }
+          radius: 100,
+        ),
+      ];
 
       return AspectRatio(
         aspectRatio: 1,

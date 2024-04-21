@@ -706,26 +706,19 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
   Widget _buildPieChart() {
     if (selectedBodyPart == 'Overall') {
-      // Calculate total sets
-      int totalSets = 0;
+      // Calculate sets by body part
       Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
-      for (var entry in setsByBodyPart.entries) {
-        totalSets += entry.value.values.reduce((a, b) => a + b);
-      }
 
       // Convert setsByBodyPart to pie chart data
       List<PieChartSectionData> pieChartSections =
           setsByBodyPart.entries.map((entry) {
         String bodyPart = entry.key;
-        int bodyPartTotalSets = entry.value.values
-            .reduce((a, b) => a + b); // Total sets for body part
-        double percentage = (bodyPartTotalSets / totalSets) * 100;
+        int totalSets = entry.value.values.reduce((a, b) => a + b);
 
         return PieChartSectionData(
           color: getRandomColor(), // Get random color
-          value: percentage, // Percentage of total sets
-          title:
-              '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
+          value: totalSets.toDouble(), // Convert to double
+          title: '$bodyPart ($totalSets sets)',
           titleStyle: TextStyle(color: getRandomColor()),
 
           radius: 100,

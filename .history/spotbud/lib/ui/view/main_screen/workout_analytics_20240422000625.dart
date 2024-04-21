@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +21,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   String selectedOption = 'Average Weight';
   String selectedExercise = ''; // Initialize selectedExercise
   late DateTime _focusedDay = DateTime.now();
-  String selectedBodyPart = 'Overall';
 
   late DateTime _selectedDay;
   @override
@@ -101,43 +98,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
               _buildAnalyticsItem("Longest Streak ", '${longestStreak} 🔥')
             ],
           ),
-          Row(
-            children: [
-              const Text(
-                'Select Body Part:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.0,
-                    color: AppColors.acccentColor),
-              ),
-              const SizedBox(width: 20.0),
-              DropdownButton<String>(
-                dropdownColor: AppColors.primaryColor,
-                value: selectedBodyPart,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedBodyPart = newValue!;
-                  });
-                },
-                items: [
-                  'Overall',
-                  'Chest',
-                  'Back',
-                  // Add more body parts as needed
-                ].map<DropdownMenuItem<String>>((bodyPart) {
-                  return DropdownMenuItem<String>(
-                    value: bodyPart,
-                    child: Text(
-                      bodyPart,
-                      style: const TextStyle(color: AppColors.backgroundColor),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const Spacer(),
-            ],
-          ),
-          _buildPieChart(),
           Row(
             children: [
               const Text(
@@ -684,121 +644,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     );
   }
 
-  Map<String, Map<String, int>> _calculateSetsByBodyPart() {
-    Map<String, Map<String, int>> setsByBodyPart = {};
-
-    for (var workout in workoutController.workouts) {
-      for (var exercise in workout.exercises) {
-        String bodyPart = exercise.bodyPart;
-        String exerciseName = exercise.machine;
-        int numSets = exercise.sets.length;
-
-        // Initialize setsByBodyPart if not exist
-        setsByBodyPart[bodyPart] ??= {};
-        // Increment the count for the exercise
-        setsByBodyPart[bodyPart]![exerciseName] =
-            (setsByBodyPart[bodyPart]![exerciseName] ?? 0) + numSets;
-      }
-    }
-
-    return setsByBodyPart;
-  }
-
-  Widget _buildPieChart() {
-    if (selectedBodyPart == 'Overall') {
-      // Calculate total sets
-      int totalSets = 0;
-      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
-      for (var entry in setsByBodyPart.entries) {
-        totalSets += entry.value.values.reduce((a, b) => a + b);
-      }
-
-      // Convert setsByBodyPart to pie chart data
-      List<PieChartSectionData> pieChartSections =
-          setsByBodyPart.entries.map((entry) {
-        String bodyPart = entry.key;
-        int bodyPartTotalSets = entry.value.values
-            .reduce((a, b) => a + b); // Total sets for body part
-        double percentage = (bodyPartTotalSets / totalSets) * 100;
-
-        return PieChartSectionData(
-          color: getRandomColor(), // Get random color
-          value: percentage, // Percentage of total sets
-          title:
-              '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
-          titleStyle: TextStyle(color: getRandomColor()),
-
-          radius: 100,
-        );
-      }).toList();
-
-      return AspectRatio(
-        aspectRatio: 1,
-        child: PieChart(
-          PieChartData(
-            sections: pieChartSections,
-            borderData: FlBorderData(show: false),
-            sectionsSpace: 0,
-            centerSpaceRadius: 40,
-            pieTouchData: PieTouchData(enabled: true),
-            // You can add more customization here
-          ),
-        ),
-      );
-    } else {
-      // Calculate sets by selected body part
-      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
-
-      // Get sets for selected body part
-      Map<String, int>? setsForSelectedPart = setsByBodyPart[selectedBodyPart];
-
-      // Convert setsForSelectedPart to pie chart data
-      List<PieChartSectionData> pieChartSections = [];
-      if (setsForSelectedPart != null) {
-        int totalSets = setsForSelectedPart.values.reduce((a, b) => a + b);
-
-        pieChartSections = setsForSelectedPart.entries.map((entry) {
-          String exerciseName = entry.key;
-          int sets = entry.value;
-          double percentage = (sets / totalSets) * 100;
-
-          return PieChartSectionData(
-            color: getRandomColor(), // Get random color
-            value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
-            titleStyle: TextStyle(color: getRandomColor()),
-
-            radius: 100,
-          );
-        }).toList();
-      }
-
-      return AspectRatio(
-        aspectRatio: 1,
-        child: PieChart(
-          PieChartData(
-            sections: pieChartSections,
-            borderData: FlBorderData(show: false),
-            sectionsSpace: 0,
-            centerSpaceRadius: 40,
-            pieTouchData: PieTouchData(enabled: true),
-            // You can add more customization here
-          ),
-        ),
-      );
-    }
-  }
-
-  Color getRandomColor() {
-    Random random = Random();
-    return Color.fromRGBO(
-      random.nextInt(256), // Red
-      random.nextInt(256), // Green
-      random.nextInt(256), // Blue
-      1, // Opacity (1 for fully opaque)
-    );
-  }
-
   Widget _buildHeatMap() {
     return Container(
       color: AppColors.primaryColor,
@@ -879,5 +724,21 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         DateTime.parse(workout.date).year == date.year &&
         DateTime.parse(workout.date).month == date.month &&
         DateTime.parse(workout.date).day == date.day);
+  }
+
+  Map<String, int> _calculateSetsByBodyPart() {
+    Map<String, int> setsByBodyPart = {};
+
+    for (var workout in workoutController.workouts) {
+      for (var exercise in workout.exercises) {
+        String bodyPart = exercise.bodyPart;
+        int numSets = exercise.sets.length;
+
+        // Increment the count for the body part
+        setsByBodyPart[bodyPart] = (setsByBodyPart[bodyPart] ?? 0) + numSets;
+      }
+    }
+
+    return setsByBodyPart;
   }
 }
