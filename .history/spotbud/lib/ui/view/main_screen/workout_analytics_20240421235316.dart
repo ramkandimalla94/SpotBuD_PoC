@@ -21,7 +21,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   String selectedOption = 'Average Weight';
   String selectedExercise = ''; // Initialize selectedExercise
   late DateTime _focusedDay = DateTime.now();
-
+  int currentStreak = _calculateCurrentStreak();
+  int longestStreak = _calculateLongestStreak();
   late DateTime _selectedDay;
   @override
   void initState() {
@@ -70,8 +71,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   }
 
   Widget _buildContent() {
-    int currentStreak = _calculateCurrentStreak();
-    int longestStreak = _calculateLongestStreak();
     List<String> allExercises = workoutController.workouts
         .expand(
             (workout) => workout.exercises.map((exercise) => exercise.machine))
@@ -88,15 +87,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           _buildHeatMap(),
           const SizedBox(
             height: 10,
-          ),
-          Row(
-            children: [
-              _buildAnalyticsItem('Current Streak', '${currentStreak} 🔥'),
-              SizedBox.square(
-                dimension: 20,
-              ),
-              _buildAnalyticsItem("Longest Streak ", '${longestStreak} 🔥')
-            ],
           ),
           Row(
             children: [
@@ -231,41 +221,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         ],
       ),
     );
-  }
-
-  int _calculateCurrentStreak() {
-    int streak = 0;
-    DateTime today = DateTime.now();
-    // Iterate backwards from today until a workout is not logged
-    for (int i = 0; i < 30; i++) {
-      DateTime date = today.subtract(Duration(days: i));
-      if (_isWorkoutLogged(date)) {
-        streak++;
-      } else {
-        break; // Exit the loop if no workout is logged for the day
-      }
-    }
-    return streak;
-  }
-
-  // Method to calculate the longest streak
-  int _calculateLongestStreak() {
-    int longestStreak = 0;
-    int currentStreak = 0;
-    DateTime today = DateTime.now();
-    // Iterate backwards from today until a workout is not logged
-    for (int i = 0; i < 365; i++) {
-      DateTime date = today.subtract(Duration(days: i));
-      if (_isWorkoutLogged(date)) {
-        currentStreak++;
-        if (currentStreak > longestStreak) {
-          longestStreak = currentStreak;
-        }
-      } else {
-        currentStreak = 0; // Reset streak if no workout is logged
-      }
-    }
-    return longestStreak;
   }
 
   Widget _buildExerciseAnalytics(String selectedExercise) {

@@ -91,15 +91,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           ),
           Row(
             children: [
-              _buildAnalyticsItem('Current Streak', '${currentStreak} 🔥'),
-              SizedBox.square(
-                dimension: 20,
-              ),
-              _buildAnalyticsItem("Longest Streak ", '${longestStreak} 🔥')
-            ],
-          ),
-          Row(
-            children: [
               const Text(
                 'Select an Exercise:',
                 style: TextStyle(
@@ -231,41 +222,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         ],
       ),
     );
-  }
-
-  int _calculateCurrentStreak() {
-    int streak = 0;
-    DateTime today = DateTime.now();
-    // Iterate backwards from today until a workout is not logged
-    for (int i = 0; i < 30; i++) {
-      DateTime date = today.subtract(Duration(days: i));
-      if (_isWorkoutLogged(date)) {
-        streak++;
-      } else {
-        break; // Exit the loop if no workout is logged for the day
-      }
-    }
-    return streak;
-  }
-
-  // Method to calculate the longest streak
-  int _calculateLongestStreak() {
-    int longestStreak = 0;
-    int currentStreak = 0;
-    DateTime today = DateTime.now();
-    // Iterate backwards from today until a workout is not logged
-    for (int i = 0; i < 365; i++) {
-      DateTime date = today.subtract(Duration(days: i));
-      if (_isWorkoutLogged(date)) {
-        currentStreak++;
-        if (currentStreak > longestStreak) {
-          longestStreak = currentStreak;
-        }
-      } else {
-        currentStreak = 0; // Reset streak if no workout is logged
-      }
-    }
-    return longestStreak;
   }
 
   Widget _buildExerciseAnalytics(String selectedExercise) {

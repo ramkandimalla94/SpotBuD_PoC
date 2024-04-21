@@ -91,11 +91,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           ),
           Row(
             children: [
-              _buildAnalyticsItem('Current Streak', '${currentStreak} 🔥'),
+              _buildAnalyticsItem('Current Streak', '${currentStreak}'),
               SizedBox.square(
-                dimension: 20,
+                dimension: 10,
               ),
-              _buildAnalyticsItem("Longest Streak ", '${longestStreak} 🔥')
+              _buildAnalyticsItem("Longest Streak", '${longestStreak}')
             ],
           ),
           Row(
