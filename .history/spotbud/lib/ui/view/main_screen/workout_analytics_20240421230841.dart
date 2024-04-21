@@ -202,10 +202,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 ],
               ),
             ] else ...[
-              _buildBarGraph(
-                workoutController.workouts,
-                selectedExercise,
-              ),
+              _buildBarGraph(workoutController.workouts, selectedExercise),
             ],
           ],
         ],
@@ -350,10 +347,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       }
     }
 
-// Define line chart data
+    // Define line chart data
     List<FlSpot> lineChartSpots = [];
 
-// Iterate over each date in weightData
+    // Iterate over each date in weightData
     weightData.forEach((date, weights) {
       double value;
       switch (selectedOption) {
@@ -369,7 +366,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           value = sum / weights.length;
       }
       value = double.parse(value.toStringAsFixed(2));
-      lineChartSpots.add(FlSpot(date.millisecondsSinceEpoch.toDouble(), value));
+      lineChartSpots.add(FlSpot(date.day.toDouble(), value));
     });
 
     return Padding(
@@ -391,24 +388,24 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             minX: weightData.isNotEmpty
                 ? weightData.keys
                         .reduce((a, b) => a.isBefore(b) ? a : b)
-                        .millisecondsSinceEpoch
+                        .day
                         .toDouble() -
-                    86400000 // Subtract 1 day in milliseconds
+                    1
                 : 0,
             maxX: weightData.isNotEmpty
                 ? weightData.keys
                         .reduce((a, b) => a.isAfter(b) ? a : b)
-                        .millisecondsSinceEpoch
+                        .day
                         .toDouble() +
-                    86400000 // Add 1 day in milliseconds
+                    1
                 : 0,
             minY: 0,
             maxY: weightData.isNotEmpty
                 ? weightData.values
                         .expand((weights) => weights)
                         .reduce((a, b) => a > b ? a : b) +
-                    10 // Add some padding to the y-axis
-                : 0,
+                    10
+                : 0, // Add some padding to the y-axis
             titlesData: FlTitlesData(
                 rightTitles: AxisTitles(
                   sideTitles: SideTitles(
@@ -435,16 +432,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: (value, titleMeta) {
-                      // Using getTitlesWidget to return custom widget for bottom axis titles
-                      // Formatting the DateTime object to DD-MM-YYYY
-                      DateTime date =
-                          DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                      // Your custom widget for bottom axis titles
                       return Text(
-                        DateFormat('dd').format(date),
+                        value.toInt().toString(),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 10,
+                          fontSize: 14,
                         ),
                       );
                     },
@@ -456,6 +450,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     AxisTitles(sideTitles: SideTitles(showTitles: false))),
             gridData: FlGridData(
                 show: true, drawHorizontalLine: false), // Remove grid lines
+            // borderData: FlBorderData(
+            //   show: true,
+            //   border: Border.all(color: Colors.white, width: 1),
+            // ),
             backgroundColor: AppColors.primaryColor,
           ),
         ),
@@ -499,7 +497,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             .millisecondsSinceEpoch, // Using milliseconds since epoch as x value
         barRods: weights.map((weight) {
           return BarChartRodData(
-            toY: weight, // Set y value directly instead of toY
+            y: weight, // Set y value directly instead of toY
             color: AppColors.acccentColor,
           );
         }).toList(),
@@ -534,23 +532,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-
-                        // reservedSize: 30,
-                        getTitlesWidget: (value, titleMeta) {
-                          // Your custom widget for left axis titles
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 2.5),
-                            child: Text(
-                              value.toInt().toString(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          );
-                        },
                       ),
                     ),
                     bottomTitles: AxisTitles(
@@ -562,11 +543,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                           DateTime date = DateTime.fromMillisecondsSinceEpoch(
                               value.toInt());
                           return Text(
-                            DateFormat('dd-MM').format(date),
+                            DateFormat('dd-MM-yyyy').format(date),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 14,
                             ),
                           );
                         },

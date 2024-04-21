@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:spotbud/core/models/workout.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -16,9 +15,10 @@ class ExerciseAnalyticsScreen extends StatefulWidget {
 
 class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   final WorkoutController workoutController = Get.put(WorkoutController());
-  bool showLineChart = true;
-  String selectedOption = 'Average Weight';
-  String selectedExercise = ''; // Initialize selectedExercise
+
+  String selectedOption = 'Average Weight'; // Default option
+  bool showLineChart = true; // Track the selected graph type
+  String selectedExercise = ''; // Declare selectedExercise as a state variable
 
   @override
   void initState() {
@@ -28,17 +28,24 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
   Future<void> _fetchData() async {
     await workoutController.fetchWorkoutLogs();
-    // Set selectedExercise to the first exercise if available
+    // Set the selected exercise to the first one in the list after fetching data
     if (workoutController.workouts.isNotEmpty) {
       setState(() {
-        selectedExercise = workoutController.workouts
+        selectedExercise = (workoutController.workouts
             .expand((workout) =>
                 workout.exercises.map((exercise) => exercise.machine))
             .toSet()
-            .toList()[0];
+            .toList()
+          ..sort()
+          ..first) as String;
       });
     }
   }
+
+  // Rest of your code...
+
+  bool isShowingTooltip = false;
+  int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +80,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
     allExercises.sort();
 
+    String selectedExercise = allExercises.isNotEmpty ? allExercises.first : '';
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -92,6 +101,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 dropdownColor: AppColors.primaryColor,
                 value: selectedExercise,
                 onChanged: (newValue) {
+                  print('Selected exercise: $newValue');
                   setState(() {
                     selectedExercise = newValue!;
                   });
@@ -110,104 +120,99 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             ],
           ),
           SizedBox(height: 16.0),
-          if (selectedExercise.isNotEmpty) ...[
-            _buildExerciseAnalytics(selectedExercise),
-            SizedBox(height: 16.0),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        showLineChart = true;
-                      });
-                    },
-                    child: Text(
-                      'Line Graph',
-                      style: TextStyle(
-                        color: showLineChart
-                            ? AppColors.primaryColor
-                            : AppColors.acccentColor,
-                      ),
+          if (selectedExercise.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildExerciseAnalytics(selectedExercise),
+                SizedBox(height: 16.0),
+                Column(
+                  children: [
+                    SizedBox(height: 16.0),
+                    // Toggle button between line graph and bar chart
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              showLineChart = true;
+                            });
+                          },
+                          child: Text('Line Graph'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: showLineChart
+                                ? AppColors.acccentColor
+                                : AppColors.primaryColor,
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              showLineChart = false;
+                            });
+                          },
+                          child: Text('Bar Chart'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: !showLineChart
+                                ? AppColors.acccentColor
+                                : AppColors.primaryColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: showLineChart
-                            ? AppColors.acccentColor
-                            : AppColors.primaryColor,
-                        elevation: 10),
-                  ),
-                  SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        showLineChart = false;
-                      });
-                    },
-                    child: Text(
-                      'Bar Chart',
-                      style: TextStyle(
-                        color: !showLineChart
-                            ? AppColors.primaryColor
-                            : AppColors.acccentColor,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: !showLineChart
-                            ? AppColors.acccentColor
-                            : AppColors.primaryColor,
-                        elevation: 10),
-                  ),
-                ],
-              ),
+                    SizedBox(height: 16.0),
+                    // Show selected graph based on the toggle state
+                    if (showLineChart)
+                      Column(
+                        children: [
+                          DropdownButton<String>(
+                            dropdownColor: AppColors.primaryColor,
+                            value: selectedOption,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedOption = newValue!;
+                              });
+                            },
+                            items: [
+                              DropdownMenuItem(
+                                value: 'Min Weight',
+                                child: Text(
+                                  'Min Weight',
+                                  style: TextStyle(
+                                      color: AppColors.backgroundColor),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Max Weight',
+                                child: Text(
+                                  'Max Weight',
+                                  style: TextStyle(
+                                      color: AppColors.backgroundColor),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Average Weight',
+                                child: Text(
+                                  'Average Weight',
+                                  style: TextStyle(
+                                      color: AppColors.backgroundColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                          _buildLineGraph(workoutController.workouts,
+                              selectedExercise, selectedOption),
+                        ],
+                      )
+                    else
+                      _buildBarGraph(
+                          workoutController.workouts, selectedExercise),
+                  ],
+                ),
+              ],
             ),
-            if (showLineChart) ...[
-              Column(
-                children: [
-                  DropdownButton<String>(
-                    dropdownColor: AppColors.primaryColor,
-                    value: selectedOption,
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedOption = newValue!;
-                      });
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        value: 'Min Weight',
-                        child: Text(
-                          'Min Weight',
-                          style: TextStyle(color: AppColors.backgroundColor),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Max Weight',
-                        child: Text(
-                          'Max Weight',
-                          style: TextStyle(color: AppColors.backgroundColor),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Average Weight',
-                        child: Text(
-                          'Average Weight',
-                          style: TextStyle(color: AppColors.backgroundColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                  _buildLineGraph(workoutController.workouts, selectedExercise,
-                      selectedOption),
-                ],
-              ),
-            ] else ...[
-              _buildBarGraph(
-                workoutController.workouts,
-                selectedExercise,
-              ),
-            ],
-          ],
         ],
       ),
     );
@@ -229,6 +234,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       for (var exercise in workout.exercises) {
         if (exercise.machine == selectedExercise) {
           for (var set in exercise.sets) {
+            // Parse reps and weight to integers or doubles
             int reps = int.tryParse(set.reps) ?? 0;
             double weight = double.tryParse(set.weight) ?? 0.0;
 
@@ -236,6 +242,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             totalReps += reps;
             totalWeight += weight;
 
+            // Compare weight with maxWeight
             if (weight > maxWeight) {
               maxWeight = weight;
             }
@@ -244,6 +251,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       }
     }
 
+    // Calculate average weight
     double averageWeight = totalSets > 0 ? totalWeight / totalSets : 0.0;
 
     return Column(
@@ -295,7 +303,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             color: Colors.white.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 2),
+            offset: Offset(0, 2), // changes position of shadow
           ),
         ],
       ),
@@ -350,10 +358,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       }
     }
 
-// Define line chart data
+    // Define line chart data
     List<FlSpot> lineChartSpots = [];
 
-// Iterate over each date in weightData
+    // Iterate over each date in weightData
     weightData.forEach((date, weights) {
       double value;
       switch (selectedOption) {
@@ -369,95 +377,88 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           value = sum / weights.length;
       }
       value = double.parse(value.toStringAsFixed(2));
-      lineChartSpots.add(FlSpot(date.millisecondsSinceEpoch.toDouble(), value));
+      lineChartSpots.add(FlSpot(date.day.toDouble(), value));
     });
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 300,
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                spots: lineChartSpots,
-                isCurved: true,
-                color: AppColors.acccentColor,
-                barWidth: 4,
-                isStrokeCapRound: true,
-                belowBarData: BarAreaData(show: false),
-              ),
-            ],
-            minX: weightData.isNotEmpty
-                ? weightData.keys
-                        .reduce((a, b) => a.isBefore(b) ? a : b)
-                        .millisecondsSinceEpoch
-                        .toDouble() -
-                    86400000 // Subtract 1 day in milliseconds
-                : 0,
-            maxX: weightData.isNotEmpty
-                ? weightData.keys
-                        .reduce((a, b) => a.isAfter(b) ? a : b)
-                        .millisecondsSinceEpoch
-                        .toDouble() +
-                    86400000 // Add 1 day in milliseconds
-                : 0,
-            minY: 0,
-            maxY: weightData.isNotEmpty
-                ? weightData.values
-                        .expand((weights) => weights)
-                        .reduce((a, b) => a > b ? a : b) +
-                    10 // Add some padding to the y-axis
-                : 0,
-            titlesData: FlTitlesData(
-                rightTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
+    return Container(
+      height: 300,
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            LineChartBarData(
+              spots: lineChartSpots,
+              isCurved: true,
+              color: AppColors.acccentColor,
+              barWidth: 4,
+              isStrokeCapRound: true,
+              belowBarData: BarAreaData(show: false),
+            ),
+          ],
+          minX: weightData.isNotEmpty
+              ? weightData.keys
+                      .reduce((a, b) => a.isBefore(b) ? a : b)
+                      .day
+                      .toDouble() -
+                  1
+              : 0,
+          maxX: weightData.isNotEmpty
+              ? weightData.keys
+                      .reduce((a, b) => a.isAfter(b) ? a : b)
+                      .day
+                      .toDouble() +
+                  1
+              : 0,
+          minY: 0,
+          maxY: weightData.isNotEmpty
+              ? weightData.values
+                      .expand((weights) => weights)
+                      .reduce((a, b) => a > b ? a : b) +
+                  10
+              : 0, // Add some padding to the y-axis
+          titlesData: FlTitlesData(
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
 
-                    // reservedSize: 30,
-                    getTitlesWidget: (value, titleMeta) {
-                      // Your custom widget for left axis titles
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.5),
-                        child: Text(
-                          value.toInt().toString(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  // reservedSize: 30,
+                  getTitlesWidget: (value, titleMeta) {
+                    // Your custom widget for left axis titles
+                    return Text(
+                      value.toInt().toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    );
+                  },
                 ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, titleMeta) {
-                      // Using getTitlesWidget to return custom widget for bottom axis titles
-                      // Formatting the DateTime object to DD-MM-YYYY
-                      DateTime date =
-                          DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                      return Text(
-                        DateFormat('dd').format(date),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                      );
-                    },
-                  ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, titleMeta) {
+                    // Your custom widget for bottom axis titles
+                    return Text(
+                      value.toInt().toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    );
+                  },
                 ),
-                leftTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false))),
-            gridData: FlGridData(
-                show: true, drawHorizontalLine: false), // Remove grid lines
-            backgroundColor: AppColors.primaryColor,
-          ),
+              ),
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false))),
+          gridData: FlGridData(
+              show: true, drawHorizontalLine: false), // Remove grid lines
+          // borderData: FlBorderData(
+          //   show: true,
+          //   border: Border.all(color: Colors.white, width: 1),
+          // ),
+          backgroundColor: AppColors.primaryColor,
         ),
       ),
     );
@@ -495,18 +496,17 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     List<BarChartGroupData> barChartGroups = sortedDates.map((date) {
       List<double> weights = dateWeightsMap[date]!;
       return BarChartGroupData(
-        x: date
-            .millisecondsSinceEpoch, // Using milliseconds since epoch as x value
+        x: date.day.toInt(),
         barRods: weights.map((weight) {
           return BarChartRodData(
-            toY: weight, // Set y value directly instead of toY
+            toY: weight,
             color: AppColors.acccentColor,
           );
         }).toList(),
       );
     }).toList();
 
-// Calculate maxY based on the maximum weight
+    // Calculate maxY based on the maximum weight
     double maxY = barChartGroups.isNotEmpty
         ? dateWeightsMap.values
                 .expand((weights) => weights)
@@ -514,23 +514,21 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             10
         : 10;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 300,
-        child: Column(
-          children: [
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  barGroups: barChartGroups,
-                  maxY: maxY,
-                  borderData: FlBorderData(
-                    show: true,
-                    border: Border.all(color: Colors.white, width: 1),
-                  ),
-                  titlesData: FlTitlesData(
+    return Container(
+      height: 300,
+      child: Column(
+        children: [
+          Expanded(
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                barGroups: barChartGroups,
+                maxY: maxY,
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: Colors.white, width: 1),
+                ),
+                titlesData: FlTitlesData(
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -538,16 +536,12 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                         // reservedSize: 30,
                         getTitlesWidget: (value, titleMeta) {
                           // Your custom widget for left axis titles
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 2.5),
-                            child: Text(
-                              value.toInt().toString(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
+                          return Text(
+                            value.toInt().toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
                             ),
                           );
                         },
@@ -557,16 +551,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, titleMeta) {
-                          // Using getTitlesWidget to return custom widget for bottom axis titles
-                          // Formatting the DateTime object to DD-MM-YYYY
-                          DateTime date = DateTime.fromMillisecondsSinceEpoch(
-                              value.toInt());
+                          // Your custom widget for bottom axis titles
                           return Text(
-                            DateFormat('dd-MM').format(date),
+                            value.toInt().toString(),
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                              fontSize: 14,
                             ),
                           );
                         },
@@ -575,15 +566,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     leftTitles:
                         AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     topTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  ),
-                  gridData: FlGridData(show: false),
-                  backgroundColor: AppColors.primaryColor,
-                ),
+                        AxisTitles(sideTitles: SideTitles(showTitles: false))),
+                gridData: FlGridData(show: false),
+                backgroundColor: AppColors.primaryColor,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -440,7 +440,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                       DateTime date =
                           DateTime.fromMillisecondsSinceEpoch(value.toInt());
                       return Text(
-                        DateFormat('dd').format(date),
+                        DateFormat('dd-MM').format(date),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
