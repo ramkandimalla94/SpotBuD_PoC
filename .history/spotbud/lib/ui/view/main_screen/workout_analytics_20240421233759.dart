@@ -51,8 +51,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       backgroundColor: AppColors.primaryColor,
       appBar: AppBar(
         backgroundColor: AppColors.primaryColor,
-        iconTheme: const IconThemeData(color: AppColors.acccentColor),
-        title: const Text(
+        iconTheme: IconThemeData(color: AppColors.acccentColor),
+        title: Text(
           'Exercise Analytics',
           style: TextStyle(color: AppColors.acccentColor),
         ),
@@ -60,7 +60,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       body: Obx(
         () {
           if (workoutController.isLoading.value) {
-            return const Center(child: LoadingIndicator());
+            return Center(child: LoadingIndicator());
           } else {
             return _buildContent();
           }
@@ -79,24 +79,24 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     allExercises.sort();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeatMap(),
-          const SizedBox(
+          SizedBox(
             height: 10,
           ),
           Row(
             children: [
-              const Text(
+              Text(
                 'Select an Exercise:',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
                     color: AppColors.acccentColor),
               ),
-              const SizedBox(width: 20.0),
+              SizedBox(width: 20.0),
               DropdownButton<String>(
                 dropdownColor: AppColors.primaryColor,
                 value: selectedExercise,
@@ -110,18 +110,18 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     value: exercise,
                     child: Text(
                       exercise,
-                      style: const TextStyle(color: AppColors.backgroundColor),
+                      style: TextStyle(color: AppColors.backgroundColor),
                     ),
                   );
                 }).toList(),
               ),
-              const Spacer(),
+              Spacer(),
             ],
           ),
-          const SizedBox(height: 16.0),
+          SizedBox(height: 16.0),
           if (selectedExercise.isNotEmpty) ...[
             _buildExerciseAnalytics(selectedExercise),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -147,7 +147,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                             : AppColors.primaryColor,
                         elevation: 10),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -183,21 +183,21 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                       });
                     },
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: 'Min Weight',
                         child: Text(
                           'Min Weight',
                           style: TextStyle(color: AppColors.backgroundColor),
                         ),
                       ),
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: 'Max Weight',
                         child: Text(
                           'Max Weight',
                           style: TextStyle(color: AppColors.backgroundColor),
                         ),
                       ),
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: 'Average Weight',
                         child: Text(
                           'Average Weight',
@@ -260,32 +260,32 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       children: [
         Text(
           'Analytics for $selectedExercise:',
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
               color: AppColors.acccentColor),
         ),
-        const SizedBox(height: 16.0),
+        SizedBox(height: 16.0),
         Row(
           children: [
             _buildAnalyticsItem('Total Sets', totalSets.toString()),
-            const SizedBox.square(
+            SizedBox.square(
               dimension: 20,
             ),
             _buildAnalyticsItem('Total Reps', totalReps.toString()),
-            const Spacer()
+            Spacer()
           ],
         ),
         Row(
           children: [
             _buildAnalyticsItem(
                 'Average Weight', '${averageWeight.toStringAsFixed(2)} kgs'),
-            const SizedBox.square(
+            SizedBox.square(
               dimension: 20,
             ),
             _buildAnalyticsItem(
                 'Max Weight', '${maxWeight.toStringAsFixed(2)} kgs'),
-            const Spacer(),
+            Spacer(),
           ],
         ),
       ],
@@ -294,8 +294,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
   Widget _buildAnalyticsItem(String title, String value) {
     return Container(
-      padding: const EdgeInsets.all(12.0),
-      margin: const EdgeInsets.only(bottom: 12.0),
+      padding: EdgeInsets.all(12.0),
+      margin: EdgeInsets.only(bottom: 12.0),
       decoration: BoxDecoration(
         color: AppColors.primaryColor,
         borderRadius: BorderRadius.circular(10.0),
@@ -304,7 +304,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             color: Colors.white.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -313,16 +313,15 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
                 color: AppColors.acccentColor),
           ),
-          const SizedBox(height: 4.0),
+          SizedBox(height: 4.0),
           Text(
             value,
-            style: const TextStyle(
-                fontSize: 14.0, color: AppColors.backgroundColor),
+            style: TextStyle(fontSize: 14.0, color: AppColors.backgroundColor),
           ),
         ],
       ),
@@ -431,7 +430,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 2.5),
                         child: Text(
                           value.toInt().toString(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -451,7 +450,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                           DateTime.fromMillisecondsSinceEpoch(value.toInt());
                       return Text(
                         DateFormat('dd').format(date),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 10,
@@ -461,10 +460,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                   ),
                 ),
                 leftTitles:
-                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false))),
-            gridData: const FlGridData(
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false))),
+            gridData: FlGridData(
                 show: true, drawHorizontalLine: false), // Remove grid lines
             backgroundColor: AppColors.primaryColor,
           ),
@@ -553,7 +552,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                                 const EdgeInsets.symmetric(horizontal: 2.5),
                             child: Text(
                               value.toInt().toString(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
@@ -573,7 +572,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                               value.toInt());
                           return Text(
                             DateFormat('dd-MM').format(date),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
@@ -582,12 +581,12 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                         },
                       ),
                     ),
-                    leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                    leftTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
-                  gridData: const FlGridData(show: false),
+                  gridData: FlGridData(show: false),
                   backgroundColor: AppColors.primaryColor,
                 ),
               ),
@@ -603,29 +602,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       color: AppColors.primaryColor,
       width: MediaQuery.of(context).size.width,
       child: TableCalendar(
-        headerStyle: const HeaderStyle(
-          titleCentered: true,
-          formatButtonVisible: false,
-          titleTextStyle: TextStyle(
-              fontSize: 15, color: AppColors.black), // Customize the text color
-          leftChevronIcon: Icon(Icons.chevron_left,
-              color: AppColors.black), // Customize the left chevron color
-          rightChevronIcon: Icon(Icons.chevron_right,
-              color: AppColors.black), // Customize the right chevron color
-          headerPadding: EdgeInsets.symmetric(
-              vertical: 0, horizontal: 5), // Adjust header padding
-          headerMargin: EdgeInsets.only(bottom: 5), // Adjust header margin
-          decoration: BoxDecoration(
-            color:
-                AppColors.acccentColor, // Specify the header background color
-          ),
-        ),
-        daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: AppColors.backgroundColor),
-            weekendStyle: TextStyle(color: AppColors.acccentColor)),
-        firstDay: DateTime(
-          DateTime.now().year - 1,
-        ),
+        firstDay: DateTime(DateTime.now().year - 1),
         lastDay: DateTime(DateTime.now().year + 1),
         focusedDay: _focusedDay,
         selectedDayPredicate: (day) {
@@ -639,7 +616,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             _focusedDay = focusedDay; // update `_focusedDay` here as well
           });
         },
-        calendarStyle: const CalendarStyle(
+        headerStyle: HeaderStyle(
+          formatButtonVisible: false,
+        ),
+        calendarStyle: CalendarStyle(
           outsideDaysVisible: true,
           weekendTextStyle: TextStyle(color: Colors.red),
         ),
@@ -661,7 +641,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 child: Text(
                   '${date.day}',
                   style: TextStyle(
-                    color: _isWorkoutLogged(date) ? Colors.white : Colors.white,
+                    color: _isWorkoutLogged(date) ? Colors.white : Colors.black,
                   ),
                 ),
               ),

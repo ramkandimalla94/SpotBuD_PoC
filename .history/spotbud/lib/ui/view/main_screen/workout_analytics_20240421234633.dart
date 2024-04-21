@@ -621,8 +621,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           ),
         ),
         daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: AppColors.backgroundColor),
-            weekendStyle: TextStyle(color: AppColors.acccentColor)),
+            weekdayStyle: TextStyle(color: AppColors.backgroundColor)),
         firstDay: DateTime(
           DateTime.now().year - 1,
         ),

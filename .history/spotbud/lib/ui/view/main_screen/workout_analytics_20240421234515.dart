@@ -620,9 +620,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 AppColors.acccentColor, // Specify the header background color
           ),
         ),
-        daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: AppColors.backgroundColor),
-            weekendStyle: TextStyle(color: AppColors.acccentColor)),
         firstDay: DateTime(
           DateTime.now().year - 1,
         ),

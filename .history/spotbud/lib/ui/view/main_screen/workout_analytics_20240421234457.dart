@@ -609,9 +609,9 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           titleTextStyle: TextStyle(
               fontSize: 15, color: AppColors.black), // Customize the text color
           leftChevronIcon: Icon(Icons.chevron_left,
-              color: AppColors.black), // Customize the left chevron color
+              color: Colors.white), // Customize the left chevron color
           rightChevronIcon: Icon(Icons.chevron_right,
-              color: AppColors.black), // Customize the right chevron color
+              color: Colors.white), // Customize the right chevron color
           headerPadding: EdgeInsets.symmetric(
               vertical: 0, horizontal: 5), // Adjust header padding
           headerMargin: EdgeInsets.only(bottom: 5), // Adjust header margin
@@ -620,9 +620,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 AppColors.acccentColor, // Specify the header background color
           ),
         ),
-        daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: AppColors.backgroundColor),
-            weekendStyle: TextStyle(color: AppColors.acccentColor)),
         firstDay: DateTime(
           DateTime.now().year - 1,
         ),
