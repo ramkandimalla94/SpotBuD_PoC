@@ -120,29 +120,19 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                   });
                 },
                 items: [
-                  DropdownMenuItem(
-                    value: 'Overall',
+                  'Overall',
+                  'Chest',
+                  'Back',
+                  // Add more body parts as needed
+                ].map<DropdownMenuItem<String>>((bodyPart) {
+                  return DropdownMenuItem<String>(
+                    value: bodyPart,
                     child: Text(
-                      'Overall',
+                      bodyPart,
                       style: const TextStyle(color: AppColors.backgroundColor),
                     ),
-                  ), // Include Overall option
-                  ...workoutController.workouts
-                      .expand((workout) => workout.exercises
-                          .map((exercise) => exercise.bodyPart))
-                      .toSet() // Convert to set to remove duplicates
-                      .toList() // Convert back to list
-                      .map<DropdownMenuItem<String>>((bodyPart) {
-                    return DropdownMenuItem<String>(
-                      value: bodyPart,
-                      child: Text(
-                        bodyPart,
-                        style:
-                            const TextStyle(color: AppColors.backgroundColor),
-                      ),
-                    );
-                  }).toList(),
-                ],
+                  );
+                }).toList(),
               ),
               const Spacer(),
             ],
@@ -732,11 +722,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         double percentage = (bodyPartTotalSets / totalSets) * 100;
 
         return PieChartSectionData(
-          color: getRandomLightColor(), // Get random color
+          color: getRandomColor(), // Get random color
           value: percentage, // Percentage of total sets
           title:
               '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
-          titleStyle: TextStyle(color: getRandomDarkColor()),
+          titleStyle: TextStyle(color: getRandomColor()),
 
           radius: 100,
         );
@@ -747,12 +737,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         child: PieChart(
           PieChartData(
             sections: pieChartSections,
-            borderData: FlBorderData(show: true),
-            startDegreeOffset: Checkbox.width,
+            borderData: FlBorderData(show: false),
             sectionsSpace: 0,
             centerSpaceRadius: 40,
             pieTouchData: PieTouchData(enabled: true),
-
             // You can add more customization here
           ),
         ),

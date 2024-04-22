@@ -120,29 +120,19 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                   });
                 },
                 items: [
-                  DropdownMenuItem(
-                    value: 'Overall',
+                  'Overall',
+                  'Chest',
+                  'Back',
+                  // Add more body parts as needed
+                ].map<DropdownMenuItem<String>>((bodyPart) {
+                  return DropdownMenuItem<String>(
+                    value: bodyPart,
                     child: Text(
-                      'Overall',
+                      bodyPart,
                       style: const TextStyle(color: AppColors.backgroundColor),
                     ),
-                  ), // Include Overall option
-                  ...workoutController.workouts
-                      .expand((workout) => workout.exercises
-                          .map((exercise) => exercise.bodyPart))
-                      .toSet() // Convert to set to remove duplicates
-                      .toList() // Convert back to list
-                      .map<DropdownMenuItem<String>>((bodyPart) {
-                    return DropdownMenuItem<String>(
-                      value: bodyPart,
-                      child: Text(
-                        bodyPart,
-                        style:
-                            const TextStyle(color: AppColors.backgroundColor),
-                      ),
-                    );
-                  }).toList(),
-                ],
+                  );
+                }).toList(),
               ),
               const Spacer(),
             ],
@@ -748,7 +738,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           PieChartData(
             sections: pieChartSections,
             borderData: FlBorderData(show: true),
-            startDegreeOffset: Checkbox.width,
+            centerSpaceColor: AppColors.backgroundColor,
             sectionsSpace: 0,
             centerSpaceRadius: 40,
             pieTouchData: PieTouchData(enabled: true),

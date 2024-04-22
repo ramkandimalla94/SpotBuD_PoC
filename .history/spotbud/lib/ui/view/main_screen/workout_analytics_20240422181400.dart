@@ -120,29 +120,19 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                   });
                 },
                 items: [
-                  DropdownMenuItem(
-                    value: 'Overall',
+                  'Overall',
+                  'Chest',
+                  'Back',
+                  // Add more body parts as needed
+                ].map<DropdownMenuItem<String>>((bodyPart) {
+                  return DropdownMenuItem<String>(
+                    value: bodyPart,
                     child: Text(
-                      'Overall',
+                      bodyPart,
                       style: const TextStyle(color: AppColors.backgroundColor),
                     ),
-                  ), // Include Overall option
-                  ...workoutController.workouts
-                      .expand((workout) => workout.exercises
-                          .map((exercise) => exercise.bodyPart))
-                      .toSet() // Convert to set to remove duplicates
-                      .toList() // Convert back to list
-                      .map<DropdownMenuItem<String>>((bodyPart) {
-                    return DropdownMenuItem<String>(
-                      value: bodyPart,
-                      child: Text(
-                        bodyPart,
-                        style:
-                            const TextStyle(color: AppColors.backgroundColor),
-                      ),
-                    );
-                  }).toList(),
-                ],
+                  );
+                }).toList(),
               ),
               const Spacer(),
             ],
@@ -732,11 +722,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         double percentage = (bodyPartTotalSets / totalSets) * 100;
 
         return PieChartSectionData(
-          color: getRandomLightColor(), // Get random color
+          color: getRandomColor(), // Get random color
           value: percentage, // Percentage of total sets
           title:
               '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
-          titleStyle: TextStyle(color: getRandomDarkColor()),
+          titleStyle: TextStyle(color: getRandomColor()),
 
           radius: 100,
         );
@@ -747,12 +737,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         child: PieChart(
           PieChartData(
             sections: pieChartSections,
-            borderData: FlBorderData(show: true),
-            startDegreeOffset: Checkbox.width,
+            borderData: FlBorderData(show: false),
             sectionsSpace: 0,
             centerSpaceRadius: 40,
             pieTouchData: PieTouchData(enabled: true),
-
             // You can add more customization here
           ),
         ),
@@ -778,7 +766,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             color: getRandomLightColor(), // Get random color
             value: sets.toDouble(), // Convert to double
             title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
-            titleStyle: TextStyle(color: getRandomDarkColor()),
+            titleStyle: TextStyle(color: getRandomColor()),
 
             radius: 100,
           );
@@ -806,14 +794,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     int red = random.nextInt(128) + 128; // Red in the range [128, 255]
     int green = random.nextInt(128) + 128; // Green in the range [128, 255]
     int blue = random.nextInt(128) + 128; // Blue in the range [128, 255]
-    return Color.fromRGBO(red, green, blue, 1);
-  }
-
-  Color getRandomDarkColor() {
-    Random random = Random();
-    int red = random.nextInt(128); // Red in the range [0, 127]
-    int green = random.nextInt(128); // Green in the range [0, 127]
-    int blue = random.nextInt(128); // Blue in the range [0, 127]
     return Color.fromRGBO(red, green, blue, 1);
   }
 

@@ -119,30 +119,27 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     selectedBodyPart = newValue!;
                   });
                 },
-                items: [
-                  DropdownMenuItem(
-                    value: 'Overall',
+               items: [
+        DropdownMenuItem(
+          value: 'Overall',
+          child: Text(
+            'Overall',
+            style: const TextStyle(color: AppColors.backgroundColor),
+          ),
+        ),// Include Overall option
+        ...allExercises.map((exercise) => exercise.) // Include logged body parts
+            .toSet() // Convert to set to remove duplicates
+            .toList() // Convert back to list
+            .map<DropdownMenuItem<String>>((bodyPart) {
+
+                  return DropdownMenuItem<String>(
+                    value: bodyPart,
                     child: Text(
-                      'Overall',
+                      bodyPart,
                       style: const TextStyle(color: AppColors.backgroundColor),
                     ),
-                  ), // Include Overall option
-                  ...workoutController.workouts
-                      .expand((workout) => workout.exercises
-                          .map((exercise) => exercise.bodyPart))
-                      .toSet() // Convert to set to remove duplicates
-                      .toList() // Convert back to list
-                      .map<DropdownMenuItem<String>>((bodyPart) {
-                    return DropdownMenuItem<String>(
-                      value: bodyPart,
-                      child: Text(
-                        bodyPart,
-                        style:
-                            const TextStyle(color: AppColors.backgroundColor),
-                      ),
-                    );
-                  }).toList(),
-                ],
+                  );
+                }).toList(),
               ),
               const Spacer(),
             ],
