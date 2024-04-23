@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
@@ -23,18 +20,14 @@ class _HistoryViewState extends State<HistoryView> {
   String? _selectedBodyPart;
   String? _selectedMachine;
   List<String> _loggedBodyParts = [];
-  late DateTime _selectedMonth = DateTime.now();
   List<String> _loggedMachines = [];
-  late FixedExtentScrollController _scrollController;
 
   bool _isKgsPreferred = true; // Default preference is kilograms
 
   @override
   void initState() {
     super.initState();
-    // Fetch workout logs for the current month initially
-    _scrollController = FixedExtentScrollController();
-    _fetchWorkoutLogs(_selectedMonth);
+    _fetchWorkoutLogs();
     _checkWeightPreference();
   }
 
@@ -51,21 +44,15 @@ class _HistoryViewState extends State<HistoryView> {
     });
   }
 
-  Future<void> _fetchWorkoutLogs(DateTime selectedMonth) async {
+  Future<void> _fetchWorkoutLogs() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.uid;
-        DateTime startDate = DateTime(selectedMonth.year, selectedMonth.month);
-        DateTime endDate = DateTime(selectedMonth.year, selectedMonth.month + 1)
-            .subtract(Duration(days: 1));
-
         _workoutLogsStream = _firestore
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: startDate, isLessThanOrEqualTo: endDate)
             .orderBy('timestamp', descending: true)
             .snapshots();
 
@@ -74,8 +61,6 @@ class _HistoryViewState extends State<HistoryView> {
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: startDate, isLessThanOrEqualTo: endDate)
             .get();
 
         setState(() {
@@ -145,155 +130,37 @@ class _HistoryViewState extends State<HistoryView> {
             final workoutLogs = snapshot.data!.docs;
             List<DateTime> dates = _extractDates(workoutLogs);
             List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
-            return Column(
-              children: [
-                _buildMonthYearSelector(_selectedMonth),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredDates.length,
-                    itemBuilder: (context, index) {
-                      final date = filteredDates[index];
-                      final dateFormatted =
-                          DateFormat('yyyy-MM-dd').format(date);
-                      final workoutsForDate =
-                          _filterWorkoutsByDate(workoutLogs, date);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  children: [
-                                    Text(
-                                      DateFormat('EEE').format(date),
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Text(
-                                      DateFormat('dd').format(date),
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Text(
-                                      DateFormat('MMM/yy').format(date),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      for (var workout in workoutsForDate)
-                                        ..._buildWorkoutDetails(
-                                            workout['exercises']),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
+            return ListView.builder(
+              itemCount: filteredDates.length,
+              itemBuilder: (context, index) {
+                final date = filteredDates[index];
+                final dateFormatted = DateFormat('yyyy-MM-dd').format(date);
+                final workoutsForDate =
+                    _filterWorkoutsByDate(workoutLogs, date);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        DateFormat('yyyy-MM-dd').format(date),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    for (var workout in workoutsForDate)
+                      ..._buildWorkoutDetails(workout['exercises']),
+                  ],
+                );
+              },
             );
           }
         },
       ),
     );
-  }
-
-  Widget _buildMonthYearSelector(DateTime selectedMonth) {
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    final scrollController =
-        ScrollController(initialScrollOffset: initialScrollOffset);
-
-    return Container(
-      height: 50,
-      child: ListView.builder(
-        controller: scrollController,
-        scrollDirection: Axis.horizontal,
-        itemCount: (maxMonth.year - minMonth.year) * 12 +
-            maxMonth.month -
-            minMonth.month +
-            1,
-        itemBuilder: (context, index) {
-          final month = DateTime(maxMonth.year - index ~/ 12, index % 12 + 1);
-          final monthYear = DateFormat('MMMM yyyy').format(month);
-          return InkWell(
-            onTap: () {
-              _handleMonthTap(month);
-            },
-            child: Container(
-              width: 150,
-              alignment: Alignment.center,
-              child: Text(
-                monthYear,
-                style: TextStyle(
-                  color: index == initialMonthIndex
-                      ? Colors.white
-                      : Colors.grey, // Highlight current month
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _handleMonthTap(DateTime selectedMonth) async {
-    setState(() {
-      _selectedMonth = selectedMonth;
-    });
-    await _fetchWorkoutLogs(_selectedMonth);
-
-    // Calculate the initial scroll offset based on the selected month
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    // Update the scroll position
-    _scrollController.jumpTo(initialScrollOffset);
-  }
-
-  void _updateScrollController(int index) {
-    _scrollController.jumpToItem(index);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   List<Widget> _buildWorkoutDetails(List<dynamic>? exercises) {
@@ -312,70 +179,57 @@ class _HistoryViewState extends State<HistoryView> {
       ];
     }
 
-    List<Widget> workoutDetails = [];
-
-    // Loop through each exercise
-    for (var exercise in exercises) {
+    return exercises.map<Widget>((exercise) {
       final bodyPart = exercise['bodyPart'] as String?;
       final exerciseName = exercise['machine'] as String?;
       final sets = exercise['sets'] as List<dynamic>?;
-
-      // Check if exercise details are valid
       if (bodyPart == null || exerciseName == null || sets == null) {
-        continue;
+        return SizedBox.shrink();
       }
 
-      // Add machine name at the top
-      workoutDetails.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            '$exerciseName:',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      );
-
-      // Loop through each set of the exercise
-      for (var set in sets) {
+      final exerciseDetails = sets.map<Widget>((set) {
         final reps = set['reps'] as String?;
         final weight = set['weight'] as String?;
         final notes = set['notes'] as String?;
 
-        // Build set details
-        workoutDetails.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$exerciseName:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                'Reps x Weight: ${reps ?? 'N/A'} x ${_convertWeight(weight)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+              if (notes != null && notes.isNotEmpty)
                 Text(
-                  '${reps ?? 'N/A'} x ${_convertWeight(weight)}',
+                  'Notes: $notes',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white,
                   ),
                 ),
-                if (notes != null && notes.isNotEmpty)
-                  Text(
-                    'Notes: $notes',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
         );
-      }
-    }
+      }).toList();
 
-    return workoutDetails;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: exerciseDetails,
+      );
+    }).toList();
   }
 
   void _showWorkoutDetailsDialog(DateTime date, List<DocumentSnapshot> logs) {

@@ -272,18 +272,6 @@ class _HistoryViewState extends State<HistoryView> {
       _selectedMonth = selectedMonth;
     });
     await _fetchWorkoutLogs(_selectedMonth);
-
-    // Calculate the initial scroll offset based on the selected month
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    // Update the scroll position
-    _scrollController.jumpTo(initialScrollOffset);
   }
 
   void _updateScrollController(int index) {

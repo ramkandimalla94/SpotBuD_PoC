@@ -222,13 +222,13 @@ class _HistoryViewState extends State<HistoryView> {
 
   Widget _buildMonthYearSelector(DateTime selectedMonth) {
     final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
+    final minMonth = DateTime(currentDate.year, currentDate.month);
     final maxMonth = currentDate;
 
     final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
         maxMonth.month -
         selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
+    final initialScrollOffset = initialMonthIndex * 50.0;
 
     final scrollController =
         ScrollController(initialScrollOffset: initialScrollOffset);
@@ -236,14 +236,16 @@ class _HistoryViewState extends State<HistoryView> {
     return Container(
       height: 50,
       child: ListView.builder(
+        reverse: true,
         controller: scrollController,
         scrollDirection: Axis.horizontal,
-        itemCount: (maxMonth.year - minMonth.year) * 12 +
-            maxMonth.month -
+        itemCount: (selectedMonth.year - minMonth.year) * 12 +
+            selectedMonth.month -
             minMonth.month +
             1,
         itemBuilder: (context, index) {
-          final month = DateTime(maxMonth.year - index ~/ 12, index % 12 + 1);
+          final month =
+              DateTime(selectedMonth.year - index ~/ 12, index % 12 + 1);
           final monthYear = DateFormat('MMMM yyyy').format(month);
           return InkWell(
             onTap: () {
@@ -254,11 +256,7 @@ class _HistoryViewState extends State<HistoryView> {
               alignment: Alignment.center,
               child: Text(
                 monthYear,
-                style: TextStyle(
-                  color: index == initialMonthIndex
-                      ? Colors.white
-                      : Colors.grey, // Highlight current month
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           );
@@ -272,18 +270,6 @@ class _HistoryViewState extends State<HistoryView> {
       _selectedMonth = selectedMonth;
     });
     await _fetchWorkoutLogs(_selectedMonth);
-
-    // Calculate the initial scroll offset based on the selected month
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    // Update the scroll position
-    _scrollController.jumpTo(initialScrollOffset);
   }
 
   void _updateScrollController(int index) {

@@ -220,72 +220,55 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
-  Widget _buildMonthYearSelector(DateTime selectedMonth) {
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
+  
+Got it! We can start the scroll from the current month and go backwards in time. Here's the updated code:
 
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
+dart
+Copy code
+Widget _buildMonthYearSelector(DateTime selectedMonth) {
+  final currentDate = DateTime.now();
+  final minMonth = DateTime(currentDate.year, currentDate.month);
+  final maxMonth = DateTime(2020, 1); // Adjust this as needed
 
-    final scrollController =
-        ScrollController(initialScrollOffset: initialScrollOffset);
+  final initialMonthIndex =
+      (maxMonth.year - selectedMonth.year) * 12 + maxMonth.month - selectedMonth.month;
+  final initialScrollOffset = initialMonthIndex * 50.0;
 
-    return Container(
-      height: 50,
-      child: ListView.builder(
-        controller: scrollController,
-        scrollDirection: Axis.horizontal,
-        itemCount: (maxMonth.year - minMonth.year) * 12 +
-            maxMonth.month -
-            minMonth.month +
-            1,
-        itemBuilder: (context, index) {
-          final month = DateTime(maxMonth.year - index ~/ 12, index % 12 + 1);
-          final monthYear = DateFormat('MMMM yyyy').format(month);
-          return InkWell(
-            onTap: () {
-              _handleMonthTap(month);
-            },
-            child: Container(
-              width: 150,
-              alignment: Alignment.center,
-              child: Text(
-                monthYear,
-                style: TextStyle(
-                  color: index == initialMonthIndex
-                      ? Colors.white
-                      : Colors.grey, // Highlight current month
-                ),
-              ),
+  final scrollController = ScrollController(initialScrollOffset: initialScrollOffset);
+
+  return Container(
+    height: 50,
+    child: ListView.builder(
+      controller: scrollController,
+      scrollDirection: Axis.horizontal,
+      itemCount: (selectedMonth.year - minMonth.year) * 12 + selectedMonth.month - minMonth.month + 1,
+      itemBuilder: (context, index) {
+        final month = DateTime(selectedMonth.year - index ~/ 12, index % 12 + 1);
+        final monthYear = DateFormat('MMMM yyyy').format(month);
+        return InkWell(
+          onTap: () {
+            _handleMonthTap(month);
+          },
+          child: Container(
+            width: 150,
+            alignment: Alignment.center,
+            child: Text(
+              monthYear,
+              style: TextStyle(color: Colors.white),
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 
-  Future<void> _handleMonthTap(DateTime selectedMonth) async {
-    setState(() {
-      _selectedMonth = selectedMonth;
-    });
-    await _fetchWorkoutLogs(_selectedMonth);
-
-    // Calculate the initial scroll offset based on the selected month
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    // Update the scroll position
-    _scrollController.jumpTo(initialScrollOffset);
-  }
-
+Future<void> _handleMonthTap(DateTime selectedMonth) async {
+  setState(() {
+    _selectedMonth = selectedMonth;
+  });
+  await _fetchWorkoutLogs(_selectedMonth);
+}
   void _updateScrollController(int index) {
     _scrollController.jumpToItem(index);
   }

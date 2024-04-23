@@ -236,6 +236,7 @@ class _HistoryViewState extends State<HistoryView> {
     return Container(
       height: 50,
       child: ListView.builder(
+        reverse: true, // Reverse the list order
         controller: scrollController,
         scrollDirection: Axis.horizontal,
         itemCount: (maxMonth.year - minMonth.year) * 12 +
@@ -243,7 +244,10 @@ class _HistoryViewState extends State<HistoryView> {
             minMonth.month +
             1,
         itemBuilder: (context, index) {
-          final month = DateTime(maxMonth.year - index ~/ 12, index % 12 + 1);
+          final reversedIndex =
+              (maxMonth.year - index ~/ 12) * 12 + (12 - index % 12);
+          final month = DateTime(
+              maxMonth.year - reversedIndex ~/ 12, reversedIndex % 12 + 1);
           final monthYear = DateFormat('MMMM yyyy').format(month);
           return InkWell(
             onTap: () {

@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
@@ -23,18 +22,14 @@ class _HistoryViewState extends State<HistoryView> {
   String? _selectedBodyPart;
   String? _selectedMachine;
   List<String> _loggedBodyParts = [];
-  late DateTime _selectedMonth = DateTime.now();
   List<String> _loggedMachines = [];
-  late FixedExtentScrollController _scrollController;
 
   bool _isKgsPreferred = true; // Default preference is kilograms
 
   @override
   void initState() {
     super.initState();
-    // Fetch workout logs for the current month initially
-    _scrollController = FixedExtentScrollController();
-    _fetchWorkoutLogs(_selectedMonth);
+    _fetchWorkoutLogs();
     _checkWeightPreference();
   }
 
@@ -51,21 +46,15 @@ class _HistoryViewState extends State<HistoryView> {
     });
   }
 
-  Future<void> _fetchWorkoutLogs(DateTime selectedMonth) async {
+  Future<void> _fetchWorkoutLogs() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.uid;
-        DateTime startDate = DateTime(selectedMonth.year, selectedMonth.month);
-        DateTime endDate = DateTime(selectedMonth.year, selectedMonth.month + 1)
-            .subtract(Duration(days: 1));
-
         _workoutLogsStream = _firestore
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: startDate, isLessThanOrEqualTo: endDate)
             .orderBy('timestamp', descending: true)
             .snapshots();
 
@@ -74,8 +63,6 @@ class _HistoryViewState extends State<HistoryView> {
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: startDate, isLessThanOrEqualTo: endDate)
             .get();
 
         setState(() {
@@ -147,7 +134,7 @@ class _HistoryViewState extends State<HistoryView> {
             List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
             return Column(
               children: [
-                _buildMonthYearSelector(_selectedMonth),
+                _buildMonthYearSelector(),
                 Expanded(
                   child: ListView.builder(
                     itemCount: filteredDates.length,
@@ -220,80 +207,33 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
-  Widget _buildMonthYearSelector(DateTime selectedMonth) {
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    final scrollController =
-        ScrollController(initialScrollOffset: initialScrollOffset);
-
+  Widget _buildMonthYearSelector() {
     return Container(
       height: 50,
-      child: ListView.builder(
-        controller: scrollController,
-        scrollDirection: Axis.horizontal,
-        itemCount: (maxMonth.year - minMonth.year) * 12 +
-            maxMonth.month -
-            minMonth.month +
-            1,
-        itemBuilder: (context, index) {
-          final month = DateTime(maxMonth.year - index ~/ 12, index % 12 + 1);
-          final monthYear = DateFormat('MMMM yyyy').format(month);
-          return InkWell(
-            onTap: () {
-              _handleMonthTap(month);
-            },
-            child: Container(
-              width: 150,
-              alignment: Alignment.center,
+      child: ListWheelScrollView(
+        physics: FixedExtentScrollPhysics(),
+        itemExtent: 50,
+        diameterRatio: 2.5,
+        onSelectedItemChanged: (index) {
+          // Handle month/year selection here
+        },
+        children: List.generate(
+          24, // 2 years * 12 months = 24 months
+          (index) {
+            final currentDate = DateTime.now();
+            final date = DateTime(currentDate.year - (index ~/ 12),
+                currentDate.month - (index % 12));
+            final monthYear = DateFormat('MMMM yyyy').format(date);
+            return Center(
               child: Text(
                 monthYear,
-                style: TextStyle(
-                  color: index == initialMonthIndex
-                      ? Colors.white
-                      : Colors.grey, // Highlight current month
-                ),
+                style: TextStyle(color: Colors.white),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
-  }
-
-  Future<void> _handleMonthTap(DateTime selectedMonth) async {
-    setState(() {
-      _selectedMonth = selectedMonth;
-    });
-    await _fetchWorkoutLogs(_selectedMonth);
-
-    // Calculate the initial scroll offset based on the selected month
-    final currentDate = DateTime.now();
-    final minMonth = DateTime(currentDate.year - 1, currentDate.month - 6);
-    final maxMonth = currentDate;
-    final initialMonthIndex = (maxMonth.year - selectedMonth.year) * 12 +
-        maxMonth.month -
-        selectedMonth.month;
-    final initialScrollOffset = initialMonthIndex * 150.0;
-
-    // Update the scroll position
-    _scrollController.jumpTo(initialScrollOffset);
-  }
-
-  void _updateScrollController(int index) {
-    _scrollController.jumpToItem(index);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   List<Widget> _buildWorkoutDetails(List<dynamic>? exercises) {
