@@ -1,9 +1,10 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:get/get_state_manager/src/simple/list_notifier.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -225,7 +226,7 @@ class _HistoryViewState extends State<HistoryView> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.acccentColor,
+                                              color: Colors.white,
                                             ),
                                           ),
                                           Text(
@@ -233,44 +234,37 @@ class _HistoryViewState extends State<HistoryView> {
                                             style: TextStyle(
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.backgroundColor,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          // Text(
-                                          //   DateFormat('MMM/yy').format(date),
-                                          //   style: TextStyle(
-                                          //     fontSize: 18,
-                                          //     fontWeight: FontWeight.bold,
-                                          //     color: Colors.white,
-                                          //   ),
-                                          // ),
+                                          Text(
+                                            DateFormat('MMM/yy').format(date),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         ],
-                                      ),
-                                      SizedBox(
-                                        width: 5,
                                       ),
                                       Expanded(
                                         child: Container(
                                           width: double
                                               .infinity, // Take all available width
                                           decoration: BoxDecoration(
-                                            color: AppColors.secondaryColor
-                                                .withOpacity(0.5),
+                                            color: AppColors.secondaryColor,
                                             borderRadius: BorderRadius.circular(
-                                                15), // Rounded border
+                                                10), // Rounded border
                                           ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                for (var workout
-                                                    in workoutsForDate)
-                                                  ..._buildWorkoutDetails(
-                                                      workout['exercises']),
-                                              ],
-                                            ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              for (var workout
+                                                  in workoutsForDate)
+                                                ..._buildWorkoutDetails(
+                                                    workout['exercises']),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -304,7 +298,7 @@ class _HistoryViewState extends State<HistoryView> {
             DateFormat('MMMM yyyy').format(selectedMonth),
             style: TextStyle(
                 fontSize: 20,
-                color: AppColors.backgroundColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.bold),
           ),
           IconButton(
@@ -415,7 +409,7 @@ class _HistoryViewState extends State<HistoryView> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.acccentColor,
+              color: Colors.white,
             ),
           ),
         ),
@@ -442,23 +436,12 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
                 if (notes != null && notes.isNotEmpty)
-                  Row(
-                    children: [
-                      Text(
-                        'Notes: ',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.acccentColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '$notes',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Notes: $notes',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
                   ),
               ],
             ),
@@ -493,7 +476,7 @@ class _HistoryViewState extends State<HistoryView> {
       hint: Text(
         'Select Body Part',
         style: AppTheme.primaryText(
-          color: AppColors.backgroundColor,
+          color: AppColors.acccentColor,
           size: 15,
           fontWeight: FontWeight.bold,
         ),
@@ -529,7 +512,7 @@ class _HistoryViewState extends State<HistoryView> {
       hint: Text(
         'Select Machine',
         style: AppTheme.primaryText(
-          color: AppColors.backgroundColor,
+          color: AppColors.acccentColor,
           size: 15,
           fontWeight: FontWeight.bold,
         ),

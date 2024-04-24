@@ -134,6 +134,7 @@ class _HistoryViewState extends State<HistoryView> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _buildMonthYearSelector(context, _selectedMonth),
           // Add filter dropdowns here
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -199,7 +200,6 @@ class _HistoryViewState extends State<HistoryView> {
                       _filteredDates(dates, workoutLogs);
                   return Column(
                     children: [
-                      _buildMonthYearSelector(context, _selectedMonth),
                       Expanded(
                         child: ListView.builder(
                           itemCount: filteredDates.length,
@@ -255,7 +255,7 @@ class _HistoryViewState extends State<HistoryView> {
                                               .infinity, // Take all available width
                                           decoration: BoxDecoration(
                                             color: AppColors.secondaryColor
-                                                .withOpacity(0.5),
+                                                .withOpacity(0.3),
                                             borderRadius: BorderRadius.circular(
                                                 15), // Rounded border
                                           ),

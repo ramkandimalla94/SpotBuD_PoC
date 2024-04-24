@@ -139,6 +139,7 @@ class _HistoryViewState extends State<HistoryView> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                _buildMonthYearSelector(context, _selectedMonth),
                 Row(
                   children: [
                     Text(
@@ -199,7 +200,6 @@ class _HistoryViewState extends State<HistoryView> {
                       _filteredDates(dates, workoutLogs);
                   return Column(
                     children: [
-                      _buildMonthYearSelector(context, _selectedMonth),
                       Expanded(
                         child: ListView.builder(
                           itemCount: filteredDates.length,

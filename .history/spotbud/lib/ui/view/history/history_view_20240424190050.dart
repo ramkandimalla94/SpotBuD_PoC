@@ -1,9 +1,10 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:get/get_state_manager/src/simple/list_notifier.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -225,7 +226,7 @@ class _HistoryViewState extends State<HistoryView> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.acccentColor,
+                                              color: Colors.white,
                                             ),
                                           ),
                                           Text(
@@ -233,45 +234,28 @@ class _HistoryViewState extends State<HistoryView> {
                                             style: TextStyle(
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.backgroundColor,
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          // Text(
-                                          //   DateFormat('MMM/yy').format(date),
-                                          //   style: TextStyle(
-                                          //     fontSize: 18,
-                                          //     fontWeight: FontWeight.bold,
-                                          //     color: Colors.white,
-                                          //   ),
-                                          // ),
+                                          Text(
+                                            DateFormat('MMM/yy').format(date),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
                                       Expanded(
-                                        child: Container(
-                                          width: double
-                                              .infinity, // Take all available width
-                                          decoration: BoxDecoration(
-                                            color: AppColors.secondaryColor
-                                                .withOpacity(0.5),
-                                            borderRadius: BorderRadius.circular(
-                                                15), // Rounded border
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                for (var workout
-                                                    in workoutsForDate)
-                                                  ..._buildWorkoutDetails(
-                                                      workout['exercises']),
-                                              ],
-                                            ),
-                                          ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            for (var workout in workoutsForDate)
+                                              ..._buildWorkoutDetails(
+                                                  workout['exercises']),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -304,7 +288,7 @@ class _HistoryViewState extends State<HistoryView> {
             DateFormat('MMMM yyyy').format(selectedMonth),
             style: TextStyle(
                 fontSize: 20,
-                color: AppColors.backgroundColor,
+                color: AppColors.acccentColor,
                 fontWeight: FontWeight.bold),
           ),
           IconButton(
@@ -415,7 +399,7 @@ class _HistoryViewState extends State<HistoryView> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.acccentColor,
+              color: Colors.white,
             ),
           ),
         ),
@@ -442,23 +426,12 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
                 if (notes != null && notes.isNotEmpty)
-                  Row(
-                    children: [
-                      Text(
-                        'Notes: ',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.acccentColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '$notes',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Notes: $notes',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
                   ),
               ],
             ),
@@ -493,7 +466,7 @@ class _HistoryViewState extends State<HistoryView> {
       hint: Text(
         'Select Body Part',
         style: AppTheme.primaryText(
-          color: AppColors.backgroundColor,
+          color: AppColors.acccentColor,
           size: 15,
           fontWeight: FontWeight.bold,
         ),
@@ -529,7 +502,7 @@ class _HistoryViewState extends State<HistoryView> {
       hint: Text(
         'Select Machine',
         style: AppTheme.primaryText(
-          color: AppColors.backgroundColor,
+          color: AppColors.acccentColor,
           size: 15,
           fontWeight: FontWeight.bold,
         ),
@@ -548,9 +521,8 @@ class _HistoryViewState extends State<HistoryView> {
   List<DateTime> _extractDates(List<DocumentSnapshot> logs) {
     final dates = <DateTime>{};
     logs.forEach((log) {
-      final timestamp = log['timestamp'] as Timestamp;
-      final date =
-          DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
+      final timestamp = log['startTime'] as DateTime;
+      final date = DateTime.fromMillisecondsSinceEpoch(timestamp.day * 1000);
       dates.add(DateTime(date.year, date.month, date.day));
     });
     return dates.toList()..sort((a, b) => b.compareTo(a));
@@ -590,6 +562,67 @@ class _HistoryViewState extends State<HistoryView> {
       } else {
         return true;
       }
+    }).toList();
+  }
+
+  List<Widget> _buildWorkoutDetails1(List<dynamic>? exercises) {
+    if (exercises == null || exercises.isEmpty) {
+      return [
+        Text(
+          'No exercises recorded.',
+          style: AppTheme.secondaryText(
+              size: 22,
+              fontWeight: FontWeight.w500,
+              color: AppColors.acccentColor),
+        )
+      ];
+    }
+
+    return exercises.map<Widget>((exercise) {
+      final bodyPart = exercise['bodyPart'] as String?;
+      final exerciseName = exercise['machine'] as String?;
+      final sets = exercise['sets'] as List<dynamic>?;
+      if (bodyPart == null || exerciseName == null || sets == null) {
+        return SizedBox.shrink();
+      }
+
+      final setWidgets = sets.map<Widget>((set) {
+        final reps = set['reps'] as String?;
+        final weight = set['weight'] as String?;
+        final notes = set['notes'] as String?;
+
+        return ListTile(
+          title: Text(
+            'Reps: ${reps ?? 'N/A'}, Weight: ${_convertWeight(weight)}',
+            style: AppTheme.secondaryText(
+                size: 17,
+                fontWeight: FontWeight.w500,
+                color: AppColors.backgroundColor),
+          ),
+          subtitle: Text(
+            'Notes: ${notes ?? 'N/A'}',
+            style: AppTheme.secondaryText(
+                size: 15,
+                fontWeight: FontWeight.w500,
+                color: AppColors.backgroundColor),
+          ),
+        );
+      }).toList();
+
+      return ExpansionTile(
+        trailing: Icon(
+          Icons.arrow_drop_down,
+          color: AppColors.acccentColor,
+        ),
+        title: Text(
+          exerciseName,
+          style: AppTheme.secondaryText(
+              size: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.acccentColor),
+        ),
+        children: setWidgets,
+      );
     }).toList();
   }
 
