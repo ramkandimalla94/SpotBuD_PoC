@@ -26,7 +26,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -51,20 +54,9 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCSitSodg2WrcDi94jR7hWfKBjOk7lj6to',
-    appId: '1:341521927870:android:b845b5980825ae4273d8ef',
+    appId: '1:341521927870:android:47a52685935ebd9573d8ef',
     messagingSenderId: '341521927870',
     projectId: 'spotbud-b9d9e',
     storageBucket: 'spotbud-b9d9e.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC0t0lsj8wqA0cWXtJQ-PEvl4n4OzMXPDE',
-    appId: '1:341521927870:ios:bdcc7a2f4d7fbf8973d8ef',
-    messagingSenderId: '341521927870',
-    projectId: 'spotbud-b9d9e',
-    storageBucket: 'spotbud-b9d9e.appspot.com',
-    androidClientId: '341521927870-uv5lf2kmoueqs9med9g20ih6u7umcbtg.apps.googleusercontent.com',
-    iosClientId: '341521927870-q6b6gm3et29hm22vaimm0a35rtariou7.apps.googleusercontent.com',
-    iosBundleId: 'com.example.spotbud',
   );
 }

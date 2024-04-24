@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:341521927870:android:b845b5980825ae4273d8ef",
+        "mobilesdk_app_id": "1:341521927870:android:47a52685935ebd9573d8ef",
         "android_client_info": {
-          "package_name": "com.example.spotbud"
+          "package_name": "com.ram.spotbud"
         }
       },
       "oauth_client": [
         {
-          "client_id": "341521927870-uv5lf2kmoueqs9med9g20ih6u7umcbtg.apps.googleusercontent.com",
+          "client_id": "341521927870-2c3vffbkq8s346003ii0paghoi4agkl4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.spotbud",
+            "package_name": "com.ram.spotbud",
             "certificate_hash": "3b5a3ef55b09373c6deeed0a2f5c6eb853ac5b4d"
           }
         },
@@ -39,10 +39,10 @@
               "client_type": 3
             },
             {
-              "client_id": "341521927870-q6b6gm3et29hm22vaimm0a35rtariou7.apps.googleusercontent.com",
+              "client_id": "341521927870-17f2qhni8c15ql8vsbfpu00rejut0ku8.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.spotbud"
+                "bundle_id": "com.ram.spotbud"
               }
             }
           ]
