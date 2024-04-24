@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/src/simple/list_notifier.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -147,11 +146,7 @@ class _HistoryViewState extends State<HistoryView> {
                       style: TextStyle(
                           color: AppColors.acccentColor,
                           fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(
-                      width: 10,
+                          fontWeight: FontWeight.bold),
                     ),
                     Icon(
                       Icons.filter_list,
@@ -159,15 +154,13 @@ class _HistoryViewState extends State<HistoryView> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  width: 15,
-                ),
                 Column(
                   children: [
                     _buildBodyPartFilter(),
                     _buildMachineFilter(_loggedMachines),
                   ],
                 ),
+                SizedBox(width: 16),
                 SizedBox(width: 16),
                 TextButton(
                   onPressed: () {
@@ -286,10 +279,7 @@ class _HistoryViewState extends State<HistoryView> {
         children: [
           Text(
             DateFormat('MMMM yyyy').format(selectedMonth),
-            style: TextStyle(
-                fontSize: 20,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, color: AppColors.acccentColor),
           ),
           IconButton(
             icon: Icon(

@@ -4,9 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_state_manager/src/simple/list_notifier.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/text.dart';
@@ -132,240 +130,188 @@ class _HistoryViewState extends State<HistoryView> {
           ),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Add filter dropdowns here
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _workoutLogsStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: LoadingIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else {
+            final workoutLogs = snapshot.data!.docs;
+            List<DateTime> dates = _extractDates(workoutLogs);
+            List<DateTime> filteredDates = _filteredDates(dates, workoutLogs);
+            return Column(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Filters',
-                      style: TextStyle(
-                          color: AppColors.acccentColor,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      Icons.filter_list,
-                      color: AppColors.acccentColor,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: 15,
-                ),
-                Column(
-                  children: [
-                    _buildBodyPartFilter(),
-                    _buildMachineFilter(_loggedMachines),
-                  ],
-                ),
-                SizedBox(width: 16),
-                TextButton(
-                  onPressed: () {
-                    _resetFilters();
-                  },
-                  child: Text(
-                    'Reset',
-                    style: TextStyle(color: AppColors.backgroundColor),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _workoutLogsStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: LoadingIndicator(),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  final workoutLogs = snapshot.data!.docs;
-                  List<DateTime> dates = _extractDates(workoutLogs);
-                  List<DateTime> filteredDates =
-                      _filteredDates(dates, workoutLogs);
-                  return Column(
-                    children: [
-                      _buildMonthYearSelector(context, _selectedMonth),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: filteredDates.length,
-                          itemBuilder: (context, index) {
-                            final date = filteredDates[index];
-                            final dateFormatted =
-                                DateFormat('yyyy-MM-dd').format(date);
-                            final workoutsForDate =
-                                _filterWorkoutsByDate(workoutLogs, date);
-                            return Column(
+                _buildMonthYearSelector(context, _selectedMonth),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredDates.length,
+                    itemBuilder: (context, index) {
+                      final date = filteredDates[index];
+                      final dateFormatted =
+                          DateFormat('yyyy-MM-dd').format(date);
+                      final workoutsForDate =
+                          _filterWorkoutsByDate(workoutLogs, date);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
+                                Column(
+                                  children: [
+                                    Text(
+                                      DateFormat('EEE').format(date),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('dd').format(date),
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('MMM/yy').format(date),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Expanded(
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        children: [
-                                          Text(
-                                            DateFormat('EEE').format(date),
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            DateFormat('dd').format(date),
-                                            style: TextStyle(
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            DateFormat('MMM/yy').format(date),
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            for (var workout in workoutsForDate)
-                                              ..._buildWorkoutDetails(
-                                                  workout['exercises']),
-                                          ],
-                                        ),
-                                      ),
+                                      for (var workout in workoutsForDate)
+                                        ..._buildWorkoutDetails(
+                                            workout['exercises']),
                                     ],
                                   ),
                                 ),
                               ],
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+        },
       ),
     );
   }
 
   Widget _buildMonthYearSelector(BuildContext context, DateTime selectedMonth) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            DateFormat('MMMM yyyy').format(selectedMonth),
-            style: TextStyle(
-                fontSize: 20,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.calendar_today,
-              color: AppColors.backgroundColor,
-            ),
-            onPressed: () {
-              _showMonthYearPicker(context);
-            },
-          ),
-        ],
-      ),
+    return IconButton(
+      icon: Icon(Icons.calendar_today),
+      onPressed: () {
+        _showMonthYearPicker(context);
+      },
     );
   }
 
   void _showMonthYearPicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.primaryColor,
-      elevation: 2,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+        return Container(
+          height: 300,
+          child: Column(
+            children: [
+              SizedBox(height: 20),
+              Text(
+                'Select Month and Year',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  MonthPicker(
-                    selectedMonth: _selectedMonth,
-                    onChanged: (DateTime newDateTime) {
-                      setState(() {
-                        _selectedMonth = newDateTime;
-                      });
-                    },
+                  SizedBox(
+                    width: 150,
+                    child: CupertinoPicker(
+                      scrollController: FixedExtentScrollController(
+                        initialItem: _selectedMonth.month - 1,
+                      ),
+                      itemExtent: 32,
+                      onSelectedItemChanged: (int index) {
+                        setState(() {
+                          _selectedMonth = DateTime(_selectedMonth.year,
+                              index + 1, _selectedMonth.day);
+                        });
+                      },
+                      children: List.generate(12, (index) {
+                        return Text(
+                          DateFormat('MMM')
+                              .format(DateTime(2022, index + 1, 1)),
+                        );
+                      }),
+                    ),
                   ),
-                  YearPicker(
-                    selectedMonth: _selectedMonth,
-                    onChanged: (DateTime newDateTime) {
-                      setState(() {
-                        _selectedMonth = newDateTime;
-                      });
-                    },
-                  ),
-                  buildLoginButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _handleMonthTap(_selectedMonth);
-                      setState(() {}); // Trigger a rebuild
-                    },
-                    text: 'Done',
+                  SizedBox(
+                    width: 150,
+                    child: YearPicker(
+                      firstDate: DateTime(2010),
+                      lastDate: DateTime.now(),
+                      selectedDate: _selectedMonth,
+                      onChanged: (DateTime newDateTime) {
+                        setState(() {
+                          _selectedMonth = DateTime(newDateTime.year,
+                              _selectedMonth.month, _selectedMonth.day);
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),
-            );
-          },
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleMonthTap(_selectedMonth);
+                },
+                child: Text('Done'),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  void _handleMonthTap(DateTime selectedMonth) async {
-    setState(() {
-      _selectedMonth = selectedMonth;
-    });
-
-    // Fetch and update data for the selected month
-    await _fetchWorkoutLogs(_selectedMonth);
-
-    // Print a message to verify the selected month
-    print('Selected Month: ${DateFormat('MMMM yyyy').format(selectedMonth)}');
+  Future<void> _handleMonthTap(DateTime? selectedMonth) async {
+    if (selectedMonth != null) {
+      setState(() {
+        _selectedMonth = selectedMonth;
+      });
+      await _fetchWorkoutLogs(_selectedMonth);
+    }
   }
 
   List<Widget> _buildWorkoutDetails(List<dynamic>? exercises) {
     if (exercises == null || exercises.isEmpty) {
       return [
-        Center(
+        Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Text(
             'No exercises recorded.',
             style: TextStyle(
@@ -683,78 +629,5 @@ class _HistoryViewState extends State<HistoryView> {
         return 'N/A';
       }
     }
-  }
-}
-
-class MonthPicker extends StatelessWidget {
-  final DateTime selectedMonth;
-  final ValueChanged<DateTime> onChanged;
-
-  MonthPicker({
-    required this.selectedMonth,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: CupertinoPicker.builder(
-        scrollController: FixedExtentScrollController(
-          initialItem: selectedMonth.month - 1,
-        ),
-        itemExtent: 32,
-        onSelectedItemChanged: (int index) {
-          onChanged(DateTime(selectedMonth.year, index + 1, selectedMonth.day));
-        },
-        childCount: 12,
-        itemBuilder: (BuildContext context, int index) {
-          return Center(
-            child: Text(
-              DateFormat(
-                'MMMM',
-              ).format(DateTime(selectedMonth.year, index + 1)),
-              style: TextStyle(color: AppColors.backgroundColor),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class YearPicker extends StatelessWidget {
-  final DateTime selectedMonth;
-  final ValueChanged<DateTime> onChanged;
-
-  YearPicker({
-    required this.selectedMonth,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: CupertinoPicker.builder(
-        scrollController: FixedExtentScrollController(
-          initialItem: selectedMonth.year - 2010,
-        ),
-        itemExtent: 32,
-        onSelectedItemChanged: (int index) {
-          onChanged(
-              DateTime(index + 2010, selectedMonth.month, selectedMonth.day));
-        },
-        childCount: DateTime.now().year - 2010 + 1,
-        itemBuilder: (BuildContext context, int index) {
-          return Center(
-            child: Text(
-              (2010 + index).toString(),
-              style: TextStyle(color: AppColors.backgroundColor),
-            ),
-          );
-        },
-      ),
-    );
   }
 }

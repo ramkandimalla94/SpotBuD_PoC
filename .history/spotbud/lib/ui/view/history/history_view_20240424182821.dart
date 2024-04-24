@@ -169,6 +169,7 @@ class _HistoryViewState extends State<HistoryView> {
                   ],
                 ),
                 SizedBox(width: 16),
+                SizedBox(width: 16),
                 TextButton(
                   onPressed: () {
                     _resetFilters();
@@ -286,10 +287,7 @@ class _HistoryViewState extends State<HistoryView> {
         children: [
           Text(
             DateFormat('MMMM yyyy').format(selectedMonth),
-            style: TextStyle(
-                fontSize: 20,
-                color: AppColors.acccentColor,
-                fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, color: AppColors.acccentColor),
           ),
           IconButton(
             icon: Icon(
