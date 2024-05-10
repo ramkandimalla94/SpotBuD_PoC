@@ -530,7 +530,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 spots: lineChartSpots,
                 isCurved: false,
                 color: Theme.of(context).colorScheme.primary,
-                barWidth: 2,
+                barWidth: 4,
                 isStrokeCapRound: true,
                 belowBarData: BarAreaData(show: false),
               ),
@@ -571,7 +571,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.bold,
-                            fontSize: value.toInt() > 99 ? 10 : 12,
+                            fontSize: 12,
                           ),
                         ),
                       );
@@ -695,7 +695,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: value.toInt() > 99 ? 9 : 12,
+                                fontSize: 14,
                               ),
                             ),
                           );

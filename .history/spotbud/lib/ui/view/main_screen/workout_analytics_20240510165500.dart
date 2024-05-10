@@ -520,17 +520,18 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     });
 
     return Padding(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
         height: 300,
+        width: 350,
         child: LineChart(
           LineChartData(
             lineBarsData: [
               LineChartBarData(
                 spots: lineChartSpots,
-                isCurved: false,
+                isCurved: true,
                 color: Theme.of(context).colorScheme.primary,
-                barWidth: 2,
+                barWidth: 4,
                 isStrokeCapRound: true,
                 belowBarData: BarAreaData(show: false),
               ),
@@ -565,13 +566,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     getTitlesWidget: (value, titleMeta) {
                       // Your custom widget for left axis titles
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.5),
                         child: Text(
                           value.toInt().toString(),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.bold,
-                            fontSize: value.toInt() > 99 ? 10 : 12,
+                            fontSize: 14,
                           ),
                         ),
                       );
@@ -695,7 +696,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: value.toInt() > 99 ? 9 : 12,
+                                fontSize: 14,
                               ),
                             ),
                           );

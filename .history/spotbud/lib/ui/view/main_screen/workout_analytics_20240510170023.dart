@@ -695,7 +695,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: value.toInt() > 99 ? 9 : 12,
+                                fontSize: value.toInt() > 99 ? 8 : 12,
                               ),
                             ),
                           );

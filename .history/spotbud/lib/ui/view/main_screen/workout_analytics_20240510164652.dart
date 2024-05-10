@@ -46,27 +46,16 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   String _convertWeight(String? weight) {
     if (_isKgsPreferred) {
       // If preferred weight unit is kilograms, return weight as it is
-      return '$weight';
+      return '$weight kg';
     } else {
       // Convert weight from kilograms to pounds
       final double? kg = double.tryParse(weight ?? '');
       if (kg != null) {
         final double lbs = kg * 2.20462;
-        return lbs.toStringAsFixed(2);
+        return lbs.toStringAsFixed(2) + ' lbs';
       } else {
         return 'N/A';
       }
-    }
-  }
-
-  String _preferdunit() {
-    if (_isKgsPreferred) {
-      // If preferred weight unit is kilograms, return weight as it is
-      return 'kgs';
-    } else {
-      // Convert weight from kilograms to pounds
-
-      return 'lbs';
     }
   }
 
@@ -415,13 +404,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         ),
         Row(
           children: [
-            _buildAnalyticsItem('Average Weight',
-                '${averageWeight.toStringAsFixed(2)} ' + _preferdunit()),
+            _buildAnalyticsItem(
+                'Average Weight', '${averageWeight.toStringAsFixed(2)} kgs'),
             const SizedBox.square(
               dimension: 20,
             ),
-            _buildAnalyticsItem('Max Weight',
-                '${maxWeight.toStringAsFixed(2)} ' + _preferdunit()),
+            _buildAnalyticsItem(
+                'Max Weight', '${maxWeight.toStringAsFixed(2)} kgs'),
             const Spacer(),
           ],
         ),
@@ -520,7 +509,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     });
 
     return Padding(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
         height: 300,
         child: LineChart(
@@ -528,9 +517,9 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             lineBarsData: [
               LineChartBarData(
                 spots: lineChartSpots,
-                isCurved: false,
+                isCurved: true,
                 color: Theme.of(context).colorScheme.primary,
-                barWidth: 2,
+                barWidth: 4,
                 isStrokeCapRound: true,
                 belowBarData: BarAreaData(show: false),
               ),
@@ -565,13 +554,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     getTitlesWidget: (value, titleMeta) {
                       // Your custom widget for left axis titles
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.5),
                         child: Text(
                           value.toInt().toString(),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.bold,
-                            fontSize: value.toInt() > 99 ? 10 : 12,
+                            fontSize: 14,
                           ),
                         ),
                       );
@@ -695,7 +684,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: value.toInt() > 99 ? 9 : 12,
+                                fontSize: 14,
                               ),
                             ),
                           );
