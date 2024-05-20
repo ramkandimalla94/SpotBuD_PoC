@@ -27,7 +27,7 @@ class _BodypartState extends State<Bodypart> {
           onSelectionUpdated: (selectedParts) {
             setState(() {
               _bodyParts = selectedParts;
-              // print(_bodyParts);
+              print(_bodyParts);
             });
 
             // Print the selected body parts

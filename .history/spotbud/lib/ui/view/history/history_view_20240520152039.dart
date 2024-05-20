@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

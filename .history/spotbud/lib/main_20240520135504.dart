@@ -31,6 +31,9 @@ Future<void> main() async {
 }
 
 ThemeData _darkTheme = ThemeData(
+  textTheme: TextTheme(
+    bodyMedium: TextStyle(fontSize: 10)
+  ),
   hintColor: AppColors.secondaryColor,
   colorScheme: const ColorScheme.dark(
       background: AppColors.black,
@@ -74,7 +77,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _getThemeStatus();
-    //print(_userDataViewModel.isLightTheme);
+    print(_userDataViewModel.isLightTheme);
     return Builder(
       builder: (context) {
         ScreenUtil.init(

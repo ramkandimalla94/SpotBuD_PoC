@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -179,6 +168,16 @@ class _HistoryViewState extends State<HistoryView> {
                   ],
                 ),
                 SizedBox(width: 16),
+                TextButton(
+                  onPressed: () {
+                    _resetFilters();
+                  },
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ),
               ],
             ),
           ),
@@ -537,7 +536,7 @@ class _HistoryViewState extends State<HistoryView> {
         'Select Machine',
         style: AppTheme.primaryText(
           color: Theme.of(context).colorScheme.secondary,
-          size: 15,
+          size: 12,
           fontWeight: FontWeight.bold,
         ),
       ),

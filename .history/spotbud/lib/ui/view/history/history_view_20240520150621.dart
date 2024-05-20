@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -172,15 +161,25 @@ class _HistoryViewState extends State<HistoryView> {
                 SizedBox(
                   width: 15,
                 ),
-                Column(
-                  children: [
-                    _buildBodyPartFilter(),
-                    _buildMachineFilter(_loggedMachines),
-                  ],
-                ),
                 SizedBox(width: 16),
+                TextButton(
+                  onPressed: () {
+                    _resetFilters();
+                  },
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ),
               ],
             ),
+          ),
+          Column(
+            children: [
+              _buildBodyPartFilter(),
+              _buildMachineFilter(_loggedMachines),
+            ],
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -519,6 +518,8 @@ class _HistoryViewState extends State<HistoryView> {
     return DropdownButton<String>(
       dropdownColor: Theme.of(context).colorScheme.background,
       value: _selectedMachine,
+      isDense: true,
+      isExpanded: false,
       onChanged: (newValue) {
         setState(() {
           _selectedMachine = newValue;
@@ -527,9 +528,21 @@ class _HistoryViewState extends State<HistoryView> {
       items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          child: Container(
+            constraints:
+                BoxConstraints(maxWidth: 150), // Adjust the maxWidth as needed
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    value,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }).toList(),

@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -148,39 +137,47 @@ class _HistoryViewState extends State<HistoryView> {
           // Add filter dropdowns here
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
+            child: Center(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Filters',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      Icons.filter_list,
+                Text(
+                  'Filters',
+                  style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ],
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic),
                 ),
                 SizedBox(
-                  width: 15,
+                  width: 10,
                 ),
-                Column(
-                  children: [
-                    _buildBodyPartFilter(),
-                    _buildMachineFilter(_loggedMachines),
-                  ],
+                Icon(
+                  Icons.filter_list,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                SizedBox(width: 16),
               ],
             ),
+          ),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildBodyPartFilter(),
+                  _buildMachineFilter(_loggedMachines),
+                ],
+              ),
+              TextButton(
+                onPressed: () {
+                  _resetFilters();
+                },
+                child: Text(
+                  'Reset',
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -519,6 +516,8 @@ class _HistoryViewState extends State<HistoryView> {
     return DropdownButton<String>(
       dropdownColor: Theme.of(context).colorScheme.background,
       value: _selectedMachine,
+      isDense: true,
+      isExpanded: false,
       onChanged: (newValue) {
         setState(() {
           _selectedMachine = newValue;
@@ -527,9 +526,21 @@ class _HistoryViewState extends State<HistoryView> {
       items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(
-            value,
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          child: Container(
+            constraints:
+                BoxConstraints(maxWidth: 200), // Adjust the maxWidth as needed
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    value,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }).toList(),

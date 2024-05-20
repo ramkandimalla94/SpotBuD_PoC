@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -150,22 +139,36 @@ class _HistoryViewState extends State<HistoryView> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Row(
+                Column(
                   children: [
-                    Text(
-                      'Filters',
-                      style: TextStyle(
+                    Row(
+                      children: [
+                        Text(
+                          'Filters',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Icon(
+                          Icons.filter_list,
                           color: Theme.of(context).colorScheme.primary,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Icon(
-                      Icons.filter_list,
-                      color: Theme.of(context).colorScheme.primary,
+                    TextButton(
+                      onPressed: () {
+                        _resetFilters();
+                      },
+                      child: Text(
+                        'Reset',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary),
+                      ),
                     ),
                   ],
                 ),

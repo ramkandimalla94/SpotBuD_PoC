@@ -130,17 +130,6 @@ class _HistoryViewState extends State<HistoryView> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetFilters();
-            },
-            child: Text(
-              'Reset',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -179,6 +168,16 @@ class _HistoryViewState extends State<HistoryView> {
                   ],
                 ),
                 SizedBox(width: 16),
+                TextButton(
+                  onPressed: () {
+                    _resetFilters();
+                  },
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                ),
               ],
             ),
           ),
@@ -516,29 +515,32 @@ class _HistoryViewState extends State<HistoryView> {
                 loggedMachines.contains(machine);
           }).toList();
 
-    return DropdownButton<String>(
-      dropdownColor: Theme.of(context).colorScheme.background,
-      value: _selectedMachine,
-      onChanged: (newValue) {
-        setState(() {
-          _selectedMachine = newValue;
-        });
-      },
-      items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(
-            value,
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+    return Container(
+      width: 150,
+      child: DropdownButton<String>(
+        dropdownColor: Theme.of(context).colorScheme.background,
+        value: _selectedMachine,
+        onChanged: (newValue) {
+          setState(() {
+            _selectedMachine = newValue;
+          });
+        },
+        items: machinesToShow.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+            ),
+          );
+        }).toList(),
+        hint: Text(
+          'Select Machine',
+          style: AppTheme.primaryText(
+            color: Theme.of(context).colorScheme.secondary,
+            size: 15,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      }).toList(),
-      hint: Text(
-        'Select Machine',
-        style: AppTheme.primaryText(
-          color: Theme.of(context).colorScheme.secondary,
-          size: 15,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );

@@ -34,7 +34,7 @@ class _BodypartState extends State<Bodypart> {
             // print(_bodyParts);
           },
           mirrored: true,
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
         ),
       ),
     );

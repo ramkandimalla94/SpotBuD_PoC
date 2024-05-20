@@ -31,6 +31,11 @@ Future<void> main() async {
 }
 
 ThemeData _darkTheme = ThemeData(
+  textTheme: TextTheme(
+    bodyLarge: TextStyle(fontSize: 10),
+    caption: TextStyle(fontSize: 10),
+    bodyMedium: TextStyle(fontSize: 10),
+  ),
   hintColor: AppColors.secondaryColor,
   colorScheme: const ColorScheme.dark(
       background: AppColors.black,
