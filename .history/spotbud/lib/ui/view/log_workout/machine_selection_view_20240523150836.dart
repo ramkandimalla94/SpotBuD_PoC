@@ -66,6 +66,7 @@ class MachineSelectionScreen extends StatelessWidget {
                   onTap: () {
                     Get.back(
                         result: {'bodyPart': bodyPart, 'machine': machine});
+                    Get.toNamed('/logworkout');
                   },
                 );
               },

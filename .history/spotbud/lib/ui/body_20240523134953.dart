@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:body_part_selector/body_part_selector.dart';
-import 'package:get/get.dart';
-import 'package:spotbud/ui/view/log_workout/machine_selection_view.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 
 class Bodypart extends StatefulWidget {
@@ -17,7 +15,6 @@ class _BodypartState extends State<Bodypart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       backgroundColor: AppColors.primaryColor,
       body: SafeArea(
         child: BodyPartSelectorTurnable(
@@ -46,22 +43,26 @@ class _BodypartState extends State<Bodypart> {
 
     if (bodyParts.head) changedParts.add('Head');
     if (bodyParts.neck) changedParts.add('Neck');
-    if (bodyParts.leftShoulder || bodyParts.rightShoulder)
-      changedParts.add('Shoulders');
-    if (bodyParts.leftUpperArm || bodyParts.rightUpperArm)
-      changedParts.add('Upper Arms');
-    if (bodyParts.leftElbow || bodyParts.rightElbow) changedParts.add('Elbows');
-    if (bodyParts.leftLowerArm || bodyParts.rightLowerArm)
-      changedParts.add('Lower Arms');
-    if (bodyParts.leftHand || bodyParts.rightHand) changedParts.add('Hands');
-    if (bodyParts.upperBody) changedParts.add('Chest & Back');
+    if (bodyParts.leftShoulder) changedParts.add('Left Shoulder');
+    if (bodyParts.leftUpperArm) changedParts.add('Left Upper Arm');
+    if (bodyParts.leftElbow) changedParts.add('Left Elbow');
+    if (bodyParts.leftLowerArm) changedParts.add('Left Lower Arm');
+    if (bodyParts.leftHand) changedParts.add('Left Hand');
+    if (bodyParts.rightShoulder) changedParts.add('Right Shoulder');
+    if (bodyParts.rightUpperArm) changedParts.add('Right Upper Arm');
+    if (bodyParts.rightElbow) changedParts.add('Right Elbow');
+    if (bodyParts.rightLowerArm) changedParts.add('Right Lower Arm');
+    if (bodyParts.rightHand) changedParts.add('Right Hand');
+    if (bodyParts.upperBody) changedParts.add('Upper Body');
     if (bodyParts.lowerBody) changedParts.add('Lower Body');
-    if (bodyParts.leftUpperLeg || bodyParts.rightUpperLeg)
-      changedParts.add('Upper Legs');
-    if (bodyParts.leftKnee || bodyParts.rightKnee) changedParts.add('Knees');
-    if (bodyParts.leftLowerLeg || bodyParts.rightLowerLeg)
-      changedParts.add('Lower Legs');
-    if (bodyParts.leftFoot || bodyParts.rightFoot) changedParts.add('Feet');
+    if (bodyParts.leftUpperLeg) changedParts.add('Left Upper Leg');
+    if (bodyParts.leftKnee) changedParts.add('Left Knee');
+    if (bodyParts.leftLowerLeg) changedParts.add('Left Lower Leg');
+    if (bodyParts.leftFoot) changedParts.add('Left Foot');
+    if (bodyParts.rightUpperLeg) changedParts.add('Right Upper Leg');
+    if (bodyParts.rightKnee) changedParts.add('Right Knee');
+    if (bodyParts.rightLowerLeg) changedParts.add('Right Lower Leg');
+    if (bodyParts.rightFoot) changedParts.add('Right Foot');
     if (bodyParts.abdomen) changedParts.add('Abdomen');
     if (bodyParts.vestibular) changedParts.add('Vestibular');
 
@@ -84,10 +85,6 @@ class _BodypartState extends State<Bodypart> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
-                print(changedParts);
-                String selectedPart =
-                    changedParts[0]; // Get the first (and only) element
-                Get.back(result: selectedPart);
               },
             ),
           ],

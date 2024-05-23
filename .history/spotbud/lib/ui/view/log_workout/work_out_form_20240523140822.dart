@@ -783,7 +783,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
   void _openBodyPartSelection() async {
     var result = await Get.to(() => Bodypart());
-    print(result);
     if (result != null && result is String) {
       var selectedBodyPart = result;
 

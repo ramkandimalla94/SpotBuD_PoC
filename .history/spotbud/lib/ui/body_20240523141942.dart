@@ -17,7 +17,6 @@ class _BodypartState extends State<Bodypart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       backgroundColor: AppColors.primaryColor,
       body: SafeArea(
         child: BodyPartSelectorTurnable(
@@ -54,7 +53,7 @@ class _BodypartState extends State<Bodypart> {
     if (bodyParts.leftLowerArm || bodyParts.rightLowerArm)
       changedParts.add('Lower Arms');
     if (bodyParts.leftHand || bodyParts.rightHand) changedParts.add('Hands');
-    if (bodyParts.upperBody) changedParts.add('Chest & Back');
+    if (bodyParts.upperBody) changedParts.add('Upper Body');
     if (bodyParts.lowerBody) changedParts.add('Lower Body');
     if (bodyParts.leftUpperLeg || bodyParts.rightUpperLeg)
       changedParts.add('Upper Legs');
@@ -84,10 +83,7 @@ class _BodypartState extends State<Bodypart> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
-                print(changedParts);
-                String selectedPart =
-                    changedParts[0]; // Get the first (and only) element
-                Get.back(result: selectedPart);
+                Get.toNamed(MachineSelectionScreen(bodyPart: changedParts));
               },
             ),
           ],

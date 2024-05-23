@@ -783,7 +783,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
   void _openBodyPartSelection() async {
     var result = await Get.to(() => Bodypart());
-    print(result);
     if (result != null && result is String) {
       var selectedBodyPart = result;
 
@@ -819,6 +818,9 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                   weightInLbs.toStringAsFixed(2);
             }
           }
+
+          // Navigate back to the workout form
+          Get.until((route) => route.isFirst); // Go back to the first screen
         }
       }
     }

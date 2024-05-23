@@ -64,6 +64,16 @@ class MachineSelectionScreen extends StatelessWidget {
                         color: Theme.of(context).hintColor),
                   ),
                   onTap: () {
+                    int count = 0;
+                    Get.until((route) {
+                      // Custom condition to stop navigating back after 2 screens
+                      if (count < 2) {
+                        count++;
+                        return false; // Continue navigating back
+                      } else {
+                        return true; // Stop navigating back after 2 screens
+                      }
+                    });
                     Get.back(
                         result: {'bodyPart': bodyPart, 'machine': machine});
                   },

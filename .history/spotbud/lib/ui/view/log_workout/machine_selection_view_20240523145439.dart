@@ -15,63 +15,81 @@ class MachineSelectionScreen extends StatelessWidget {
   MachineSelectionScreen({required this.bodyPart});
   @override
   Widget build(BuildContext context) {
-    controller._loadData(bodyPart);
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          iconTheme:
-              IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: Text(
-            'Exercise for $bodyPart',
-            style: AppTheme.secondaryText(
-                fontWeight: FontWeight.w500,
-                size: 20,
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        title: Text(
+          'Select Exercise',
+          style: AppTheme.secondaryText(
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.primary),
+        ),
+        actions: [
+          IconButton(
+            color: Theme.of(context).colorScheme.primary,
+            onPressed: () => _showSearchBar(context),
+            icon: Icon(Icons.search,
                 color: Theme.of(context).colorScheme.primary),
           ),
-          actions: [
-            IconButton(
-              color: Theme.of(context).colorScheme.primary,
-              onPressed: () => _showSearchBar(context),
-              icon: Icon(Icons.search,
-                  color: Theme.of(context).colorScheme.primary),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddExerciseDialog(context),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(Icons.add),
-        ),
-        body: Obx(() {
-          if (controller.loading.value) {
-            return Center(
-              child: LoadingIndicator(),
-            );
-          } else {
-            final machinesByBodyPart = controller.machinesByBodyPart;
-            final machines = machinesByBodyPart[bodyPart] ?? [];
-            return ListView.builder(
-              itemCount: machines.length,
-              itemBuilder: (context, index) {
-                final machine = machines[index];
-                return ListTile(
-                  title: Text(
-                    machine,
-                    style: AppTheme.secondaryText(
-                        size: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).hintColor),
-                  ),
-                  onTap: () {
-                    Get.back(
-                        result: {'bodyPart': bodyPart, 'machine': machine});
-                  },
-                );
-              },
-            );
-          }
-        }));
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddExerciseDialog(context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(Icons.add),
+      ),
+      body: Obx(() {
+        if (controller.loading.value) {
+          return Center(
+            child: LoadingIndicator(),
+          );
+        } else {
+          final machinesByBodyPart = controller.machinesByBodyPart;
+          final bodyParts = controller.bodyParts;
+
+          final machiness = machinesByBodyPart[bodyPart] ?? [];
+          return ListView.builder(
+            itemCount: bodyParts.length,
+            itemBuilder: (context, index) {
+              final bodyPart = bodyParts[index];
+              final machines = machinesByBodyPart[bodyPart] ?? [];
+              return ExpansionTile(
+                trailing: Icon(
+                  Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(
+                  bodyPart,
+                  style: AppTheme.secondaryText(
+                      size: 22,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.primary),
+                ),
+                children: machines
+                    .map((machine) => ListTile(
+                          title: Text(
+                            machine,
+                            style: AppTheme.secondaryText(
+                                size: 20,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).hintColor),
+                          ),
+                          onTap: () {
+                            Get.back(result: {
+                              'bodyPart': bodyPart,
+                              'machine': machine
+                            });
+                          },
+                        ))
+                    .toList(),
+              );
+            },
+          );
+        }
+      }),
+    );
   }
 
   void _showSearchBar(BuildContext context) {
@@ -434,7 +452,7 @@ class MachineSelectionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    controller._loadData(bodyPart);
     _loadRecentSearches();
   }
 
@@ -564,7 +582,7 @@ class MachineSelectionController extends GetxController {
               .update({'customMachine': customMachines});
 
           // Reload data
-          _loadData(bodyPart);
+          _loadData();
         }
       }
     } catch (e) {

@@ -26,7 +26,7 @@ class MachineSelectionScreen extends StatelessWidget {
             'Exercise for $bodyPart',
             style: AppTheme.secondaryText(
                 fontWeight: FontWeight.w500,
-                size: 20,
+                size: 25,
                 color: Theme.of(context).colorScheme.primary),
           ),
           actions: [

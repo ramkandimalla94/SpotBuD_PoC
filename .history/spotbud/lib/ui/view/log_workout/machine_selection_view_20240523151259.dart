@@ -64,6 +64,7 @@ class MachineSelectionScreen extends StatelessWidget {
                         color: Theme.of(context).hintColor),
                   ),
                   onTap: () {
+                    get.popu
                     Get.back(
                         result: {'bodyPart': bodyPart, 'machine': machine});
                   },

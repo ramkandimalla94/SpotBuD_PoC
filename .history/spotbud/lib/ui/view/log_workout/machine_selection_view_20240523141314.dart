@@ -15,63 +15,77 @@ class MachineSelectionScreen extends StatelessWidget {
   MachineSelectionScreen({required this.bodyPart});
   @override
   Widget build(BuildContext context) {
-    controller._loadData(bodyPart);
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          iconTheme:
-              IconThemeData(color: Theme.of(context).colorScheme.primary),
-          title: Text(
-            'Exercise for $bodyPart',
-            style: AppTheme.secondaryText(
-                fontWeight: FontWeight.w500,
-                size: 20,
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+        title: Text(
+          'Select Exercise',
+          style: AppTheme.secondaryText(
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.primary),
+        ),
+        actions: [
+          IconButton(
+            color: Theme.of(context).colorScheme.primary,
+            onPressed: () => _showSearchBar(context),
+            icon: Icon(Icons.search,
                 color: Theme.of(context).colorScheme.primary),
           ),
-          actions: [
-            IconButton(
-              color: Theme.of(context).colorScheme.primary,
-              onPressed: () => _showSearchBar(context),
-              icon: Icon(Icons.search,
-                  color: Theme.of(context).colorScheme.primary),
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showAddExerciseDialog(context),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(Icons.add),
-        ),
-        body: Obx(() {
-          if (controller.loading.value) {
-            return Center(
-              child: LoadingIndicator(),
-            );
-          } else {
-            final machinesByBodyPart = controller.machinesByBodyPart;
-            final machines = machinesByBodyPart[bodyPart] ?? [];
-            return ListView.builder(
-              itemCount: machines.length,
-              itemBuilder: (context, index) {
-                final machine = machines[index];
-                return ListTile(
-                  title: Text(
-                    machine,
-                    style: AppTheme.secondaryText(
-                        size: 20,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).hintColor),
-                  ),
-                  onTap: () {
-                    Get.back(
-                        result: {'bodyPart': bodyPart, 'machine': machine});
-                  },
-                );
-              },
-            );
-          }
-        }));
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddExerciseDialog(context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(Icons.add),
+      ),
+      body: Obx(() {
+        if (controller.loading.value) {
+          return Center(
+            child: LoadingIndicator(),
+          );
+        } else {
+          return ListView.builder(
+            itemCount: controller.bodyParts.length,
+            itemBuilder: (context, index) {
+              final bodyPart = controller.bodyParts[index];
+              final machines = controller.machinesByBodyPart[bodyPart] ?? [];
+              return ExpansionTile(
+                trailing: Icon(
+                  Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(
+                  bodyPart,
+                  style: AppTheme.secondaryText(
+                      size: 22,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.primary),
+                ),
+                children: machines
+                    .map((machine) => ListTile(
+                          title: Text(
+                            machine,
+                            style: AppTheme.secondaryText(
+                                size: 20,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).hintColor),
+                          ),
+                          onTap: () {
+                            Get.back(result: {
+                              'bodyPart': bodyPart,
+                              'machine': machine
+                            });
+                          },
+                        ))
+                    .toList(),
+              );
+            },
+          );
+        }
+      }),
+    );
   }
 
   void _showSearchBar(BuildContext context) {
@@ -434,7 +448,7 @@ class MachineSelectionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    _loadData();
     _loadRecentSearches();
   }
 
@@ -457,7 +471,7 @@ class MachineSelectionController extends GetxController {
     }
   }
 
-  void _loadData(String selectedBodyPart) async {
+  void _loadData() async {
     try {
       loading.value = true; // Start loading
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -482,18 +496,15 @@ class MachineSelectionController extends GetxController {
                   .map((machine) => machine['name'] as String)
                   .toList();
 
-              // Filter machines based on the selected body part
-              if (bodyPart == selectedBodyPart) {
-                if (!bodyParts.contains(bodyPart)) {
-                  bodyParts.add(bodyPart);
-                }
-
-                if (!machinesByBodyPart.containsKey(bodyPart)) {
-                  machinesByBodyPart[bodyPart] = [];
-                }
-
-                machinesByBodyPart[bodyPart]?.addAll(machines);
+              if (!bodyParts.contains(bodyPart)) {
+                bodyParts.add(bodyPart);
               }
+
+              if (!machinesByBodyPart.containsKey(bodyPart)) {
+                machinesByBodyPart[bodyPart] = [];
+              }
+
+              machinesByBodyPart[bodyPart]?.addAll(machines);
             });
 
             // Sort machines alphabetically
@@ -564,7 +575,7 @@ class MachineSelectionController extends GetxController {
               .update({'customMachine': customMachines});
 
           // Reload data
-          _loadData(bodyPart);
+          _loadData();
         }
       }
     } catch (e) {

@@ -783,12 +783,10 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
 
   void _openBodyPartSelection() async {
     var result = await Get.to(() => Bodypart());
-    print(result);
     if (result != null && result is String) {
       var selectedBodyPart = result;
 
-      var machineResult = await Get.to(
-          () => MachineSelectionScreen(bodyPart: selectedBodyPart));
+      var machineResult = await Get.to(() => MachineSelectionScreen());
       if (machineResult != null && machineResult is Map<String, String>) {
         var bodyPart = machineResult['bodyPart'];
         var machine = machineResult['machine'];

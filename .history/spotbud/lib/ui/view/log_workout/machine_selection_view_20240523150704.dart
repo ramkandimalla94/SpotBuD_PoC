@@ -225,7 +225,7 @@ class MachineSelectionScreen extends StatelessWidget {
                     selectedExerciseType!,
                     singleLegOrArm,
                   );
-                  Navigator.of(context).pop();
+                  Get.toNamed('/logworkout');
                 } else {
                   // Show an error message if any field is empty
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(

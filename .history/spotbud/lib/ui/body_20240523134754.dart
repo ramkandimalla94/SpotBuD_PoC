@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:body_part_selector/body_part_selector.dart';
-import 'package:get/get.dart';
-import 'package:spotbud/ui/view/log_workout/machine_selection_view.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 
 class Bodypart extends StatefulWidget {
@@ -17,7 +15,6 @@ class _BodypartState extends State<Bodypart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       backgroundColor: AppColors.primaryColor,
       body: SafeArea(
         child: BodyPartSelectorTurnable(
@@ -42,33 +39,6 @@ class _BodypartState extends State<Bodypart> {
   }
 
   void _showSelectedBodyPartsDialog(BuildContext context, BodyParts bodyParts) {
-    final changedParts = <String>[];
-
-    if (bodyParts.head) changedParts.add('Head');
-    if (bodyParts.neck) changedParts.add('Neck');
-    if (bodyParts.leftShoulder || bodyParts.rightShoulder)
-      changedParts.add('Shoulders');
-    if (bodyParts.leftUpperArm || bodyParts.rightUpperArm)
-      changedParts.add('Upper Arms');
-    if (bodyParts.leftElbow || bodyParts.rightElbow) changedParts.add('Elbows');
-    if (bodyParts.leftLowerArm || bodyParts.rightLowerArm)
-      changedParts.add('Lower Arms');
-    if (bodyParts.leftHand || bodyParts.rightHand) changedParts.add('Hands');
-    if (bodyParts.upperBody) changedParts.add('Chest & Back');
-    if (bodyParts.lowerBody) changedParts.add('Lower Body');
-    if (bodyParts.leftUpperLeg || bodyParts.rightUpperLeg)
-      changedParts.add('Upper Legs');
-    if (bodyParts.leftKnee || bodyParts.rightKnee) changedParts.add('Knees');
-    if (bodyParts.leftLowerLeg || bodyParts.rightLowerLeg)
-      changedParts.add('Lower Legs');
-    if (bodyParts.leftFoot || bodyParts.rightFoot) changedParts.add('Feet');
-    if (bodyParts.abdomen) changedParts.add('Abdomen');
-    if (bodyParts.vestibular) changedParts.add('Vestibular');
-
-    if (changedParts.isEmpty) {
-      return;
-    }
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -76,7 +46,32 @@ class _BodypartState extends State<Bodypart> {
           title: Text('Selected Body Parts'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: changedParts.map((part) => Text(part)).toList(),
+              children: <Widget>[
+                Text('Head: ${bodyParts.head}'),
+                Text('Neck: ${bodyParts.neck}'),
+                Text('Left Shoulder: ${bodyParts.leftShoulder}'),
+                Text('Left Upper Arm: ${bodyParts.leftUpperArm}'),
+                Text('Left Elbow: ${bodyParts.leftElbow}'),
+                Text('Left Lower Arm: ${bodyParts.leftLowerArm}'),
+                Text('Left Hand: ${bodyParts.leftHand}'),
+                Text('Right Shoulder: ${bodyParts.rightShoulder}'),
+                Text('Right Upper Arm: ${bodyParts.rightUpperArm}'),
+                Text('Right Elbow: ${bodyParts.rightElbow}'),
+                Text('Right Lower Arm: ${bodyParts.rightLowerArm}'),
+                Text('Right Hand: ${bodyParts.rightHand}'),
+                Text('Upper Body: ${bodyParts.upperBody}'),
+                Text('Lower Body: ${bodyParts.lowerBody}'),
+                Text('Left Upper Leg: ${bodyParts.leftUpperLeg}'),
+                Text('Left Knee: ${bodyParts.leftKnee}'),
+                Text('Left Lower Leg: ${bodyParts.leftLowerLeg}'),
+                Text('Left Foot: ${bodyParts.leftFoot}'),
+                Text('Right Upper Leg: ${bodyParts.rightUpperLeg}'),
+                Text('Right Knee: ${bodyParts.rightKnee}'),
+                Text('Right Lower Leg: ${bodyParts.rightLowerLeg}'),
+                Text('Right Foot: ${bodyParts.rightFoot}'),
+                Text('Abdomen: ${bodyParts.abdomen}'),
+                Text('Vestibular: ${bodyParts.vestibular}'),
+              ],
             ),
           ),
           actions: <Widget>[
@@ -84,10 +79,6 @@ class _BodypartState extends State<Bodypart> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
-                print(changedParts);
-                String selectedPart =
-                    changedParts[0]; // Get the first (and only) element
-                Get.back(result: selectedPart);
               },
             ),
           ],
