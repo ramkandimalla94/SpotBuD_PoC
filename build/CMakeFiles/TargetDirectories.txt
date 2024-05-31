@@ -1,0 +1,2 @@
+D:/intern/SpotBuD_PoC/build/CMakeFiles/ALL_BUILD.dir
+D:/intern/SpotBuD_PoC/build/CMakeFiles/ZERO_CHECK.dir
