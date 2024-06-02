@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:spotbud/ui/view/main_screen/pedometer_controller.dart';
 import 'package:spotbud/ui/view/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/workout_logging/work_out_form.dart';
 import 'package:spotbud/ui/view/workout_analytics/workout_analytics.dart';
@@ -12,7 +11,6 @@ import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/step_counter_data.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
@@ -27,8 +25,6 @@ class _HomeViewState extends State<HomeView> {
   late String currentTime;
   late Timer _timer;
   late String gifPath = '';
-  final PedometerController _pedometerController =
-      Get.put(PedometerController());
 
   final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
 
@@ -168,8 +164,6 @@ class _HomeViewState extends State<HomeView> {
                   Obx(() =>
                       Text('Steps taken: ${_pedometerController.steps.value}')),
                   Obx(() => Text(
-                      'Daily steps: ${_pedometerController.dailySteps.value}')),
-                  Obx(() => Text(
                       'Pedestrian status: ${_pedometerController.status.value}')),
                 ],
               ),
@@ -185,16 +179,16 @@ class _HomeViewState extends State<HomeView> {
             SizedBox(
               height: 20,
             ),
-            customHomeButton(
-                text: "Step Counter",
-                onPressed: () {
-                  Get.to(DailyStepRecords());
-                },
-                theme: Theme.of(context),
-                imagePath: AppAssets.dumble),
-            SizedBox(
-              height: 20,
-            ),
+            // customHomeButton(
+            //     text: "Role",
+            //     onPressed: () {
+            //       Get.to(RoleSelectionScreen());
+            //     },
+            //     theme: Theme.of(context),
+            //     imagePath: AppAssets.dumble),
+            // SizedBox(
+            //   height: 20,
+            // ),
 
             customHomeButton(
                 text: "History",

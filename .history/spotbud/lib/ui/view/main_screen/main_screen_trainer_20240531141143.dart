@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:spotbud/ui/view/main_screen/profile_view.dart';
 import 'package:spotbud/ui/view/onboarding/role.dart';
-import 'package:spotbud/ui/view/trainer/trainerszone.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/view/main_screen/home_view.dart';
@@ -19,7 +18,6 @@ class _MainScreenTrainerState extends State<MainScreenTrainer> {
 
   final List<Widget> _screens = [
     HomeView(),
-    TrainersZone(),
     ProfileView(),
   ];
 
@@ -60,10 +58,6 @@ class _MainScreenTrainerState extends State<MainScreenTrainer> {
                   GButton(
                     icon: Icons.home,
                     text: "Home",
-                  ),
-                  GButton(
-                    icon: Icons.workspaces_outlined,
-                    text: "Trainers Zone",
                   ),
                   GButton(
                     icon: Icons.person,

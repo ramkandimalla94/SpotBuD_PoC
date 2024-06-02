@@ -4,9 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:spotbud/ui/body.dart';
-import 'package:spotbud/ui/view/log_workout/work_out_form.dart';
-import 'package:spotbud/ui/view/main_screen/workout_analytics.dart';
+import 'package:spotbud/ui/view/workout_logging/exercise_selection/body.dart';
+import 'package:spotbud/ui/view/workout_logging/work_out_form.dart';
+import 'package:spotbud/ui/view/workout_analytics/workout_analytics.dart';
+import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -77,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
         child: Column(
@@ -94,7 +95,7 @@ class _HomeViewState extends State<HomeView> {
                     style: AppTheme.primaryText(
                         size: 40.0,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.backgroundColor),
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ),
                 Spacer(),
@@ -135,7 +136,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Text(
                     'Date: ${DateFormat('MMMM d, y').format(DateTime.now())}',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.secondary,
                       fontSize: 16,
                     ),
                   ),
@@ -146,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Text(
                     'Time: $currentTime',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.secondary,
                       fontSize: 16,
                     ),
                   ),
@@ -161,26 +162,31 @@ class _HomeViewState extends State<HomeView> {
                 onPressed: () {
                   Get.toNamed('/logworkout');
                 },
+                theme: Theme.of(context),
                 imagePath: AppAssets.dumble),
+
             SizedBox(
               height: 20,
             ),
-            customHomeButton(
-                text: "Body Part",
-                onPressed: () {
-                  Get.to(Bodypart());
-                },
-                imagePath: AppAssets.dumble),
-            SizedBox(
-              height: 20,
-            ),
+            // customHomeButton(
+            //     text: "Role",
+            //     onPressed: () {
+            //       Get.to(RoleSelectionScreen());
+            //     },
+            //     theme: Theme.of(context),
+            //     imagePath: AppAssets.dumble),
+            // SizedBox(
+            //   height: 20,
+            // ),
+
             customHomeButton(
                 text: "History",
                 onPressed: () {
                   Get.toNamed('/history');
                 },
+                theme: Theme.of(context),
                 imagePath: AppAssets.history),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             customHomeButton(
@@ -188,6 +194,7 @@ class _HomeViewState extends State<HomeView> {
                 onPressed: () {
                   Get.to(ExerciseAnalyticsScreen());
                 },
+                theme: Theme.of(context),
                 imagePath: AppAssets.progress),
             SizedBox(
               height: 20,
@@ -210,3 +217,4 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 }
+//kw8P0jjOrMTa9RxKsXHkE6xcHJc2

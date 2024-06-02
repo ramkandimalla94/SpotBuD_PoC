@@ -1,22 +1,23 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:spotbud/ui/view/main_screen/profile_view.dart';
-import 'package:spotbud/ui/view/trainee/traineezone.dart';
+import 'package:spotbud/ui/view/onboarding/role.dart';
+import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/view/main_screen/home_view.dart';
 
-class MainScreenTrainee extends StatefulWidget {
+class MainScreenTrainer extends StatefulWidget {
   @override
-  _MainScreenTraineeState createState() => _MainScreenTraineeState();
+  _MainScreenTrainerState createState() => _MainScreenTrainerState();
 }
 
-class _MainScreenTraineeState extends State<MainScreenTrainee> {
+class _MainScreenTrainerState extends State<MainScreenTrainer> {
   int selectedIndex = 0;
 
   final List<Widget> _screens = [
     HomeView(),
-    Myzone(),
     ProfileView(),
   ];
 
@@ -34,13 +35,13 @@ class _MainScreenTraineeState extends State<MainScreenTrainee> {
           child: _screens.elementAt(selectedIndex),
         ),
         bottomNavigationBar: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 90),
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 50),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: GNav(
                 curve: Curves.fastLinearToSlowEaseIn,
-                gap: 10,
-                padding: EdgeInsets.all(20),
+                gap: 5,
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                 backgroundColor: Theme.of(context).colorScheme.background,
                 activeColor: Theme.of(context).colorScheme.background,
                 color: Theme.of(context).colorScheme.secondary,
@@ -60,11 +61,7 @@ class _MainScreenTraineeState extends State<MainScreenTrainee> {
                   ),
                   GButton(
                     icon: Icons.workspaces_outlined,
-                    text: "My Zone",
-                  ),
-                  GButton(
-                    icon: Icons.person,
-                    text: "Profile",
+                    text: "Trainers Zone",
                   ),
                 ],
               ),

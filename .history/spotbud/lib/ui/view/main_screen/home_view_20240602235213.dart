@@ -12,7 +12,6 @@ import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/step_counter_data.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
@@ -168,8 +167,6 @@ class _HomeViewState extends State<HomeView> {
                   Obx(() =>
                       Text('Steps taken: ${_pedometerController.steps.value}')),
                   Obx(() => Text(
-                      'Daily steps: ${_pedometerController.dailySteps.value}')),
-                  Obx(() => Text(
                       'Pedestrian status: ${_pedometerController.status.value}')),
                 ],
               ),
@@ -185,16 +182,16 @@ class _HomeViewState extends State<HomeView> {
             SizedBox(
               height: 20,
             ),
-            customHomeButton(
-                text: "Step Counter",
-                onPressed: () {
-                  Get.to(DailyStepRecords());
-                },
-                theme: Theme.of(context),
-                imagePath: AppAssets.dumble),
-            SizedBox(
-              height: 20,
-            ),
+            // customHomeButton(
+            //     text: "Role",
+            //     onPressed: () {
+            //       Get.to(RoleSelectionScreen());
+            //     },
+            //     theme: Theme.of(context),
+            //     imagePath: AppAssets.dumble),
+            // SizedBox(
+            //   height: 20,
+            // ),
 
             customHomeButton(
                 text: "History",

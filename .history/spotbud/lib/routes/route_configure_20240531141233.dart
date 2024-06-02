@@ -40,8 +40,8 @@ class AppRoutes {
       page: () => ProfileView(),
     ),
     GetPage(
-      name: '/mainscreen',
-      page: () => MainScreen(),
+      name: '/mainscreentrainer',
+      page: () => MainScreenTrainer(),
     ),
     GetPage(
       name: '/history',

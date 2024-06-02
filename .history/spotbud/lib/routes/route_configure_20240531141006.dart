@@ -5,7 +5,8 @@ import 'package:spotbud/ui/view/auth/auth_verification.dart';
 import 'package:spotbud/ui/view/history/history_view.dart';
 import 'package:spotbud/ui/view/workout_logging/work_out_form.dart';
 import 'package:spotbud/ui/view/main_screen/home_view.dart';
-import 'package:spotbud/ui/view/main_screen/main_screen.dart';
+import 'package:spotbud/ui/view/main_screen/trainee/main_screen_trainee.dart';
+import 'package:spotbud/ui/view/main_screen/main_screen_trainer.dart';
 import 'package:spotbud/ui/view/body_details_profile/body_info.dart';
 import 'package:spotbud/ui/view/main_screen/profile_view.dart';
 import 'package:spotbud/ui/view/onboarding/body_details.dart';
@@ -40,8 +41,12 @@ class AppRoutes {
       page: () => ProfileView(),
     ),
     GetPage(
-      name: '/mainscreen',
-      page: () => MainScreen(),
+      name: '/mainscreentrainer',
+      page: () => MainScreenTrainer(),
+    ),
+    GetPage(
+      name: '/mainscreentrainee',
+      page: () => MainScreenTrainee(),
     ),
     GetPage(
       name: '/history',

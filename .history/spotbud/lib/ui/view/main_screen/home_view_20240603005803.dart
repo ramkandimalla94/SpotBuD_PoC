@@ -12,7 +12,6 @@ import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/widgets/step_counter_data.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
 
@@ -188,7 +187,7 @@ class _HomeViewState extends State<HomeView> {
             customHomeButton(
                 text: "Step Counter",
                 onPressed: () {
-                  Get.to(DailyStepRecords());
+                  Get.to(RoleSelectionScreen());
                 },
                 theme: Theme.of(context),
                 imagePath: AppAssets.dumble),

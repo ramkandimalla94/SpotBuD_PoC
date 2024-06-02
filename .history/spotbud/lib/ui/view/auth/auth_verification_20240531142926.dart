@@ -109,7 +109,7 @@ class VerificationModel extends GetxController {
     await user?.reload();
     if (user != null && user.emailVerified) {
       // Navigate to authbodydetail screen if email is verified
-      Get.offAllNamed('/bodydetail');
+      Get.offAllNamed('/bodydetails');
     } else {
       // Navigate to verify screen if email is not verified
       Get.offAll(VerifyScreen());

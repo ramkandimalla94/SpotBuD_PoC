@@ -104,6 +104,13 @@ class LoginView extends StatelessWidget {
                         if (userModel.hasInitialData == true) {
                           // If user role is trainer, navigate to trainer's main screen
                           Get.offNamed('/mainscreen');
+                        } else if (userModel.role == 'trainee' &&
+                            userModel.hasInitialData == true) {
+                          // If user role is trainee, navigate to trainee's main screen
+                          Get.offNamed('/mainscreentrainee');
+                        } else if (userModel.role.isEmpty) {
+                          // If user role is empty, navigate to role selection screen
+                          Get.offNamed('/role');
                         } else {
                           Get.toNamed('/bodydetail');
                         }
@@ -166,9 +173,17 @@ class LoginView extends StatelessWidget {
                                     if (userCredential != null) {
                                       _fetchUserData();
 
-                                      if (userModel.hasInitialData == true) {
+                                      if (userModel.role == 'trainer' &&
+                                          userModel.hasInitialData == true) {
                                         // If user role is trainer, navigate to trainer's main screen
-                                        Get.offNamed('/mainscreen');
+                                        Get.offNamed('/mainscreentrainer');
+                                      } else if (userModel.role == 'trainee' &&
+                                          userModel.hasInitialData == true) {
+                                        // If user role is trainee, navigate to trainee's main screen
+                                        Get.offNamed('/mainscreentrainee');
+                                      } else if (userModel.role.isEmpty) {
+                                        // If user role is empty, navigate to role selection screen
+                                        Get.offNamed('/role');
                                       } else {
                                         Get.toNamed('/bodydetail');
                                       }
