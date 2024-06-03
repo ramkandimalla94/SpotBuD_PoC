@@ -158,7 +158,9 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ],
             ),
-
+            SizedBox(
+              height: 10,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Center(
@@ -177,9 +179,6 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              height: 10,
             ),
             customHomeButton(
                 text: "Log Workout",

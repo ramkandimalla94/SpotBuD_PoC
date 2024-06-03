@@ -158,28 +158,24 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ],
             ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    // Obx(() =>
-                    //     Text('Steps taken: ${_pedometerController.steps.value}')),
-                    Obx(
-                      () => Text(
-                          'Daily steps: ${_pedometerController.dailySteps.value}'),
-                    ),
-                    Spacer(),
-                    Obx(() => Text(
-                        'Pedestrian status: ${_pedometerController.status.value}')),
-                  ],
-                ),
-              ),
-            ),
             SizedBox(
-              height: 10,
+              height: 60,
+            ),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // Obx(() =>
+                  //     Text('Steps taken: ${_pedometerController.steps.value}')),
+                  Obx(
+                    () => Text(
+                        'Daily steps: ${_pedometerController.dailySteps.value}'),
+                  ),
+                  Spacer(),
+                  Obx(() => Text(
+                      'Pedestrian status: ${_pedometerController.status.value}')),
+                ],
+              ),
             ),
             customHomeButton(
                 text: "Log Workout",

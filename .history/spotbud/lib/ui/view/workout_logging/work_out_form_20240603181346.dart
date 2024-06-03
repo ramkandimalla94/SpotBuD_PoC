@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:spotbud/ui/view/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/workout_logging/exercise_selection/machine_selection_view.dart';
-import 'package:spotbud/ui/view/workout_logging/timer_and_stopwatch.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
@@ -51,11 +50,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
               color: Theme.of(context).colorScheme.primary),
         ),
         actions: [
-          IconButton(
-              onPressed: () {
-                Get.to(() => StopwatchTimerScreen());
-              },
-              icon: Icon(Icons.timer)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.timer)),
           IconButton(
             icon: const Icon(
               CupertinoIcons.trash,
