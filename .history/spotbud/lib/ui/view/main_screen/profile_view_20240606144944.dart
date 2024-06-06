@@ -1,15 +1,10 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
@@ -46,26 +41,9 @@ class _ProfileViewState extends State<ProfileView> {
     pref.setBool('theme', _userDataViewModel.isLightTheme.value);
   }
 
-  Future<String> writeImageToStorage(Uint8List feedbackScreenshot) async {
-    final Directory output = await getTemporaryDirectory();
-    final String screenshotFilePath = '${output.path}/feedback.png';
-    final File screenshotFile = File(screenshotFilePath);
-    await screenshotFile.writeAsBytes(feedbackScreenshot);
-    return screenshotFilePath;
-  }
-
   void feedback() {
     BetterFeedback.of(context).show((feedback) async {
-      final screenshotFilePath = await writeImageToStorage(feedback.screenshot);
-
-      final Email email = Email(
-        body: feedback.text,
-        subject: 'Spotbud App Feedback',
-        recipients: ['admin@spotbud.fit', 'sampurn10chouksey@gmail.com'],
-        attachmentPaths: [screenshotFilePath],
-        isHTML: false,
-      );
-      await FlutterEmailSender.send(email);
+      final screenshotFilePath=
     });
   }
 
@@ -323,7 +301,10 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                     //  const SizedBox(height: 10),
                     TextButton(
-                      onPressed: feedback,
+                      onPressed: () {
+                        LinkLauncher.launchURL(
+                            'https://play.google.com/store/apps/details?id=com.ram.spotbud');
+                      },
                       child: Row(
                         children: [
                           Icon(

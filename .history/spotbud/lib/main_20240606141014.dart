@@ -1,7 +1,6 @@
 import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,15 +89,8 @@ class MyApp extends StatelessWidget {
           theme: FeedbackThemeData(
             background: Colors.grey,
             feedbackSheetColor: Colors.grey[50]!,
-            drawColors: [Colors.red, Colors.green, Colors.blue, Colors.yellow],
+            drawColors: [Colors.red, Colors.green, Colors.blue],
           ),
-          localizationsDelegates: [
-            GlobalFeedbackLocalizationsDelegate(),
-            GlobalCupertinoLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          localeOverride: const Locale('en'),
           child: GetMaterialApp(
             theme: _lightTheme,
             darkTheme: _darkTheme,

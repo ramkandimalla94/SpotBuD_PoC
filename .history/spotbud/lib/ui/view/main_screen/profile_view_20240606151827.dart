@@ -61,11 +61,7 @@ class _ProfileViewState extends State<ProfileView> {
       final Email email = Email(
         body: feedback.text,
         subject: 'Spotbud App Feedback',
-        recipients: ['admin@spotbud.fit', 'sampurn10chouksey@gmail.com'],
-        attachmentPaths: [screenshotFilePath],
-        isHTML: false,
       );
-      await FlutterEmailSender.send(email);
     });
   }
 
@@ -323,7 +319,9 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                     //  const SizedBox(height: 10),
                     TextButton(
-                      onPressed: feedback,
+                      onPressed: () {
+                        feedback;
+                      },
                       child: Row(
                         children: [
                           Icon(

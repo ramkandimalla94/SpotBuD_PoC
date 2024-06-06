@@ -95,8 +95,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: [
             GlobalFeedbackLocalizationsDelegate(),
             GlobalCupertinoLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
+            GlobalFeedbackLocalizationsDelegate.delegate,
           ],
           localeOverride: const Locale('en'),
           child: GetMaterialApp(

@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -57,15 +56,6 @@ class _ProfileViewState extends State<ProfileView> {
   void feedback() {
     BetterFeedback.of(context).show((feedback) async {
       final screenshotFilePath = await writeImageToStorage(feedback.screenshot);
-
-      final Email email = Email(
-        body: feedback.text,
-        subject: 'Spotbud App Feedback',
-        recipients: ['admin@spotbud.fit', 'sampurn10chouksey@gmail.com'],
-        attachmentPaths: [screenshotFilePath],
-        isHTML: false,
-      );
-      await FlutterEmailSender.send(email);
     });
   }
 
@@ -323,7 +313,9 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                     //  const SizedBox(height: 10),
                     TextButton(
-                      onPressed: feedback,
+                      onPressed: () {
+                        feedback;
+                      },
                       child: Row(
                         children: [
                           Icon(
