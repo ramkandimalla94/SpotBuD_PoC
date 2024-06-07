@@ -107,25 +107,25 @@ class _ProfileViewState extends State<ProfileView> {
                           () => Text(
                             '${capitalize(_userDataViewModel.firstName.value)} ${capitalize(_userDataViewModel.lastName.value)}',
                             style: TextStyle(
-                                fontSize: 28,
-                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 25,
+                                color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ),
 
-                    // Container(
-                    //   child: Center(
-                    //     child: Text(
-                    //       '${capitalize(_userDataViewModel.role.value)}',
-                    //       style: TextStyle(
-                    //           fontSize: 22,
-                    //           color: Theme.of(context).focusColor,
-                    //           fontWeight: FontWeight.bold),
-                    //     ),
-                    //   ),
-                    // ),
+                    Container(
+                      child: Center(
+                        child: Text(
+                          '${capitalize(_userDataViewModel.role.value)}',
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: Theme.of(context).focusColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 15),
                     Row(
                       children: [

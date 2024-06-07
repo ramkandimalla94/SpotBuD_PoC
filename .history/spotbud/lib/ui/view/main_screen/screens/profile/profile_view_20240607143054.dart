@@ -107,7 +107,7 @@ class _ProfileViewState extends State<ProfileView> {
                           () => Text(
                             '${capitalize(_userDataViewModel.firstName.value)} ${capitalize(_userDataViewModel.lastName.value)}',
                             style: TextStyle(
-                                fontSize: 28,
+                                fontSize: 25,
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold),
                           ),
