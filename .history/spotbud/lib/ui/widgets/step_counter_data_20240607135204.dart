@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:spotbud/ui/view/main_screen/pedometer_controller.dart';
+import 'package:spotbud/viewmodels/pedometer_viewmodel.dart';
 
 class DailyStepRecords extends StatelessWidget {
-  final PedometerController _pedometerController =
-      Get.put(PedometerController());
+  final PedometerViewModel _pedometerController = Get.put(PedometerViewModel());
 
   @override
   Widget build(BuildContext context) {

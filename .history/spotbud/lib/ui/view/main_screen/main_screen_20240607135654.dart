@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:spotbud/ui/view/main_screen/profile_view.dart';
+import 'package:spotbud/ui/view/main_screen/screens/profile/profile_view.dart';
+import 'package:spotbud/ui/view/onboarding/role.dart';
+import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/view/main_screen/home_view.dart';
+import 'package:spotbud/ui/view/main_screen/screens/home/home_view.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -13,7 +16,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int selectedIndex = 0;
 
-  static List<Widget> _screens = [
+  final List<Widget> _screens = [
     HomeView(),
     ProfileView(),
   ];
@@ -27,22 +30,22 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.black,
+        backgroundColor: Theme.of(context).colorScheme.background,
         body: Center(
           child: _screens.elementAt(selectedIndex),
         ),
         bottomNavigationBar: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 90),
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 50),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: GNav(
                 curve: Curves.fastLinearToSlowEaseIn,
-                gap: 10,
-                padding: EdgeInsets.all(20),
-                backgroundColor: AppColors.primaryColor,
-                activeColor: AppColors.black,
-                color: AppColors.backgroundColor,
-                hoverColor: AppColors.blue,
+                gap: 5,
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                backgroundColor: Theme.of(context).colorScheme.background,
+                activeColor: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.secondary,
+                hoverColor: Theme.of(context).colorScheme.background,
                 tabBackgroundColor: AppColors.acccentColor,
                 mainAxisAlignment: MainAxisAlignment.center,
                 selectedIndex: selectedIndex,

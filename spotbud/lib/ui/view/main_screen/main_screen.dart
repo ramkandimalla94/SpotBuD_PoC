@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:spotbud/ui/view/main_screen/profile_view.dart';
+import 'package:spotbud/ui/view/main_screen/screens/profile/profile_view.dart';
 import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
-import 'package:spotbud/ui/view/main_screen/home_view.dart';
+import 'package:spotbud/ui/view/main_screen/screens/home/home_view.dart';
 
 class MainScreen extends StatefulWidget {
   @override

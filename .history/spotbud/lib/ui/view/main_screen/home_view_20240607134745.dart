@@ -214,6 +214,16 @@ class _HomeViewState extends State<HomeView> {
               height: 20,
             ),
             customHomeButton(
+                text: "Manage Routine",
+                onPressed: () {
+                  Get.toNamed('/history');
+                },
+                theme: Theme.of(context),
+                imagePath: AppAssets.history),
+            const SizedBox(
+              height: 20,
+            ),
+            customHomeButton(
                 text: "Progress Tracker",
                 onPressed: () {
                   Get.to(ExerciseAnalyticsScreen());
