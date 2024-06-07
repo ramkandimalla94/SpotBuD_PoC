@@ -159,25 +159,25 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    // Obx(() =>
-                    //     Text('Steps taken: ${_pedometerController.steps.value}')),
-                    Obx(
-                      () => Text(
-                          'Daily steps: ${_pedometerController.dailySteps.value}'),
-                    ),
-                    Spacer(),
-                    Obx(() => Text(
-                        'Pedestrian status: ${_pedometerController.status.value}')),
-                  ],
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            //   child: Center(
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: <Widget>[
+            //         // Obx(() =>
+            //         //     Text('Steps taken: ${_pedometerController.steps.value}')),
+            //         Obx(
+            //           () => Text(
+            //               'Daily steps: ${_pedometerController.dailySteps.value}'),
+            //         ),
+            //         Spacer(),
+            //         Obx(() => Text(
+            //             'Pedestrian status: ${_pedometerController.status.value}')),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             SizedBox(
               height: 10,
             ),
@@ -192,16 +192,16 @@ class _HomeViewState extends State<HomeView> {
             SizedBox(
               height: 20,
             ),
-            customHomeButton(
-                text: "Step Counter",
-                onPressed: () {
-                  Get.to(DailyStepRecords());
-                },
-                theme: Theme.of(context),
-                imagePath: AppAssets.dumble),
-            SizedBox(
-              height: 20,
-            ),
+            // customHomeButton(
+            //     text: "Step Counter",
+            //     onPressed: () {
+            //       Get.to(DailyStepRecords());
+            //     },
+            //     theme: Theme.of(context),
+            //     imagePath: AppAssets.dumble),
+            // SizedBox(
+            //   height: 20,
+            // ),
 
             customHomeButton(
                 text: "History",
