@@ -555,23 +555,10 @@ class _HistoryViewState extends State<HistoryView> {
   List<DateTime> _extractDates(List<DocumentSnapshot> logs) {
     final dates = <DateTime>{};
     logs.forEach((log) {
-      final String dateString = log['date'] as String;
-      final String startTimeString = log['startTime'] as String;
-
-      // Parse date and time
-      final logDate = DateTime.parse(dateString);
-      final startTimeParts = startTimeString.split(':');
-      final logStartTime = DateTime(
-        logDate.year,
-        logDate.month,
-        logDate.day,
-        int.parse(startTimeParts[0]),
-        int.parse(startTimeParts[1]),
-        int.parse(startTimeParts[2]),
-      );
-
-      dates.add(
-          DateTime(logStartTime.year, logStartTime.month, logStartTime.day));
+      final timestamp = log['timestamp'] as Timestamp;
+      final date =
+          DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
+      dates.add(DateTime(date.year, date.month, date.day));
     });
     return dates.toList()..sort((a, b) => b.compareTo(a));
   }

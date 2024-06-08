@@ -1022,7 +1022,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         break;
     }
 
-    if (selectedBodyPart == 'Overall') {
+    if (selectedBodyPart == 'All Time') {
       // Calculate total sets
       int totalSets = 0;
       for (var entry in setsByBodyPart.entries) {

@@ -600,7 +600,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 7)));
         }).toList();
         break;
-      case 'Last Month':
+      case 'LastMonth':
         workouts = workouts.where((workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 30)));
@@ -624,7 +624,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 365)));
         }).toList();
         break;
-      case 'All Time':
+      case 'Overall':
       default:
         // No filtering needed for 'Overall'
         break;
@@ -1022,7 +1022,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         break;
     }
 
-    if (selectedBodyPart == 'Overall') {
+    if (selectedBodyPart == 'All Time') {
       // Calculate total sets
       int totalSets = 0;
       for (var entry in setsByBodyPart.entries) {

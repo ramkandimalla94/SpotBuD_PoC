@@ -600,7 +600,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 7)));
         }).toList();
         break;
-      case 'Last Month':
+      case 'LastMonth':
         workouts = workouts.where((workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 30)));
@@ -624,7 +624,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 365)));
         }).toList();
         break;
-      case 'All Time':
+      case 'Overall':
       default:
         // No filtering needed for 'Overall'
         break;
@@ -986,37 +986,37 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     // Filter setsByBodyPart based on the selected time period
     DateTime now = DateTime.now();
     switch (selectedTimePeriod) {
-      case 'Last Week':
+      case 'Week':
         setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 7)));
         });
         break;
-      case 'Last Month':
+      case 'Month':
         setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 30)));
         });
         break;
-      case 'Last 3 Months':
+      case '3 Months':
         setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 90)));
         });
         break;
-      case 'Last 6 Months':
+      case '6 Months':
         setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 180)));
         });
         break;
-      case 'Last Year':
+      case 'Year':
         setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 365)));
         });
         break;
-      case 'All Time':
+      case 'Overall':
       default:
         // No filtering needed for 'Overall'
         break;

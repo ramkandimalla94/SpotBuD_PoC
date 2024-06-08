@@ -137,23 +137,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
               _buildAnalyticsItem("Longest Streak ", '${longestStreak} 🔥')
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            height: 5,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(5),
-            ),
+          Divider(
+            color: Theme.of(context).colorScheme.primary,
+            thickness: 5,
+            indent: 5,
           ),
           Row(
             children: [
@@ -600,7 +587,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 7)));
         }).toList();
         break;
-      case 'Last Month':
+      case 'LastMonth':
         workouts = workouts.where((workout) {
           DateTime workoutDate = DateTime.parse(workout.date);
           return workoutDate.isAfter(now.subtract(Duration(days: 30)));
@@ -624,7 +611,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return workoutDate.isAfter(now.subtract(Duration(days: 365)));
         }).toList();
         break;
-      case 'All Time':
+      case 'Overall':
       default:
         // No filtering needed for 'Overall'
         break;
@@ -779,45 +766,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           .any((exercise) => exercise.machine == selectedExercise);
     }).toList();
 
-    // Filter workouts based on the selected time period
-    DateTime now = DateTime.now();
-    switch (selectedTimePeriod) {
-      case 'Last Week':
-        filteredWorkouts = filteredWorkouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 7)));
-        }).toList();
-        break;
-      case 'Last Month':
-        filteredWorkouts = filteredWorkouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 30)));
-        }).toList();
-        break;
-      case 'Last 3 Months':
-        filteredWorkouts = filteredWorkouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 90)));
-        }).toList();
-        break;
-      case 'Last 6 Months':
-        filteredWorkouts = filteredWorkouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 180)));
-        }).toList();
-        break;
-      case 'Last Year':
-        filteredWorkouts = filteredWorkouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 365)));
-        }).toList();
-        break;
-      case 'All Time':
-      default:
-        // No filtering needed for 'Overall'
-        break;
-    }
-
     // Map to hold workout sets grouped by date
     Map<DateTime, List<double>> dateWeightsMap = {};
 
@@ -854,7 +802,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       );
     }).toList();
 
-    // Calculate maxY based on the maximum weight
+// Calculate maxY based on the maximum weight
     double maxY = barChartGroups.isNotEmpty
         ? dateWeightsMap.values
                 .expand((weights) => weights)
@@ -958,73 +906,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     return setsByBodyPart;
   }
 
-  Map<String, Map<String, int>> _filterSetsByBodyPart(
-      Map<String, Map<String, int>> setsByBodyPart,
-      bool Function(Workout) filter) {
-    Map<String, Map<String, int>> filteredSetsByBodyPart = {};
-
-    for (var workout in workoutController.workouts.where(filter).toList()) {
-      for (var exercise in workout.exercises) {
-        String bodyPart = exercise.bodyPart;
-        String exerciseName = exercise.machine;
-        int numSets = exercise.sets.length;
-
-        // Initialize filteredSetsByBodyPart if not exist
-        filteredSetsByBodyPart[bodyPart] ??= {};
-        // Increment the count for the exercise
-        filteredSetsByBodyPart[bodyPart]![exerciseName] =
-            (filteredSetsByBodyPart[bodyPart]![exerciseName] ?? 0) + numSets;
-      }
-    }
-
-    return filteredSetsByBodyPart;
-  }
-
   Widget _buildPieChart() {
-    Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
-
-    // Filter setsByBodyPart based on the selected time period
-    DateTime now = DateTime.now();
-    switch (selectedTimePeriod) {
-      case 'Last Week':
-        setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 7)));
-        });
-        break;
-      case 'Last Month':
-        setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 30)));
-        });
-        break;
-      case 'Last 3 Months':
-        setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 90)));
-        });
-        break;
-      case 'Last 6 Months':
-        setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 180)));
-        });
-        break;
-      case 'Last Year':
-        setsByBodyPart = _filterSetsByBodyPart(setsByBodyPart, (workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 365)));
-        });
-        break;
-      case 'All Time':
-      default:
-        // No filtering needed for 'Overall'
-        break;
-    }
-
     if (selectedBodyPart == 'Overall') {
       // Calculate total sets
       int totalSets = 0;
+      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
       for (var entry in setsByBodyPart.entries) {
         totalSets += entry.value.values.reduce((a, b) => a + b);
       }
@@ -1043,6 +929,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           title:
               '$bodyPart (${percentage.toStringAsFixed(2)}%)', // Title with percentage
           titleStyle: TextStyle(color: getRandomDarkColor()),
+
           radius: 100,
         );
       }).toList();
@@ -1057,12 +944,16 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             sectionsSpace: 0,
             centerSpaceRadius: 40,
             pieTouchData: PieTouchData(enabled: true),
+
             // You can add more customization here
           ),
         ),
       );
     } else {
       // Calculate sets by selected body part
+      Map<String, Map<String, int>> setsByBodyPart = _calculateSetsByBodyPart();
+
+      // Get sets for selected body part
       Map<String, int>? setsForSelectedPart = setsByBodyPart[selectedBodyPart];
 
       // Convert setsForSelectedPart to pie chart data
@@ -1080,6 +971,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             value: sets.toDouble(), // Convert to double
             title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
             titleStyle: TextStyle(color: getRandomDarkColor()),
+
             radius: 100,
           );
         }).toList();

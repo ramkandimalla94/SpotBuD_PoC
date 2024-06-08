@@ -11,7 +11,7 @@ class _TimerWidgetState extends State<TimerWidget> {
   Duration duration = Duration.zero;
   Timer? countdownTimer;
   double progressValue = 1.0;
-  Duration totalDuration = const Duration(minutes: 0);
+  Duration totalDuration = Duration(minutes: 0);
   void startTimer() {
     if (countdownTimer != null && countdownTimer!.isActive) {
       countdownTimer!.cancel();
@@ -22,10 +22,10 @@ class _TimerWidgetState extends State<TimerWidget> {
         return;
       }
 
-      countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
         setState(() {
-          if (duration > const Duration(seconds: 0)) {
-            duration -= const Duration(seconds: 1);
+          if (duration > Duration(seconds: 0)) {
+            duration -= Duration(seconds: 1);
             if (duration.inSeconds > 0) {
               progressValue = duration.inSeconds / totalDuration.inSeconds;
             } else {
@@ -45,37 +45,37 @@ class _TimerWidgetState extends State<TimerWidget> {
     final pickedDuration = await showDialog<Duration>(
       context: context,
       builder: (BuildContext context) {
-        Duration selectedDuration = const Duration(minutes: 0);
+        Duration selectedDuration = Duration(minutes: 0);
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Set Timer'),
+              title: Text('Set Timer'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '${selectedDuration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${(selectedDuration.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 24),
+                    style: TextStyle(fontSize: 24),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration += const Duration(minutes: 5);
+                            selectedDuration += Duration(minutes: 5);
                           });
                         },
-                        child: const Text('+5 min'),
+                        child: Text('+5 min'),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration -= const Duration(minutes: 5);
+                            selectedDuration -= Duration(minutes: 5);
                           });
                         },
-                        child: const Text('-5 min'),
+                        child: Text('-5 min'),
                       ),
                     ],
                   ),
@@ -85,39 +85,18 @@ class _TimerWidgetState extends State<TimerWidget> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration += const Duration(minutes: 1);
+                            selectedDuration += Duration(minutes: 1);
                           });
                         },
-                        child: const Text('+1 min'),
+                        child: Text('+1 min'),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration -= const Duration(minutes: 1);
+                            selectedDuration -= Duration(minutes: 1);
                           });
                         },
-                        child: const Text('-1 min'),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedDuration += const Duration(seconds: 30);
-                          });
-                        },
-                        child: const Text('+30 sec'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedDuration -= const Duration(seconds: 30);
-                          });
-                        },
-                        child: const Text('-30 sec'),
+                        child: Text('-1 min'),
                       ),
                     ],
                   ),
@@ -127,18 +106,18 @@ class _TimerWidgetState extends State<TimerWidget> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration += const Duration(seconds: 10);
+                            selectedDuration += Duration(seconds: 30);
                           });
                         },
-                        child: const Text('+10 sec'),
+                        child: Text('+30 sec'),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration -= const Duration(seconds: 10);
+                            selectedDuration -= Duration(seconds: 30);
                           });
                         },
-                        child: const Text('-10 sec'),
+                        child: Text('-30 sec'),
                       ),
                     ],
                   ),
@@ -148,18 +127,39 @@ class _TimerWidgetState extends State<TimerWidget> {
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration += const Duration(seconds: 1);
+                            selectedDuration += Duration(seconds: 10);
                           });
                         },
-                        child: const Text('+1 sec'),
+                        child: Text('+10 sec'),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDuration -= const Duration(seconds: 1);
+                            selectedDuration -= Duration(seconds: 10);
                           });
                         },
-                        child: const Text('-1 sec'),
+                        child: Text('-10 sec'),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedDuration += Duration(seconds: 1);
+                          });
+                        },
+                        child: Text('+1 sec'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedDuration -= Duration(seconds: 1);
+                          });
+                        },
+                        child: Text('-1 sec'),
                       ),
                     ],
                   ),
@@ -172,14 +172,14 @@ class _TimerWidgetState extends State<TimerWidget> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
                     totalDuration = selectedDuration;
                     Navigator.of(context).pop(selectedDuration);
                   },
-                  child: const Text('Set'),
+                  child: Text('Set'),
                 ),
               ],
             );
@@ -203,7 +203,7 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   void resetTimer() {
     setState(() {
-      duration = const Duration(minutes: 0);
+      duration = Duration(minutes: 0);
       progressValue = 1.0;
       countdownTimer?.cancel();
     });
@@ -274,11 +274,10 @@ class _TimerWidgetState extends State<TimerWidget> {
               onTap: () => setTimer(context),
               child: Text(
                 '${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}:${(duration.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
-                style:
-                    const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -288,10 +287,10 @@ class _TimerWidgetState extends State<TimerWidget> {
                       ? 'Stop'
                       : 'Start'),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: resetTimer,
-                  child: const Text('Reset'),
+                  child: Text('Reset'),
                 ),
               ],
             ),
