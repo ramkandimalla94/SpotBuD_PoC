@@ -1216,9 +1216,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return PieChartSectionData(
             color: getRandomLightColor(), // Get random color
             value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(1)}%)',
-            titleStyle: TextStyle(
-                color: getRandomDarkColor(), fontWeight: FontWeight.bold),
+            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
+            titleStyle: TextStyle(color: getRandomDarkColor()),
             radius: 100,
           );
         }).toList();

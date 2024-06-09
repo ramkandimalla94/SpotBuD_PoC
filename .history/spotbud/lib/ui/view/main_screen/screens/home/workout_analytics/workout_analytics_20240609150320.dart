@@ -913,11 +913,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             ? weights.map((weight) {
                 return BarChartRodData(
                   toY: weight, // Set y value directly instead of toY
-                  gradient: RadialGradient(colors: [
-                    getRandomLightColor(),
-                    Colors.blue,
-                    getRandomLightColor(),
-                  ], radius: 20),
+                  color: Theme.of(context).colorScheme.primary,
                 );
               }).toList()
             : reps.map((rep) {
@@ -1216,9 +1212,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return PieChartSectionData(
             color: getRandomLightColor(), // Get random color
             value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(1)}%)',
-            titleStyle: TextStyle(
-                color: getRandomDarkColor(), fontWeight: FontWeight.bold),
+            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
+            titleStyle: TextStyle(color: getRandomDarkColor()),
             radius: 100,
           );
         }).toList();

@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class ExerciseAnalyticsScreen extends StatefulWidget {
 class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   final WorkoutController workoutController = Get.put(WorkoutController());
   bool showLineChart = true;
-  String selectedOption = 'Average Weights and Reps';
+  String selectedOption = 'Average';
   String selectedExercise = ''; // Initialize selectedExercise
   late DateTime _focusedDay = DateTime.now();
   String selectedBodyPart = 'Overall';
@@ -365,25 +366,25 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     },
                     items: [
                       DropdownMenuItem(
-                        value: 'Minimum Weights and Reps',
+                        value: 'Min',
                         child: Text(
-                          'Minimum Weights and Reps',
+                          'Min',
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary),
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Maximum Weights and Reps',
+                        value: 'Max',
                         child: Text(
-                          'Maximum Weights and Reps',
+                          'Max',
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary),
                         ),
                       ),
                       DropdownMenuItem(
-                        value: 'Average Weights and Reps',
+                        value: 'Average',
                         child: Text(
-                          'Average Weights and Reps',
+                          'Average',
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary),
                         ),
@@ -395,7 +396,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     selectedExercise,
                     selectedOption,
                   ),
-                  buildLegendRow()
                 ],
               ),
             ] else ...[
@@ -592,156 +592,195 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     );
   }
 
-  Widget _buildLineGraph(
-      List<Workout> workouts, String selectedExercise, String selectedOption) {
-    // Filter workouts based on the selected time period
-    DateTime now = DateTime.now();
-    switch (selectedTimePeriod) {
-      case 'Last Week':
-        workouts = workouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 7)));
-        }).toList();
-        break;
-      case 'Last Month':
-        workouts = workouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 30)));
-        }).toList();
-        break;
-      case 'Last 3 Months':
-        workouts = workouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 90)));
-        }).toList();
-        break;
-      case 'Last 6 Months':
-        workouts = workouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 180)));
-        }).toList();
-        break;
-      case 'Last Year':
-        workouts = workouts.where((workout) {
-          DateTime workoutDate = DateTime.parse(workout.date);
-          return workoutDate.isAfter(now.subtract(Duration(days: 365)));
-        }).toList();
-        break;
-      case 'All Time':
-      default:
-        // No filtering needed for 'Overall'
-        break;
-    }
+Widget _buildLineGraph(
+    List<Workout> workouts, String selectedExercise, String selectedOption) {
+  // Filter workouts based on the selected time period
+  DateTime now = DateTime.now();
+  switch (selectedTimePeriod) {
+    case 'Last Week':
+      workouts = workouts.where((workout) {
+        DateTime workoutDate = DateTime.parse(workout.date);
+        return workoutDate.isAfter(now.subtract(Duration(days: 7)));
+      }).toList();
+      break;
+    case 'Last Month':
+      workouts = workouts.where((workout) {
+        DateTime workoutDate = DateTime.parse(workout.date);
+        return workoutDate.isAfter(now.subtract(Duration(days: 30)));
+      }).toList();
+      break;
+    case 'Last 3 Months':
+      workouts = workouts.where((workout) {
+        DateTime workoutDate = DateTime.parse(workout.date);
+        return workoutDate.isAfter(now.subtract(Duration(days: 90)));
+      }).toList();
+      break;
+    case 'Last 6 Months':
+      workouts = workouts.where((workout) {
+        DateTime workoutDate = DateTime.parse(workout.date);
+        return workoutDate.isAfter(now.subtract(Duration(days: 180)));
+      }).toList();
+      break;
+    case 'Last Year':
+      workouts = workouts.where((workout) {
+        DateTime workoutDate = DateTime.parse(workout.date);
+        return workoutDate.isAfter(now.subtract(Duration(days: 365)));
+      }).toList();
+      break;
+    case 'All Time':
+    default:
+      // No filtering needed for 'Overall'
+      break;
+  }
 
-    Map<DateTime, List<double>> weightData = {};
-    Map<DateTime, List<int>> repData = {};
+  Map<DateTime, List<double>> weightData = {};
+  Map<DateTime, List<int>> repData = {};
 
-    // Iterate over each workout
-    for (var workout in workouts) {
-      // Convert workout date string to DateTime
-      DateTime date = DateTime.parse(workout.date);
+  // Iterate over each workout
+  for (var workout in workouts) {
+    // Convert workout date string to DateTime
+    DateTime date = DateTime.parse(workout.date);
 
-      // Initialize lists for weights and reps of this workout
-      List<double> weights = [];
-      List<int> reps = [];
+    // Initialize lists for weights and reps of this workout
+    List<double> weights = [];
+    List<int> reps = [];
 
-      // Iterate over each exercise in the workout
-      for (var exercise in workout.exercises) {
-        if (exercise.machine == selectedExercise) {
-          // Iterate over each set in the exercise
-          for (var set in exercise.sets) {
-            // Convert set weight string to double
-            double weight = double.tryParse(_convertWeight(set.weight)) ?? 0.0;
-            weights.add(weight); // Add weight to list
+    // Iterate over each exercise in the workout
+    for (var exercise in workout.exercises) {
+      if (exercise.machine == selectedExercise) {
+        // Iterate over each set in the exercise
+        for (var set in exercise.sets) {
+          // Convert set weight string to double
+          double weight = double.tryParse(_convertWeight(set.weight)) ?? 0.0;
+          weights.add(weight); // Add weight to list
 
-            // Add reps to list
-            int setReps = int.tryParse(set.reps) ?? 0;
-            reps.add(setReps);
-          }
+          // Add reps to list
+          int setReps = int.tryParse(set.reps) ?? 0;
+          reps.add(setReps);
         }
       }
-
-      // Add weights and reps of this workout to data maps
-      if (weights.isNotEmpty && reps.isNotEmpty) {
-        weightData[date] ??= []; // Initialize if not exist
-        weightData[date]!.addAll(weights);
-
-        repData[date] ??= []; // Initialize if not exist
-        repData[date]!.addAll(reps);
-      }
     }
 
-    // Define line chart data for weights and reps
-    List<FlSpot> weightLineChartSpots = [];
-    List<FlSpot> repLineChartSpots = [];
+    // Add weights and reps of this workout to data maps
+    if (weights.isNotEmpty && reps.isNotEmpty) {
+      weightData[date] ??= []; // Initialize if not exist
+      weightData[date]!.addAll(weights);
 
-    // Iterate over each date in weightData and repData
-    weightData.forEach((date, weights) {
-      double weightValue;
-      switch (selectedOption) {
-        case 'Minimum Weights and Reps':
-          weightValue = weights.reduce((a, b) => a < b ? a : b);
-          break;
-        case 'Maximum Weights and Reps':
-          weightValue = weights.reduce((a, b) => a > b ? a : b);
-          break;
-        case 'Average Weights and Reps':
-        default:
-          double sum = weights.reduce((a, b) => a + b);
-          weightValue = sum / weights.length;
-      }
-      weightValue = double.parse(weightValue.toStringAsFixed(2));
-      weightLineChartSpots
-          .add(FlSpot(date.millisecondsSinceEpoch.toDouble(), weightValue));
-    });
+      repData[date] ??= []; // Initialize if not exist
+      repData[date]!.addAll(reps);
+    }
+  }
 
-    repData.forEach((date, reps) {
-      double repValue;
-      switch (selectedOption) {
-        case 'Minimum Weights and Reps':
-          repValue = reps.reduce((a, b) => a < b ? a : b).toDouble();
-          break;
-        case 'Maximum Weights and Reps':
-          repValue = reps.reduce((a, b) => a > b ? a : b).toDouble();
-          break;
-        case 'Average Weights and Reps':
-        default:
-          double sum = reps.reduce((a, b) => a + b).toDouble();
-          repValue = sum / reps.length;
-      }
-      repLineChartSpots
-          .add(FlSpot(date.millisecondsSinceEpoch.toDouble(), repValue));
-    });
+  // Define line chart data for weights and reps
+  List<FlSpot> weightLineChartSpots = [];
+  List<FlSpot> repLineChartSpots = [];
 
-    return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Container(
-        height: 300,
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              LineChartBarData(
-                gradient:
-                    LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
-                spots: weightLineChartSpots,
-                isCurved: false,
-                //color: Theme.of(context).colorScheme.primary,
-                barWidth: 5,
-                isStrokeCapRound: true,
-                belowBarData: BarAreaData(show: true),
-              ),
-              LineChartBarData(
-                spots: repLineChartSpots,
-                gradient:
-                    LinearGradient(colors: [Colors.green, Colors.greenAccent]),
-                isCurved: false,
+  // Iterate over each date in weightData and repData
+  weightData.forEach((date, weights) {
+    double weightValue;
+    switch (selectedOption) {
+      case 'Min Weight':
+        weightValue = weights.reduce((a, b) => a < b ? a : b);
+        break;
+      case 'Max Weight':
+        weightValue = weights.reduce((a, b) => a > b ? a : b);
+        break;
+      case 'Average Weight':
+      default:
+        double sum = weights.reduce((a, b) => a + b);
+        weightValue = sum / weights.length;
+    }
+    weightValue = double.parse(weightValue.toStringAsFixed(2));
+    weightLineChartSpots.add(FlSpot(date.millisecondsSinceEpoch.toDouble(), weightValue));
+  });
 
-                //  color: Theme.of(context).colorScheme.secondary,
-                barWidth: 5,
-                isStrokeCapRound: true,
-                belowBarData: BarAreaData(show: true),
-              ),
-            ],
+  repData.forEach((date, reps) {
+    double repValue;
+    switch (selectedOption) {
+      case 'Min Reps':
+        repValue = reps.reduce((a, b) => a < b ? a : b).toDouble();
+        break;
+      case 'Max Reps':
+        repValue = reps.reduce((a, b) => a > b ? a : b).toDouble();
+        break;
+      case 'Average Reps':
+      default:
+        double sum = reps.reduce((a, b) => a + b).toDouble();
+        repValue = sum / reps.length;
+    }
+    repLineChartSpots.add(FlSpot(date.millisecondsSinceEpoch.toDouble(), repValue));
+  });
+
+  return Padding(
+    padding: const EdgeInsets.all(5.0),
+    child: Container(
+      height: 300,
+      child: LineChart(
+        LineChartData(
+          lineTouchData: LineTouchData(
+            enabled: true,
+            getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+              return spotIndexes.map((spotIndex) {
+                return TouchedSpotIndicatorData(
+                  FlLine(color: barData.color, strokeWidth: 4),
+                  FlDotData(
+                    getDotPainter: (spot, percent, value, barData) =>
+                        FlDotCirclePainter(
+                      radius: 8,
+                      color: barData.color,
+                      strokeWidth: 2,
+                      strokeColor: Colors.white,
+                    ),
+                  ),
+                );
+              }).toList();
+            },
+            touchTooltipData: LineTouchTooltipData(
+              tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+              getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                return touchedSpots.map((spot) {
+                  return LineTooltipItem(
+                    '${spot.y.toStringAsFixed(2)}${selectedOption.contains('Weight') ? ' kg' : ' reps'}',
+                    TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+          ),
+          lineBarsData: [
+            LineChartBarData(
+              spots: weightLineChartSpots,
+              isCurved: false,
+              color: Theme.of(context).colorScheme.primary,
+              barWidth: 2,
+              isStrokeCapRound: true,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+            LineChartBarData(
+              spots: repLineChartSpots,
+              isCurved: false,
+              color: Theme.of(context).colorScheme.secondary,
+              barWidth: 2,
+              isStrokeCapRound: true,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+          ],
+          lineLegendData: LineLegendData(
+            lineLegendPosition: LineLegendPosition.bottom,
+            showLegendsInRow: true,
+            showHorizontalTrackingLineLegend: false,
+            horizontalDrawingPadding: 20.0,
+            legendShape: BoxShape.circle,
+            legendTextStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onBackground,
+              fontWeight: FontWeight.bold,
+            ),
+          ),    ],
             minX: weightData.isNotEmpty
                 ? weightData.keys
                         .reduce((a, b) => a.isBefore(b) ? a : b)
@@ -793,25 +832,13 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                       // Formatting the DateTime object to DD-MM-YYYY
                       DateTime date =
                           DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                      return Column(
-                        children: [
-                          Text(
-                            DateFormat('dd').format(date),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 8,
-                            ),
-                          ),
-                          Text(
-                            DateFormat('MMMM').format(date),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 6,
-                            ),
-                          ),
-                        ],
+                      return Text(
+                        DateFormat('dd').format(date),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
                       );
                     },
                   ),
@@ -820,9 +847,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 topTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false))),
-
             gridData: const FlGridData(
-                show: false, drawHorizontalLine: false), // Remove grid lines
+                show: true, drawHorizontalLine: false), // Remove grid lines
             backgroundColor: Theme.of(context).colorScheme.background,
           ),
         ),
@@ -878,9 +904,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
 
     // Map to hold workout sets grouped by date
     Map<DateTime, List<double>> dateWeightsMap = {};
-    Map<DateTime, List<int>> dateRepsMap = {};
 
-    // Group weights and reps by date
+    // Group weights by date
     for (var workout in filteredWorkouts) {
       DateTime date = DateTime.parse(workout.date);
       for (var exercise in workout.exercises) {
@@ -889,85 +914,64 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             double weight = double.tryParse(_convertWeight(set.weight)) ?? 0.0;
             dateWeightsMap[date] ??= [];
             dateWeightsMap[date]!.add(weight);
-
-            int reps = int.tryParse(set.reps) ?? 0;
-            dateRepsMap[date] ??= [];
-            dateRepsMap[date]!.add(reps);
           }
         }
       }
     }
 
-    // Sort the maps by date
+    // Sort the map by date
     var sortedDates = dateWeightsMap.keys.toList()
       ..sort((a, b) => a.compareTo(b));
 
     // Create BarChartGroupData for each date
     List<BarChartGroupData> barChartGroups = sortedDates.map((date) {
       List<double> weights = dateWeightsMap[date]!;
-      List<int> reps = dateRepsMap[date]!;
       return BarChartGroupData(
         x: date
             .millisecondsSinceEpoch, // Using milliseconds since epoch as x value
-        barRods: selectedBarChartOption == 'Weight'
-            ? weights.map((weight) {
-                return BarChartRodData(
-                  toY: weight, // Set y value directly instead of toY
-                  gradient: RadialGradient(colors: [
-                    getRandomLightColor(),
-                    Colors.blue,
-                    getRandomLightColor(),
-                  ], radius: 20),
-                );
-              }).toList()
-            : reps.map((rep) {
-                return BarChartRodData(
-                  gradient: RadialGradient(colors: [
-                    getRandomLightColor(),
-                    Colors.blue,
-                    getRandomLightColor(),
-                  ], radius: 20),
-                  toY: rep.toDouble(), // Convert rep to double
-                );
-              }).toList(),
+        barRods: weights.map((weight) {
+          return BarChartRodData(
+            toY: weight, // Set y value directly instead of toY
+            color: Theme.of(context).colorScheme.primary,
+          );
+        }).toList(),
       );
     }).toList();
 
-    // Calculate maxY based on the maximum weight or rep
+    // Calculate maxY based on the maximum weight
     double maxY = barChartGroups.isNotEmpty
-        ? selectedBarChartOption == 'Weight'
-            ? dateWeightsMap.values
-                    .expand((weights) => weights)
-                    .reduce((a, b) => a > b ? a : b) +
-                10
-            : dateRepsMap.values
-                    .expand((reps) => reps.map((rep) => rep.toDouble()))
-                    .reduce((a, b) => a > b ? a : b) +
-                10
+        ? dateWeightsMap.values
+                .expand((weights) => weights)
+                .reduce((a, b) => a > b ? a : b) +
+            10
         : 10;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 400,
+        height: 300,
         child: Column(
           children: [
-            _buildBarChartOptions(),
-            SizedBox(
-              height: 10,
-            ),
             Expanded(
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   barGroups: barChartGroups,
                   maxY: maxY,
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 1),
+                  ),
                   titlesData: FlTitlesData(
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+
                         // reservedSize: 30,
                         getTitlesWidget: (value, titleMeta) {
+                          // Your custom widget for left axis titles
                           return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 2.5),
@@ -987,6 +991,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, titleMeta) {
+                          // Using getTitlesWidget to return custom widget for bottom axis titles
                           // Formatting the DateTime object to DD-MM-YYYY
                           DateTime date = DateTime.fromMillisecondsSinceEpoch(
                               value.toInt());
@@ -1006,16 +1011,11 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     topTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false)),
                   ),
-                  gridData: const FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: 2),
+                  gridData: const FlGridData(show: true),
                   backgroundColor: Theme.of(context).colorScheme.background,
                 ),
               ),
             ),
-            // Add the option buttons
-            buildLegendRow(),
           ],
         ),
       ),
@@ -1062,60 +1062,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     }
 
     return filteredSetsByBodyPart;
-  }
-
-  String selectedBarChartOption = 'Weight'; // Initialize with 'Weight'
-
-// Add this method to your class
-  Widget _buildBarChartOptions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              selectedBarChartOption = 'Weight';
-            });
-          },
-          child: Text(
-            'Weight',
-            style: TextStyle(
-              color: selectedBarChartOption == 'Weight'
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedBarChartOption == 'Weight'
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.background,
-            elevation: 10,
-          ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              selectedBarChartOption = 'Reps';
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedBarChartOption == 'Reps'
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.background,
-            elevation: 10,
-          ),
-          child: Text(
-            'Reps',
-            style: TextStyle(
-              color: selectedBarChartOption == 'Reps'
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildPieChart() {
@@ -1216,9 +1162,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return PieChartSectionData(
             color: getRandomLightColor(), // Get random color
             value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(1)}%)',
-            titleStyle: TextStyle(
-                color: getRandomDarkColor(), fontWeight: FontWeight.bold),
+            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
+            titleStyle: TextStyle(color: getRandomDarkColor()),
             radius: 100,
           );
         }).toList();
@@ -1349,29 +1294,4 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         DateTime.parse(workout.date).month == date.month &&
         DateTime.parse(workout.date).day == date.day);
   }
-}
-
-Widget buildLegendRow() {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      buildLegendItem(Colors.blue, 'Weight'),
-      SizedBox(width: 20), // Space between legend items
-      buildLegendItem(Colors.green, 'Reps'),
-    ],
-  );
-}
-
-Widget buildLegendItem(Color color, String label) {
-  return Row(
-    children: [
-      Container(
-        width: 20,
-        height: 20,
-        color: color,
-      ),
-      SizedBox(width: 8), // Space between container and text
-      Text(label),
-    ],
-  );
 }

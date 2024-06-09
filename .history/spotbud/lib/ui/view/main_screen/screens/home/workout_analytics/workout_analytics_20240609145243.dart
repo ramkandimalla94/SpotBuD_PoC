@@ -909,59 +909,51 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
       return BarChartGroupData(
         x: date
             .millisecondsSinceEpoch, // Using milliseconds since epoch as x value
-        barRods: selectedBarChartOption == 'Weight'
-            ? weights.map((weight) {
-                return BarChartRodData(
-                  toY: weight, // Set y value directly instead of toY
-                  gradient: RadialGradient(colors: [
-                    getRandomLightColor(),
-                    Colors.blue,
-                    getRandomLightColor(),
-                  ], radius: 20),
-                );
-              }).toList()
-            : reps.map((rep) {
-                return BarChartRodData(
-                  gradient: RadialGradient(colors: [
-                    getRandomLightColor(),
-                    Colors.blue,
-                    getRandomLightColor(),
-                  ], radius: 20),
-                  toY: rep.toDouble(), // Convert rep to double
-                );
-              }).toList(),
+        barRods: [
+          ...weights.map((weight) {
+            return BarChartRodData(
+              toY: weight, // Set y value directly instead of toY
+              color: Theme.of(context).colorScheme.primary,
+            );
+          }).toList(),
+          ...reps.map((rep) {
+            return BarChartRodData(
+              toY: rep.toDouble(), // Convert rep to double
+              color: Theme.of(context).colorScheme.secondary,
+            );
+          }).toList(),
+        ],
       );
     }).toList();
 
-    // Calculate maxY based on the maximum weight or rep
+    // Calculate maxY based on the maximum weight and rep
     double maxY = barChartGroups.isNotEmpty
-        ? selectedBarChartOption == 'Weight'
-            ? dateWeightsMap.values
-                    .expand((weights) => weights)
-                    .reduce((a, b) => a > b ? a : b) +
-                10
-            : dateRepsMap.values
-                    .expand((reps) => reps.map((rep) => rep.toDouble()))
-                    .reduce((a, b) => a > b ? a : b) +
-                10
+        ? [
+              ...dateWeightsMap.values.expand((weights) => weights),
+              ...dateRepsMap.values
+                  .expand((reps) => reps.map((rep) => rep.toDouble())),
+            ].reduce((a, b) => a > b ? a : b) +
+            10
         : 10;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+      padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 400,
+        height: 300,
         child: Column(
           children: [
-            _buildBarChartOptions(),
-            SizedBox(
-              height: 10,
-            ),
             Expanded(
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   barGroups: barChartGroups,
                   maxY: maxY,
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 1),
+                  ),
                   titlesData: FlTitlesData(
                     rightTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -1014,7 +1006,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                 ),
               ),
             ),
-            // Add the option buttons
             buildLegendRow(),
           ],
         ),
@@ -1062,60 +1053,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     }
 
     return filteredSetsByBodyPart;
-  }
-
-  String selectedBarChartOption = 'Weight'; // Initialize with 'Weight'
-
-// Add this method to your class
-  Widget _buildBarChartOptions() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              selectedBarChartOption = 'Weight';
-            });
-          },
-          child: Text(
-            'Weight',
-            style: TextStyle(
-              color: selectedBarChartOption == 'Weight'
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedBarChartOption == 'Weight'
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.background,
-            elevation: 10,
-          ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              selectedBarChartOption = 'Reps';
-            });
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedBarChartOption == 'Reps'
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.background,
-            elevation: 10,
-          ),
-          child: Text(
-            'Reps',
-            style: TextStyle(
-              color: selectedBarChartOption == 'Reps'
-                  ? Theme.of(context).colorScheme.background
-                  : Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildPieChart() {
@@ -1216,9 +1153,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
           return PieChartSectionData(
             color: getRandomLightColor(), // Get random color
             value: sets.toDouble(), // Convert to double
-            title: '$exerciseName (${percentage.toStringAsFixed(1)}%)',
-            titleStyle: TextStyle(
-                color: getRandomDarkColor(), fontWeight: FontWeight.bold),
+            title: '$exerciseName (${percentage.toStringAsFixed(2)}%)',
+            titleStyle: TextStyle(color: getRandomDarkColor()),
             radius: 100,
           );
         }).toList();
