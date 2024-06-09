@@ -1,0 +1,72 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.sidlatau.flutteremailsender.flutter_email_sender-merged_res-24:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\sampu\\.gradle\\caches\\transforms-3\\2ba159c2ab562d6acf7271e1b417c42d\\transformed\\core-1.9.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\sampu\\.gradle\\caches\\transforms-3\\358312cf7c6a271fed9fbcb51c59349a\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.sidlatau.flutteremailsender.flutter_email_sender-mergeReleaseResources-22:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\sampu\\.gradle\\caches\\transforms-3\\2ba159c2ab562d6acf7271e1b417c42d\\transformed\\core-1.9.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\sampu\\.gradle\\caches\\transforms-3\\358312cf7c6a271fed9fbcb51c59349a\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                }
+            ]
+        }
+    ]
+}
