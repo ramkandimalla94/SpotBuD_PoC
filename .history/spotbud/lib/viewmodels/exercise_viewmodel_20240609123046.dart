@@ -9,24 +9,27 @@ class WorkoutController extends GetxController {
 
   RxList<Workout> workouts = <Workout>[].obs;
   RxList<String> loggedMachines = <String>[].obs;
+  RxBool isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _fetchWorkoutLogs();
+    fetchWorkoutLogs();
   }
 
-  Future<void> _fetchWorkoutLogs() async {
+  Future<void> fetchWorkoutLogs() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.uid;
 
+        // Update the query to order by 'date' and 'startTime'
         final QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .orderBy('timestamp', descending: true)
+            .orderBy('date', descending: true)
+            .orderBy('startTime', descending: true)
             .get();
 
         List<Workout> fetchedWorkouts = snapshot.docs.map((workoutDoc) {
@@ -47,6 +50,8 @@ class WorkoutController extends GetxController {
       }
     } catch (e) {
       print('Error fetching workout logs: $e');
+    } finally {
+      isLoading(false); // Set loading state to false
     }
   }
 

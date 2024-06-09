@@ -23,11 +23,13 @@ class WorkoutController extends GetxController {
       if (user != null) {
         String userId = user.uid;
 
+        // Update the query to order by 'date' and 'startTime'
         final QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .orderBy('timestamp', descending: true)
+            .orderBy('date', descending: true)
+            .orderBy('startTime', descending: true)
             .get();
 
         List<Workout> fetchedWorkouts = snapshot.docs.map((workoutDoc) {

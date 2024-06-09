@@ -727,3 +727,39 @@ class YearPicker extends StatelessWidget {
     );
   }
 }
+
+class ChipSelectWidget extends StatefulWidget {
+  @override
+  _ChipSelectWidgetState createState() => _ChipSelectWidgetState();
+}
+
+class _ChipSelectWidgetState extends State<ChipSelectWidget> {
+  int _selectedIndex = 0; // Initial selection is Reps
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8.0,
+      children: [
+        ChoiceChip(
+          label: Text('Reps'),
+          selected: _selectedIndex == 0,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 0 : 1;
+            });
+          },
+        ),
+        ChoiceChip(
+          label: Text('Weights'),
+          selected: _selectedIndex == 1,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 1 : 0;
+            });
+          },
+        ),
+      ],
+    );
+  }
+}

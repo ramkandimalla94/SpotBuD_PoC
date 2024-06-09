@@ -306,10 +306,6 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ChipSelectWidget(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -9,31 +9,33 @@ class WorkoutController extends GetxController {
 
   RxList<Workout> workouts = <Workout>[].obs;
   RxList<String> loggedMachines = <String>[].obs;
+  RxBool isLoading = true.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _fetchWorkoutLogs();
+    fetchWorkoutLogs();
   }
 
-  Future<void> _fetchWorkoutLogs() async {
+  Future<void> fetchWorkoutLogs() async {
     try {
       User? user = _auth.currentUser;
       if (user != null) {
         String userId = user.uid;
 
-        // Fetch workout logs
         final QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
             .collection('data')
             .doc(userId)
             .collection('workouts')
-            .orderBy('timestamp', descending: true)
+            .orderBy('date', descending: true)
             .get();
 
-        // Extract workouts
         List<Workout> fetchedWorkouts = snapshot.docs.map((workoutDoc) {
           return Workout(
-            timestamp: workoutDoc['timestamp'],
+            id: workoutDoc.id,
+            date: workoutDoc['date'],
+            endTime: workoutDoc['endTime'],
+            startTime: workoutDoc['startTime'],
             exercises: _extractLoggedExercises(workoutDoc),
           );
         }).toList();
@@ -46,6 +48,8 @@ class WorkoutController extends GetxController {
       }
     } catch (e) {
       print('Error fetching workout logs: $e');
+    } finally {
+      isLoading(false); // Set loading state to false
     }
   }
 
@@ -55,17 +59,23 @@ class WorkoutController extends GetxController {
     if (exercisesData != null) {
       exercises = exercisesData.map((exerciseData) {
         return Exercise(
-          name: exerciseData['name'],
-          sets: (exerciseData['sets'] as List<dynamic>).map((setData) {
-            return ExerciseSet(
-              reps: setData['reps'],
-              weight: setData['weight'],
-            );
-          }).toList(),
+          bodyPart: exerciseData['bodyPart'],
+          machine: exerciseData['machine'],
+          sets: _extractExerciseSets(exerciseData['sets']),
         );
       }).toList();
     }
     return exercises;
+  }
+
+  List<ExerciseSet> _extractExerciseSets(List<dynamic> setsData) {
+    return setsData.map((setData) {
+      return ExerciseSet(
+        reps: setData['reps'],
+        weight: setData['weight'],
+        notes: setData['notes'],
+      );
+    }).toList();
   }
 
   List<String> _extractLoggedMachines(List<QueryDocumentSnapshot> workoutDocs) {
