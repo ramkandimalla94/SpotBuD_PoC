@@ -26,6 +26,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   late DateTime _focusedDay = DateTime.now();
   String selectedBodyPart = 'Overall';
   bool _isKgsPreferred = true;
+  final GlobalKey<_ChipSelectWidgetState> _chipSelectWidgetKey = GlobalKey();
   late DateTime _selectedDay;
   @override
   void initState() {

@@ -26,6 +26,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   late DateTime _focusedDay = DateTime.now();
   String selectedBodyPart = 'Overall';
   bool _isKgsPreferred = true;
+  final GlobalKey<_ChipSelectWidgetState> _chipSelectWidgetKey = GlobalKey();
   late DateTime _selectedDay;
   @override
   void initState() {
@@ -1211,5 +1212,41 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         DateTime.parse(workout.date).year == date.year &&
         DateTime.parse(workout.date).month == date.month &&
         DateTime.parse(workout.date).day == date.day);
+  }
+}
+
+class ChipSelectWidget extends StatefulWidget {
+  @override
+  _ChipSelectWidgetState createState() => _ChipSelectWidgetState();
+}
+
+class _ChipSelectWidgetState extends State<ChipSelectWidget> {
+  int _selectedIndex = 0; // Initial selection is Reps
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8.0,
+      children: [
+        ChoiceChip(
+          label: Text('Reps'),
+          selected: _selectedIndex == 0,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 0 : 1;
+            });
+          },
+        ),
+        ChoiceChip(
+          label: Text('Weights'),
+          selected: _selectedIndex == 1,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 1 : 0;
+            });
+          },
+        ),
+      ],
+    );
   }
 }

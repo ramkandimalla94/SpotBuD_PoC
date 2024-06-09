@@ -26,6 +26,7 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
   late DateTime _focusedDay = DateTime.now();
   String selectedBodyPart = 'Overall';
   bool _isKgsPreferred = true;
+
   late DateTime _selectedDay;
   @override
   void initState() {
@@ -305,6 +306,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
+              child: ChipSelectWidget(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -391,10 +396,10 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
                     ],
                   ),
                   _buildLineGraph(
-                    workoutController.workouts,
-                    selectedExercise,
-                    selectedOption,
-                  ),
+                      workoutController.workouts,
+                      selectedExercise,
+                      selectedOption,
+                      _ChipSelectWidgetState._selectedIndex == 0),
                 ],
               ),
             ] else ...[
@@ -591,8 +596,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     );
   }
 
-  Widget _buildLineGraph(
-      List<Workout> workouts, String selectedExercise, String selectedOption) {
+  Widget _buildLineGraph(List<Workout> workouts, String selectedExercise,
+      String selectedOption, bool isRepsSelected) {
     // Filter workouts based on the selected time period
     DateTime now = DateTime.now();
     switch (selectedTimePeriod) {
@@ -774,7 +779,8 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
     );
   }
 
-  Widget _buildBarGraph(List<Workout> workouts, String selectedExercise) {
+  Widget _buildBarGraph(
+      List<Workout> workouts, String selectedExercise, bool isRepsSelected) {
     // Filter workouts for the selected exercise
     List<Workout> filteredWorkouts = workouts.where((workout) {
       return workout.exercises
@@ -1211,5 +1217,41 @@ class _ExerciseAnalyticsScreenState extends State<ExerciseAnalyticsScreen> {
         DateTime.parse(workout.date).year == date.year &&
         DateTime.parse(workout.date).month == date.month &&
         DateTime.parse(workout.date).day == date.day);
+  }
+}
+
+class ChipSelectWidget extends StatefulWidget {
+  @override
+  _ChipSelectWidgetState createState() => _ChipSelectWidgetState();
+}
+
+class _ChipSelectWidgetState extends State<ChipSelectWidget> {
+  int _selectedIndex = 0; // Initial selection is Reps
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8.0,
+      children: [
+        ChoiceChip(
+          label: Text('Reps'),
+          selected: _selectedIndex == 0,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 0 : 1;
+            });
+          },
+        ),
+        ChoiceChip(
+          label: Text('Weights'),
+          selected: _selectedIndex == 1,
+          onSelected: (bool selected) {
+            setState(() {
+              _selectedIndex = selected ? 1 : 0;
+            });
+          },
+        ),
+      ],
+    );
   }
 }
