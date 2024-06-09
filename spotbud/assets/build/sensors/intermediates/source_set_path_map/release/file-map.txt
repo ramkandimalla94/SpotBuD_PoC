@@ -1,0 +1,12 @@
+io.flutter.plugins.sensors-jetified-window-1.0.0-beta04-0 C:\Users\sampu\.gradle\caches\transforms-3\2d7268b49e2820725e98dd3a765d29ee\transformed\jetified-window-1.0.0-beta04\res
+io.flutter.plugins.sensors-jetified-annotation-experimental-1.1.0-1 C:\Users\sampu\.gradle\caches\transforms-3\2f596b0890f0da71d2042303fb7d6e35\transformed\jetified-annotation-experimental-1.1.0\res
+io.flutter.plugins.sensors-core-1.6.0-2 C:\Users\sampu\.gradle\caches\transforms-3\ab3b3e8c613caba376a463d83e119e45\transformed\core-1.6.0\res
+io.flutter.plugins.sensors-jetified-window-java-1.0.0-beta04-3 C:\Users\sampu\.gradle\caches\transforms-3\d9f5a633d79acc3b659ce711b872aa71\transformed\jetified-window-java-1.0.0-beta04\res
+io.flutter.plugins.sensors-main-4 C:\Users\sampu\AppData\Local\Pub\Cache\hosted\pub.dev\sensors-2.0.3\android\src\main\res
+io.flutter.plugins.sensors-release-5 C:\Users\sampu\AppData\Local\Pub\Cache\hosted\pub.dev\sensors-2.0.3\android\src\release\res
+io.flutter.plugins.sensors-pngs-6 D:\intern\SpotBuD_PoC\spotbud\build\sensors\generated\res\pngs\release
+io.flutter.plugins.sensors-resValues-7 D:\intern\SpotBuD_PoC\spotbud\build\sensors\generated\res\resValues\release
+io.flutter.plugins.sensors-rs-8 D:\intern\SpotBuD_PoC\spotbud\build\sensors\generated\res\rs\release
+io.flutter.plugins.sensors-mergeReleaseResources-9 D:\intern\SpotBuD_PoC\spotbud\build\sensors\intermediates\incremental\release\mergeReleaseResources\merged.dir
+io.flutter.plugins.sensors-mergeReleaseResources-10 D:\intern\SpotBuD_PoC\spotbud\build\sensors\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+io.flutter.plugins.sensors-merged_res-11 D:\intern\SpotBuD_PoC\spotbud\build\sensors\intermediates\merged_res\release

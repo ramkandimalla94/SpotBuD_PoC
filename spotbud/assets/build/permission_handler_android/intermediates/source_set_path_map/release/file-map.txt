@@ -1,0 +1,12 @@
+com.baseflow.permissionhandler.permission_handler_android-jetified-window-1.0.0-beta04-0 C:\Users\sampu\.gradle\caches\transforms-3\2d7268b49e2820725e98dd3a765d29ee\transformed\jetified-window-1.0.0-beta04\res
+com.baseflow.permissionhandler.permission_handler_android-jetified-annotation-experimental-1.1.0-1 C:\Users\sampu\.gradle\caches\transforms-3\2f596b0890f0da71d2042303fb7d6e35\transformed\jetified-annotation-experimental-1.1.0\res
+com.baseflow.permissionhandler.permission_handler_android-core-1.6.0-2 C:\Users\sampu\.gradle\caches\transforms-3\ab3b3e8c613caba376a463d83e119e45\transformed\core-1.6.0\res
+com.baseflow.permissionhandler.permission_handler_android-jetified-window-java-1.0.0-beta04-3 C:\Users\sampu\.gradle\caches\transforms-3\d9f5a633d79acc3b659ce711b872aa71\transformed\jetified-window-java-1.0.0-beta04\res
+com.baseflow.permissionhandler.permission_handler_android-main-4 C:\Users\sampu\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.6\android\src\main\res
+com.baseflow.permissionhandler.permission_handler_android-release-5 C:\Users\sampu\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.6\android\src\release\res
+com.baseflow.permissionhandler.permission_handler_android-pngs-6 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\generated\res\pngs\release
+com.baseflow.permissionhandler.permission_handler_android-resValues-7 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\generated\res\resValues\release
+com.baseflow.permissionhandler.permission_handler_android-rs-8 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\generated\res\rs\release
+com.baseflow.permissionhandler.permission_handler_android-mergeReleaseResources-9 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\intermediates\incremental\release\mergeReleaseResources\merged.dir
+com.baseflow.permissionhandler.permission_handler_android-mergeReleaseResources-10 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+com.baseflow.permissionhandler.permission_handler_android-merged_res-11 D:\intern\SpotBuD_PoC\spotbud\build\permission_handler_android\intermediates\merged_res\release
