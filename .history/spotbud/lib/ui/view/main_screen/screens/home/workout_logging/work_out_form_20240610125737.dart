@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/machine_selection_view.dart';
-import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/routine.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/timer_and_stopwatch.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -33,7 +32,6 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
   void initState() {
     super.initState();
     _retrieveTempWorkoutData();
-    _populateFromRoutine(widget.routineData);
     //_populateFormFields();
   }
 
@@ -135,10 +133,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                     ),
                     //SizedBox(width: 20),
                     IconButton(
-                        onPressed: () {
-                          Get.to(WorkoutRoutineScreen());
-                        },
-                        icon: Icon(Icons.route_rounded))
+                        onPressed: () {}, icon: Icon(Icons.route_rounded))
                   ],
                 ),
               ),
@@ -789,31 +784,29 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
     if (routineData != null) {
       final List<dynamic> exercisesData = routineData['exercises'];
 
-      setState(() {
-        // Clear existing exercises and sets
-        controller.exercises.clear();
-        controller.sets.clear();
+      // Clear existing exercises and sets
+      controller.exercises.clear();
+      controller.sets.clear();
 
-        for (var exerciseData in exercisesData) {
-          final String bodyPart = exerciseData['bodyPart'];
-          final String machine = exerciseData['machine'];
-          final ExerciseData exercise =
-              ExerciseData(name: '$bodyPart - $machine');
+      for (var exerciseData in exercisesData) {
+        final String bodyPart = exerciseData['bodyPart'];
+        final String machine = exerciseData['machine'];
+        final ExerciseData exercise =
+            ExerciseData(name: '$bodyPart - $machine');
 
-          controller.addExercise(exercise);
+        controller.addExercise(exercise);
 
-          final List<dynamic> setsData = exerciseData['sets'];
-          for (var setData in setsData) {
-            final int index = setsData.indexOf(setData) + 1;
-            final String reps = setData['reps'] ?? '';
-            final String weight = setData['weight'] ?? '';
-            final String notes = setData['notes'] ?? '';
-            final SetData set =
-                SetData(index: index, reps: reps, weight: weight, notes: notes);
-            controller.getSets(exercise).add(set);
-          }
+        final List<dynamic> setsData = exerciseData['sets'];
+        for (var setData in setsData) {
+          final int index = setsData.indexOf(setData) + 1;
+          final String reps = setData['reps'] ?? '';
+          final String weight = setData['weight'] ?? '';
+          final String notes = setData['notes'] ?? '';
+          final SetData set =
+              SetData(index: index, reps: reps, weight: weight, notes: notes);
+          controller.getSets(exercise).add(set);
         }
-      });
+      }
     }
   }
 

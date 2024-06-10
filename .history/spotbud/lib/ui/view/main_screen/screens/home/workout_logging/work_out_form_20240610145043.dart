@@ -138,7 +138,7 @@ class _WorkoutLoggingFormState extends State<WorkoutLoggingForm> {
                         onPressed: () {
                           Get.to(WorkoutRoutineScreen());
                         },
-                        icon: Icon(Icons.route_rounded))
+                        icon: const Icon(Icons.route_rounded))
                   ],
                 ),
               ),
