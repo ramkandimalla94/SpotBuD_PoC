@@ -339,7 +339,7 @@ class _TimerWidgetState extends State<TimerWidget> {
             ConfettiWidget(
               confettiController: _confettiController!,
               blastDirectionality: BlastDirectionality.explosive,
-              emissionFrequency: 0.5,
+              emissionFrequency: 0.05,
               numberOfParticles: 10,
               colors: const [
                 Colors.green,
