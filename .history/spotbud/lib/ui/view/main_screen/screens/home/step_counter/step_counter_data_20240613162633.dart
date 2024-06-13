@@ -176,11 +176,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.7),
-              Theme.of(context).colorScheme.primary,
-            ],
+            colors: [Colors.yellowAccent.shade200, Colors.yellow.shade600],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

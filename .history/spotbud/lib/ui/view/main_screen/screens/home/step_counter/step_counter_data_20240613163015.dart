@@ -177,9 +177,9 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
           borderRadius: BorderRadius.circular(15),
           gradient: LinearGradient(
             colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.2),
               Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.7),
-              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withOpacity(0.1)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

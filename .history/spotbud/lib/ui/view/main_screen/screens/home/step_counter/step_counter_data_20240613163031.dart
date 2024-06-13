@@ -178,8 +178,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.7),
-              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withOpacity(0.2),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
