@@ -9,6 +9,7 @@ import 'package:spotbud/ui/view/main_screen/main_screen.dart';
 import 'package:spotbud/ui/view/main_screen/screens/profile/body_details_profile/body_info.dart';
 import 'package:spotbud/ui/view/main_screen/screens/profile/profile_view.dart';
 import 'package:spotbud/ui/view/onboarding/body_details.dart';
+import 'package:spotbud/ui/view/onboarding/role.dart';
 import 'package:spotbud/ui/view/splash_screen/splash_screen.dart';
 import 'package:spotbud/ui/view/trial.dart';
 

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:spotbud/viewmodels/pedometer_viewmodel.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/work_out_form.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_analytics/workout_analytics.dart';
@@ -25,7 +26,7 @@ class _HomeViewState extends State<HomeView> {
   late String currentTime;
   late Timer _timer;
   late String gifPath = '';
-  // final PedometerViewModel _pedometerController = Get.put(PedometerViewModel());
+  final PedometerViewModel _pedometerController = Get.put(PedometerViewModel());
 
   final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
 
@@ -192,7 +193,7 @@ class _HomeViewState extends State<HomeView> {
             customHomeButton(
                 text: "Step Counter",
                 onPressed: () {
-                  Get.to(DailyStepRecords());
+                  Get.to(StepsTracker());
                 },
                 theme: Theme.of(context),
                 imagePath: AppAssets.dumble),

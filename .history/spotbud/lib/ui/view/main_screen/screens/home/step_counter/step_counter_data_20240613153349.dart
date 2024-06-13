@@ -49,13 +49,6 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   void _onStepCount(StepCount event) {
     int currentStepCount = event.steps;
-
-    // Update only if it's a new day
-    String currentDate = _getCurrentDate();
-    if (currentDate != _currentDate) {
-      _resetDailySteps();
-    }
-
     int stepsToAdd = currentStepCount - _lastStoredStepCount;
 
     setState(() {
@@ -114,11 +107,6 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
       transaction.set(docRef, {'steps': updatedSteps});
     });
 
-    // Reset the daily steps after storing to Firestore
-    setState(() {
-      _dailySteps = 0;
-    });
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('lastStoredStepCount', _lastStoredStepCount);
   }
@@ -127,6 +115,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
     if (formattedDate != _currentDate) {
+      _resetDailySteps();
       _currentDate = formattedDate;
     }
     return formattedDate;
@@ -134,7 +123,8 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   Future<void> _resetDailySteps() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    int currentStepCount = _lastStoredStepCount;
+    int currentStepCount =
+        await _stepCountStream!.first.then((value) => value.steps);
 
     setState(() {
       _initialStepCount = currentStepCount;
@@ -168,113 +158,26 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   Widget _buildCurrentDayCard() {
     return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          gradient: LinearGradient(
-            colors: [Colors.blue.shade200, Colors.blue.shade600],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        padding: EdgeInsets.all(16),
-        child: ListTile(
-          leading: Icon(
-            Icons.directions_walk,
-            size: 40,
-            color: Colors.white,
-          ),
-          title: Text(
-            'Today ${_getCurrentDate()}',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+      child: ListTile(
+        title: Text('Today (${_getCurrentDate()})'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Current Steps: $_dailySteps'),
+            FutureBuilder<int>(
+              future: _getTodayStoredSteps(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Text('Stored Steps: Loading...');
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  int todayStoredSteps = snapshot.data ?? 0;
+                  return Text('Stored Steps: $todayStoredSteps');
+                }
+              },
             ),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     Icon(Icons.run_circle, color: Colors.white),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       'Current Steps: $_dailySteps',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       '🚶‍♂️',
-              //       style: TextStyle(fontSize: 16),
-              //     ),
-              //   ],
-              // ),
-              SizedBox(height: 10),
-              FutureBuilder<int>(
-                future: _getTodayStoredSteps(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Row(
-                      children: [
-                        Icon(Icons.hourglass_empty, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: Loading...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Row(
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Error: ${snapshot.error}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    int todayStoredSteps = snapshot.data ?? 0;
-                    return Row(
-                      children: [
-                        Icon(Icons.run_circle, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: $todayStoredSteps',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '🚶‍♂️',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
@@ -182,98 +183,128 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
           ),
         ),
         padding: EdgeInsets.all(16),
-        child: ListTile(
-          leading: Icon(
-            Icons.directions_walk,
-            size: 40,
-            color: Colors.white,
-          ),
-          title: Text(
-            'Today ${_getCurrentDate()}',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+        child: Column(
+          children: [
+            ListTile(
+              leading: Icon(
+                Icons.directions_walk,
+                size: 40,
+                color: Colors.white,
+              ),
+              title: Text(
+                'Today ${_getCurrentDate()}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  FutureBuilder<int>(
+                    future: _getTodayStoredSteps(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Row(
+                          children: [
+                            Icon(Icons.hourglass_empty, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Steps Taken Today: Loading...',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        return Row(
+                          children: [
+                            Icon(Icons.error_outline, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Error: ${snapshot.error}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        int todayStoredSteps = snapshot.data ?? 0;
+                        return Row(
+                          children: [
+                            Icon(Icons.run_circle, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Steps Taken Today: $todayStoredSteps',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              '🚶‍♂️',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  _buildStepsChart(),
+                ],
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepsChart() {
+    List<BarChartGroupData> barGroups = _dailyStepRecords.entries.map((entry) {
+      int index = _dailyStepRecords.keys.toList().indexOf(entry.key);
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: entry.value.toDouble(),
+            color: Colors.blueAccent,
+            width: 16,
           ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     Icon(Icons.run_circle, color: Colors.white),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       'Current Steps: $_dailySteps',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       '🚶‍♂️',
-              //       style: TextStyle(fontSize: 16),
-              //     ),
-              //   ],
-              // ),
-              SizedBox(height: 10),
-              FutureBuilder<int>(
-                future: _getTodayStoredSteps(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Row(
-                      children: [
-                        Icon(Icons.hourglass_empty, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: Loading...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Row(
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Error: ${snapshot.error}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    int todayStoredSteps = snapshot.data ?? 0;
-                    return Row(
-                      children: [
-                        Icon(Icons.run_circle, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: $todayStoredSteps',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '🚶‍♂️',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    );
+        ],
+      );
+    }).toList();
+
+    return Container(
+      height: 200,
+      padding: EdgeInsets.all(16),
+      child: BarChart(
+        BarChartData(
+          barGroups: barGroups,
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  int index = value.toInt();
+                  if (index < 0 || index >= _dailyStepRecords.length) {
+                    return '';
                   }
+                  return _dailyStepRecords.keys.elementAt(index);
                 },
               ),
-            ],
+            ),
           ),
         ),
       ),

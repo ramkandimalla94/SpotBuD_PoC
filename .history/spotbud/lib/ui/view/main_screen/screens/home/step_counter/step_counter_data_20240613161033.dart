@@ -200,24 +200,24 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     Icon(Icons.run_circle, color: Colors.white),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       'Current Steps: $_dailySteps',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       '🚶‍♂️',
-              //       style: TextStyle(fontSize: 16),
-              //     ),
-              //   ],
-              // ),
+              Row(
+                children: [
+                  Icon(Icons.run_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Current Steps: $_dailySteps',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '🚶‍♂️',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
               SizedBox(height: 10),
               FutureBuilder<int>(
                 future: _getTodayStoredSteps(),

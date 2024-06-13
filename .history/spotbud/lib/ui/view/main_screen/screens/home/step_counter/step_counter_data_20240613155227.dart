@@ -49,13 +49,6 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   void _onStepCount(StepCount event) {
     int currentStepCount = event.steps;
-
-    // Update only if it's a new day
-    String currentDate = _getCurrentDate();
-    if (currentDate != _currentDate) {
-      _resetDailySteps();
-    }
-
     int stepsToAdd = currentStepCount - _lastStoredStepCount;
 
     setState(() {
@@ -114,11 +107,6 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
       transaction.set(docRef, {'steps': updatedSteps});
     });
 
-    // Reset the daily steps after storing to Firestore
-    setState(() {
-      _dailySteps = 0;
-    });
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('lastStoredStepCount', _lastStoredStepCount);
   }
@@ -127,6 +115,17 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
     if (formattedDate != _currentDate) {
+      _resetDailySteps();
+      _currentDate = formattedDate;
+    }
+    return formattedDate;
+  }
+
+  String _getCurrentDatetry() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('d MMMM yyyy').format(now);
+    if (formattedDate != _currentDate) {
+      _resetDailySteps();
       _currentDate = formattedDate;
     }
     return formattedDate;
@@ -134,6 +133,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   Future<void> _resetDailySteps() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Use the most recent step count to reset the day's steps
     int currentStepCount = _lastStoredStepCount;
 
     setState(() {
@@ -200,24 +200,24 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     Icon(Icons.run_circle, color: Colors.white),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       'Current Steps: $_dailySteps',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       '🚶‍♂️',
-              //       style: TextStyle(fontSize: 16),
-              //     ),
-              //   ],
-              // ),
+              Row(
+                children: [
+                  Icon(Icons.run_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Current Steps: $_dailySteps',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '🚶‍♂️',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
               SizedBox(height: 10),
               FutureBuilder<int>(
                 future: _getTodayStoredSteps(),
@@ -228,7 +228,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
                         Icon(Icons.hourglass_empty, color: Colors.white),
                         SizedBox(width: 8),
                         Text(
-                          'Steps Taken Today: Loading...',
+                          'Stored Steps: Loading...',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -254,10 +254,10 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
                     int todayStoredSteps = snapshot.data ?? 0;
                     return Row(
                       children: [
-                        Icon(Icons.run_circle, color: Colors.white),
+                        Icon(Icons.check_circle_outline, color: Colors.white),
                         SizedBox(width: 8),
                         Text(
-                          'Steps Taken Today: $todayStoredSteps',
+                          'Stored Steps: $todayStoredSteps',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -265,7 +265,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          '🚶‍♂️',
+                          '📊',
                           style: TextStyle(fontSize: 16),
                         ),
                       ],

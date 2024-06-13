@@ -49,14 +49,12 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   void _onStepCount(StepCount event) {
     int currentStepCount = event.steps;
-
-    // Update only if it's a new day
-    String currentDate = _getCurrentDate();
-    if (currentDate != _currentDate) {
-      _resetDailySteps();
-    }
-
     int stepsToAdd = currentStepCount - _lastStoredStepCount;
+
+    if (stepsToAdd < 0) {
+      // Handle case where steps to add is negative due to counter reset
+      stepsToAdd = currentStepCount;
+    }
 
     setState(() {
       _dailySteps += stepsToAdd;
@@ -110,13 +108,8 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
         existingSteps =
             (snapshot.data() as Map<String, dynamic>)['steps'] as int? ?? 0;
       }
-      int updatedSteps = existingSteps + _dailySteps;
+      int updatedSteps = _dailySteps;
       transaction.set(docRef, {'steps': updatedSteps});
-    });
-
-    // Reset the daily steps after storing to Firestore
-    setState(() {
-      _dailySteps = 0;
     });
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -127,6 +120,17 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
     if (formattedDate != _currentDate) {
+      _resetDailySteps();
+      _currentDate = formattedDate;
+    }
+    return formattedDate;
+  }
+
+  String _getCurrentDatetry() {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('d MMMM yyyy').format(now);
+    if (formattedDate != _currentDate) {
+      _resetDailySteps();
       _currentDate = formattedDate;
     }
     return formattedDate;
@@ -134,6 +138,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
 
   Future<void> _resetDailySteps() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // Use the most recent step count to reset the day's steps
     int currentStepCount = _lastStoredStepCount;
 
     setState(() {
@@ -189,7 +194,7 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
             color: Colors.white,
           ),
           title: Text(
-            'Today ${_getCurrentDate()}',
+            'Today ${_getCurrentDatetry()}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -200,105 +205,29 @@ class _DailyStepRecordsState extends State<DailyStepRecords> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     Icon(Icons.run_circle, color: Colors.white),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       'Current Steps: $_dailySteps',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //     SizedBox(width: 8),
-              //     Text(
-              //       '🚶‍♂️',
-              //       style: TextStyle(fontSize: 16),
-              //     ),
-              //   ],
-              // ),
-              SizedBox(height: 10),
-              FutureBuilder<int>(
-                future: _getTodayStoredSteps(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Row(
-                      children: [
-                        Icon(Icons.hourglass_empty, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: Loading...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Row(
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Error: ${snapshot.error}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    int todayStoredSteps = snapshot.data ?? 0;
-                    return Row(
-                      children: [
-                        Icon(Icons.run_circle, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text(
-                          'Steps Taken Today: $todayStoredSteps',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '🚶‍♂️',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    );
-                  }
-                },
+              Row(
+                children: [
+                  Icon(Icons.run_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    'Current Steps: $_dailySteps',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    '🚶‍♂️',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<int> _getTodayStoredSteps() async {
-    User? user = _auth.currentUser;
-    if (user == null) return 0;
-    String userId = user.uid;
-
-    String currentDate = _getCurrentDate();
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('data')
-        .doc(userId)
-        .collection('dailyStepRecords')
-        .doc(currentDate)
-        .get();
-
-    if (snapshot.exists) {
-      Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
-      return data?['steps'] as int? ?? 0;
-    } else {
-      return 0;
-    }
   }
 
   Widget _buildHistoryList() {
