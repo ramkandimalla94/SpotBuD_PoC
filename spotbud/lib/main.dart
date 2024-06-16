@@ -36,7 +36,7 @@ ThemeData _darkTheme = ThemeData(
   hintColor: AppColors.secondaryColor,
   colorScheme: const ColorScheme.dark(
       background: AppColors.black,
-      primary: AppColors.acccentColor,
+      primary: Color.fromRGBO(255, 215, 0, 1),
       secondary: AppColors.backgroundColor),
   focusColor: AppColors.lightacccentColor,
   brightness: Brightness.dark,

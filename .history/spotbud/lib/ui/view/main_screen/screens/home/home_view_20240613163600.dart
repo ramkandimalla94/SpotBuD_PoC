@@ -13,6 +13,7 @@ import 'package:spotbud/ui/widgets/color_theme.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/step_counter/step_counter_data.dart';
 import 'package:spotbud/ui/widgets/text.dart';
 import 'package:spotbud/viewmodels/user_data_viewmodel.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -25,6 +26,8 @@ class _HomeViewState extends State<HomeView> {
   late String currentTime;
   late Timer _timer;
   late String gifPath = '';
+  TutorialCoachMark tutorialCoachMark = TutorialCoachMark(context,
+    targets: );
 
   // final PedometerViewModel _pedometerController = Get.put(PedometerViewModel());
 

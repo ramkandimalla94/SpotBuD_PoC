@@ -1,5 +1,7 @@
+import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,7 +36,7 @@ ThemeData _darkTheme = ThemeData(
   hintColor: AppColors.secondaryColor,
   colorScheme: const ColorScheme.dark(
       background: AppColors.black,
-      primary: AppColors.acccentColor,
+      primary: Color.fromRGBO(255, 215, 0, 1),
       secondary: AppColors.backgroundColor),
   focusColor: AppColors.lightacccentColor,
   brightness: Brightness.dark,
@@ -58,18 +60,23 @@ ThemeData _lightTheme = ThemeData(
     ));
 
 class MyApp extends StatelessWidget {
-  // Future<void> _getThemeStatus() async {
-  //   final prefs = await _prefs;
-  //   final isLight = prefs.getBool('theme') ?? true;
-  //   _userDataViewModel.isLightTheme.value = isLight;
-  //   Get.changeThemeMode(_userDataViewModel.isLightTheme.value
-  //       ? ThemeMode.light
-  //       : ThemeMode.dark);
-  // }
+  final UserDataViewModel _userDataViewModel = Get.put(UserDataViewModel());
+
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  Future<void> _getThemeStatus() async {
+    final prefs = await _prefs;
+    final isLight = prefs.getBool('theme') ?? true;
+    _userDataViewModel.isLightTheme.value = isLight;
+    Get.changeThemeMode(_userDataViewModel.isLightTheme.value
+        ? ThemeMode.light
+        : ThemeMode.dark);
+  }
 
   @override
   Widget build(BuildContext context) {
-    //_getThemeStatus();
+    _getThemeStatus();
+    //print(_userDataViewModel.isLightTheme);
     return Builder(
       builder: (context) {
         ScreenUtil.init(
@@ -79,15 +86,29 @@ class MyApp extends StatelessWidget {
             MediaQuery.of(context).size.height,
           ),
         );
-        return GetMaterialApp(
-          theme: _lightTheme,
-          darkTheme: _darkTheme,
-          themeMode: ThemeMode.system,
-          debugShowCheckedModeBanner: false,
-          initialRoute: '/',
-          unknownRoute:
-              GetPage(name: '/route_error', page: () => const RouteErrorView()),
-          getPages: AppRoutes.pages,
+        return BetterFeedback(
+          theme: FeedbackThemeData(
+            background: Colors.grey,
+            feedbackSheetColor: Colors.grey[50]!,
+            drawColors: [Colors.red, Colors.green, Colors.blue, Colors.yellow],
+          ),
+          localizationsDelegates: [
+            GlobalFeedbackLocalizationsDelegate(),
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          localeOverride: const Locale('en'),
+          child: GetMaterialApp(
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
+            themeMode: ThemeMode.dark,
+            debugShowCheckedModeBanner: false,
+            initialRoute: '/',
+            unknownRoute: GetPage(
+                name: '/route_error', page: () => const RouteErrorView()),
+            getPages: AppRoutes.pages,
+          ),
         );
       },
     );
