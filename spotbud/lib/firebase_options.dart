@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -59,4 +47,47 @@ class DefaultFirebaseOptions {
     projectId: 'spotbud-b9d9e',
     storageBucket: 'spotbud-b9d9e.appspot.com',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCKKbvi7UfX8DTFZ2c7FzdhFYbJe2l_V5g',
+    appId: '1:341521927870:web:a06db78d2e7ebf3673d8ef',
+    messagingSenderId: '341521927870',
+    projectId: 'spotbud-b9d9e',
+    authDomain: 'spotbud-b9d9e.firebaseapp.com',
+    storageBucket: 'spotbud-b9d9e.appspot.com',
+    measurementId: 'G-3H2VF6LL7S',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyC0t0lsj8wqA0cWXtJQ-PEvl4n4OzMXPDE',
+    appId: '1:341521927870:ios:b1b753acb9c9344e73d8ef',
+    messagingSenderId: '341521927870',
+    projectId: 'spotbud-b9d9e',
+    storageBucket: 'spotbud-b9d9e.appspot.com',
+    androidClientId: '341521927870-2c3vffbkq8s346003ii0paghoi4agkl4.apps.googleusercontent.com',
+    iosClientId: '341521927870-q6b6gm3et29hm22vaimm0a35rtariou7.apps.googleusercontent.com',
+    iosBundleId: 'com.example.spotbud',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyC0t0lsj8wqA0cWXtJQ-PEvl4n4OzMXPDE',
+    appId: '1:341521927870:ios:3ab32127fe913fc073d8ef',
+    messagingSenderId: '341521927870',
+    projectId: 'spotbud-b9d9e',
+    storageBucket: 'spotbud-b9d9e.appspot.com',
+    androidClientId: '341521927870-2c3vffbkq8s346003ii0paghoi4agkl4.apps.googleusercontent.com',
+    iosClientId: '341521927870-17f2qhni8c15ql8vsbfpu00rejut0ku8.apps.googleusercontent.com',
+    iosBundleId: 'com.ram.spotbud',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCKKbvi7UfX8DTFZ2c7FzdhFYbJe2l_V5g',
+    appId: '1:341521927870:web:dff15427efb19ffd73d8ef',
+    messagingSenderId: '341521927870',
+    projectId: 'spotbud-b9d9e',
+    authDomain: 'spotbud-b9d9e.firebaseapp.com',
+    storageBucket: 'spotbud-b9d9e.appspot.com',
+    measurementId: 'G-5C442CD3Y4',
+  );
+
 }
