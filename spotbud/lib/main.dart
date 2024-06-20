@@ -1,6 +1,7 @@
 import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -29,6 +30,7 @@ Future<void> main() async {
         : ThemeMode.dark);
   }
 
+  await dotenv.load(fileName: '.env');
   runApp(MyApp());
 }
 

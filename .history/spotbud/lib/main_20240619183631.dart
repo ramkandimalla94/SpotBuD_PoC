@@ -1,5 +1,8 @@
+import 'package:feedback/feedback.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,19 +30,15 @@ Future<void> main() async {
         : ThemeMode.dark);
   }
 
+  await dotenv.load(fileName: '.env');
   runApp(MyApp());
 }
 
 ThemeData _darkTheme = ThemeData(
-  textTheme: TextTheme(
-    bodyLarge: TextStyle(fontSize: 10),
-    caption: TextStyle(fontSize: 10),
-    bodyMedium: TextStyle(fontSize: 10),
-  ),
   hintColor: AppColors.secondaryColor,
   colorScheme: const ColorScheme.dark(
       background: AppColors.black,
-      primary: AppColors.acccentColor,
+      primary: Color.fromRGBO(255, 215, 0, 1),
       secondary: AppColors.backgroundColor),
   focusColor: AppColors.lightacccentColor,
   brightness: Brightness.dark,
@@ -89,15 +88,29 @@ class MyApp extends StatelessWidget {
             MediaQuery.of(context).size.height,
           ),
         );
-        return GetMaterialApp(
-          theme: _lightTheme,
-          darkTheme: _darkTheme,
-          themeMode: ThemeMode.system,
-          debugShowCheckedModeBanner: false,
-          initialRoute: '/',
-          unknownRoute:
-              GetPage(name: '/route_error', page: () => const RouteErrorView()),
-          getPages: AppRoutes.pages,
+        return BetterFeedback(
+          theme: FeedbackThemeData(
+            background: Colors.grey,
+            feedbackSheetColor: Colors.grey[50]!,
+            drawColors: [Colors.red, Colors.green, Colors.blue, Colors.yellow],
+          ),
+          localizationsDelegates: [
+            GlobalFeedbackLocalizationsDelegate(),
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          localeOverride: const Locale('en'),
+          child: GetMaterialApp(
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
+            themeMode: ThemeMode.dark,
+            debugShowCheckedModeBanner: false,
+            initialRoute: '/',
+            unknownRoute: GetPage(
+                name: '/route_error', page: () => const RouteErrorView()),
+            getPages: AppRoutes.pages,
+          ),
         );
       },
     );

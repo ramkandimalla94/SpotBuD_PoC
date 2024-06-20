@@ -122,10 +122,19 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
         final bodyPart = machineResult['bodyPart'];
         final machine = machineResult['machine'];
         if (bodyPart != null && machine != null) {
-          _showSetRepDialog(bodyPart, machine);
+          // Check if the exercise already exists in the selected exercises list
+          final existingExercise = _selectedExercises.firstWhere(
+            (exercise) =>
+                exercise['bodyPart'] == bodyPart &&
+                exercise['machine'] == machine,
+          );
 
-          // Refresh UI after adding exercise
-          setState(() {});
+          if (existingExercise == null) {
+            // Add an empty set if the exercise doesn't exist in the list
+            _showSetRepDialog(bodyPart, machine);
+          } else {
+            // Exercise already exists, do something else or show a message
+          }
         }
       }
     }
@@ -245,7 +254,7 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
                         'sets': sets,
                       });
                     });
-                    setState(() {});
+
                     Navigator.of(context).pop();
                   },
                   child: Text('Add'),

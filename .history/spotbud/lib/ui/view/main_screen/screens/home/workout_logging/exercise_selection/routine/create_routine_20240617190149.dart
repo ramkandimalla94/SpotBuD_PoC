@@ -123,9 +123,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
         final machine = machineResult['machine'];
         if (bodyPart != null && machine != null) {
           _showSetRepDialog(bodyPart, machine);
-
-          // Refresh UI after adding exercise
-          setState(() {});
         }
       }
     }
@@ -156,69 +153,67 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Text('Add Sets and Reps'),
-              content: SingleChildScrollView(
-                child: Container(
-                  width: double.maxFinite,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        controller: setsController,
-                        decoration: InputDecoration(
-                          labelText: 'Sets',
-                        ),
-                        keyboardType: TextInputType.number,
+              content: Container(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: setsController,
+                      decoration: InputDecoration(
+                        labelText: 'Sets',
                       ),
-                      SizedBox(height: 8.0),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: int.parse(setsController.text),
-                        itemBuilder: (context, setIndex) {
-                          return Column(
-                            children: [
-                              TextField(
-                                controller: repsControllers[setIndex],
-                                decoration: InputDecoration(
-                                  labelText: 'Reps for Set ${setIndex + 1}',
-                                ),
-                                keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 8.0),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: int.parse(setsController.text),
+                      itemBuilder: (context, setIndex) {
+                        return Column(
+                          children: [
+                            TextField(
+                              controller: repsControllers[setIndex],
+                              decoration: InputDecoration(
+                                labelText: 'Reps for Set ${setIndex + 1}',
                               ),
-                              TextField(
-                                controller: weightControllers[setIndex],
-                                decoration: InputDecoration(
-                                  labelText: 'Weight for Set ${setIndex + 1}',
-                                ),
-                                keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.number,
+                            ),
+                            TextField(
+                              controller: weightControllers[setIndex],
+                              decoration: InputDecoration(
+                                labelText: 'Weight for Set ${setIndex + 1}',
                               ),
-                              IconButton(
-                                icon: Icon(Icons.remove),
-                                onPressed: () {
-                                  setState(() {
-                                    repsControllers.removeAt(setIndex);
-                                    weightControllers.removeAt(setIndex);
-                                    setsController.text =
-                                        repsControllers.length.toString();
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            repsControllers.add(TextEditingController());
-                            weightControllers.add(TextEditingController());
-                            setsController.text =
-                                repsControllers.length.toString();
-                          });
-                        },
-                        child: Text('Add Set'),
-                      ),
-                    ],
-                  ),
+                              keyboardType: TextInputType.number,
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove),
+                              onPressed: () {
+                                setState(() {
+                                  repsControllers.removeAt(setIndex);
+                                  weightControllers.removeAt(setIndex);
+                                  setsController.text =
+                                      repsControllers.length.toString();
+                                });
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          repsControllers.add(TextEditingController());
+                          weightControllers.add(TextEditingController());
+                          setsController.text =
+                              repsControllers.length.toString();
+                        });
+                      },
+                      child: Text('Add Set'),
+                    ),
+                  ],
                 ),
               ),
               actions: [
@@ -230,22 +225,7 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    final sets = List.generate(
-                      int.tryParse(setsController.text) ?? 1,
-                      (index) => {
-                        'reps': repsControllers[index].text.trim(),
-                        'weight': weightControllers[index].text.trim(),
-                      },
-                    );
-
-                    setState(() {
-                      _selectedExercises.add({
-                        'bodyPart': bodyPart,
-                        'machine': machine,
-                        'sets': sets,
-                      });
-                    });
-                    setState(() {});
+                    // Your logic here to save sets
                     Navigator.of(context).pop();
                   },
                   child: Text('Add'),

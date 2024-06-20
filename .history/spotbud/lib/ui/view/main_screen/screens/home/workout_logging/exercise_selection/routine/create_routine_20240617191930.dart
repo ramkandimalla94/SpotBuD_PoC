@@ -245,7 +245,7 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
                         'sets': sets,
                       });
                     });
-                    setState(() {});
+
                     Navigator.of(context).pop();
                   },
                   child: Text('Add'),

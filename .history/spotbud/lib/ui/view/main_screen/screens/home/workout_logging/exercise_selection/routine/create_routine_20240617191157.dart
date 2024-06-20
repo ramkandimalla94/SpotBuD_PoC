@@ -123,9 +123,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
         final machine = machineResult['machine'];
         if (bodyPart != null && machine != null) {
           _showSetRepDialog(bodyPart, machine);
-
-          // Refresh UI after adding exercise
-          setState(() {});
         }
       }
     }
@@ -245,7 +242,7 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
                         'sets': sets,
                       });
                     });
-                    setState(() {});
+
                     Navigator.of(context).pop();
                   },
                   child: Text('Add'),

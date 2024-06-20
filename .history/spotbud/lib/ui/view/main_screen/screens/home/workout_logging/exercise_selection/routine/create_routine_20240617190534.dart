@@ -123,9 +123,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
         final machine = machineResult['machine'];
         if (bodyPart != null && machine != null) {
           _showSetRepDialog(bodyPart, machine);
-
-          // Refresh UI after adding exercise
-          setState(() {});
         }
       }
     }
@@ -230,22 +227,8 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
                 ),
                 TextButton(
                   onPressed: () {
-                    final sets = List.generate(
-                      int.tryParse(setsController.text) ?? 1,
-                      (index) => {
-                        'reps': repsControllers[index].text.trim(),
-                        'weight': weightControllers[index].text.trim(),
-                      },
-                    );
-
-                    setState(() {
-                      _selectedExercises.add({
-                        'bodyPart': bodyPart,
-                        'machine': machine,
-                        'sets': sets,
-                      });
-                    });
-                    setState(() {});
+                    // Your logic here to save sets
+                    _addSetsAndReps();
                     Navigator.of(context).pop();
                   },
                   child: Text('Add'),
