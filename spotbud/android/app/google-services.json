@@ -22,30 +22,6 @@
           }
         },
         {
-          "client_id": "341521927870-2j11i6bgs6ob54hs14mp7btmhqftcaqr.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ram.spotbud",
-            "certificate_hash": "49e55fc09c19a57792a75b16440c604a07fac181"
-          }
-        },
-        {
-          "client_id": "341521927870-4vfd3c3ctbpn0rptnbi0cn9u6fmeg0qp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ram.spotbud",
-            "certificate_hash": "997670a6e5f621aa7ec27280e8ac88d5a544137c"
-          }
-        },
-        {
-          "client_id": "341521927870-tg7fg128bsmf36qamel0ihn3irpgu57v.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ram.spotbud",
-            "certificate_hash": "e212e435eac03c6bcf2a40ecae01c2e310f979ef"
-          }
-        },
-        {
           "client_id": "341521927870-569ettmmtqid3plr1fd1mf9ok00i1rhf.apps.googleusercontent.com",
           "client_type": 3
         }
