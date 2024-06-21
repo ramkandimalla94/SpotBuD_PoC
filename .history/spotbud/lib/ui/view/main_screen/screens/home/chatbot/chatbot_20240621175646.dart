@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:spotbud/api/chat_service.dart';
 import 'package:spotbud/api/gemini_api.dart';
 import 'package:spotbud/ui/widgets/formattertext.dart';
-import 'package:spotbud/api/chatmodel.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -12,7 +11,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<ChatMessageModel> _messages = [];
+  final List<ChatMessage> _messages = [];
   final GeminiApiService _apiService = GeminiApiService();
   final ScrollController _scrollController = ScrollController();
   bool _isBotTyping = false;
@@ -22,6 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _apiService.initialize();
+    // Initialize ChatService with the current user's ID
     _chatService =
         ChatService(userId: getCurrentUserId()); // Replace with actual user ID
     _loadMessages();
@@ -30,7 +30,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String getCurrentUserId() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      print(user.uid);
       return user.uid;
     } else {
       print('No user is currently signed in');
@@ -42,14 +41,14 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatService.getMessages().listen((messages) {
       setState(() {
         _messages.clear();
-        _messages.addAll(messages);
+        _messages.addAll(messages.cast<ChatMessage>());
       });
       _scrollToBottom();
     });
   }
 
   void _sendMessage(String message) async {
-    final chatMessage = ChatMessageModel(text: message, isUser: true);
+    final chatMessage = ChatMessage(text: message, isUser: true);
     setState(() {
       _messages.add(chatMessage);
       _isBotTyping = true;
@@ -62,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       String reply = await _apiService.sendMessage(message);
-      final botMessage = ChatMessageModel(text: reply, isUser: false);
+      final botMessage = ChatMessage(text: reply, isUser: false);
       setState(() {
         _isBotTyping = false;
         _messages.add(botMessage);
@@ -71,8 +70,8 @@ class _ChatScreenState extends State<ChatScreen> {
       await _chatService.saveMessage(botMessage);
       _scrollToBottom();
     } catch (e) {
-      final errorMessage = ChatMessageModel(
-          text: 'Error: Failed to send message', isUser: false);
+      final errorMessage =
+          ChatMessage(text: 'Error: Failed to send message', isUser: false);
       setState(() {
         _isBotTyping = false;
         _messages.add(errorMessage);
@@ -146,7 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   if (index == _messages.length && _isBotTyping) {
                     return _buildTypingIndicator();
                   }
-                  return ChatMessage(model: _messages[index]);
+                  return _messages[index];
                 },
               ),
             ),
@@ -213,9 +212,11 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ChatMessage extends StatelessWidget {
-  final ChatMessageModel model;
+  final String text;
+  final bool isUser;
 
-  const ChatMessage({Key? key, required this.model}) : super(key: key);
+  const ChatMessage({Key? key, required this.text, required this.isUser})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -223,23 +224,23 @@ class ChatMessage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         mainAxisAlignment:
-            model.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!model.isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
+          if (!isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
           SizedBox(width: 10),
           Flexible(
             child: Container(
               padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: model.isUser
+                color: isUser
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).hintColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: FormattedText(
-                text: model.text,
+                text: text,
                 style: TextStyle(
-                  color: model.isUser
+                  color: isUser
                       ? Theme.of(context).colorScheme.background
                       : Theme.of(context).colorScheme.background,
                 ),
@@ -247,7 +248,7 @@ class ChatMessage extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          if (model.isUser) CircleAvatar(child: Icon(Icons.person)),
+          if (isUser) CircleAvatar(child: Icon(Icons.person)),
         ],
       ),
     );

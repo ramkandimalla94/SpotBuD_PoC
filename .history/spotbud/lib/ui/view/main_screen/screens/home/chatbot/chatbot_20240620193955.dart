@@ -1,9 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:spotbud/api/chat_service.dart';
 import 'package:spotbud/api/gemini_api.dart';
-import 'package:spotbud/ui/widgets/formattertext.dart';
-import 'package:spotbud/api/chatmodel.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -12,110 +8,36 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<ChatMessageModel> _messages = [];
+  final List<ChatMessage> _messages = [];
   final GeminiApiService _apiService = GeminiApiService();
   final ScrollController _scrollController = ScrollController();
-  bool _isBotTyping = false;
-  late ChatService _chatService;
 
   @override
   void initState() {
     super.initState();
     _apiService.initialize();
-    _chatService =
-        ChatService(userId: getCurrentUserId()); // Replace with actual user ID
-    _loadMessages();
-  }
-
-  String getCurrentUserId() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      print(user.uid);
-      return user.uid;
-    } else {
-      print('No user is currently signed in');
-      return 'anonymous';
-    }
-  }
-
-  void _loadMessages() {
-    _chatService.getMessages().listen((messages) {
-      setState(() {
-        _messages.clear();
-        _messages.addAll(messages);
-      });
-      _scrollToBottom();
-    });
   }
 
   void _sendMessage(String message) async {
-    final chatMessage = ChatMessageModel(text: message, isUser: true);
     setState(() {
-      _messages.add(chatMessage);
-      _isBotTyping = true;
+      _messages.add(ChatMessage(text: message, isUser: true));
     });
     _textController.clear();
     _scrollToBottom();
 
-    // Save user message to Firestore
-    await _chatService.saveMessage(chatMessage);
-
     try {
       String reply = await _apiService.sendMessage(message);
-      final botMessage = ChatMessageModel(text: reply, isUser: false);
       setState(() {
-        _isBotTyping = false;
-        _messages.add(botMessage);
+        _messages.add(ChatMessage(text: reply, isUser: false));
       });
-      // Save bot message to Firestore
-      await _chatService.saveMessage(botMessage);
       _scrollToBottom();
     } catch (e) {
-      final errorMessage = ChatMessageModel(
-          text: 'Error: Failed to send message', isUser: false);
       setState(() {
-        _isBotTyping = false;
-        _messages.add(errorMessage);
+        _messages.add(
+            ChatMessage(text: 'Error: Failed to send message', isUser: false));
       });
-      // Save error message to Firestore
-      await _chatService.saveMessage(errorMessage);
       _scrollToBottom();
     }
-  }
-
-  Widget _buildTypingIndicator() {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        children: [
-          CircleAvatar(child: Icon(Icons.fitness_center)),
-          SizedBox(width: 10),
-          Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).hintColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Text('Typing'),
-                SizedBox(width: 5),
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _scrollToBottom() {
@@ -143,10 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 controller: _scrollController,
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {
-                  if (index == _messages.length && _isBotTyping) {
-                    return _buildTypingIndicator();
-                  }
-                  return ChatMessage(model: _messages[index]);
+                  return _messages[index];
                 },
               ),
             ),
@@ -170,13 +89,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   Expanded(
                     child: TextField(
                       controller: _textController,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.background),
-                      onSubmitted: (String message) {
-                        if (message.trim().isNotEmpty) {
-                          _sendMessage(message.trim());
-                        }
-                      },
                       decoration: InputDecoration(
                         hintText: 'Type a message...',
                         border: OutlineInputBorder(
@@ -213,9 +125,11 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ChatMessage extends StatelessWidget {
-  final ChatMessageModel model;
+  final String text;
+  final bool isUser;
 
-  const ChatMessage({Key? key, required this.model}) : super(key: key);
+  const ChatMessage({Key? key, required this.text, required this.isUser})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -223,31 +137,30 @@ class ChatMessage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         mainAxisAlignment:
-            model.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!model.isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
+          if (!isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
           SizedBox(width: 10),
           Flexible(
             child: Container(
               padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: model.isUser
+                color: isUser
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).hintColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: FormattedText(
-                text: model.text,
+              child: Text(
+                text,
                 style: TextStyle(
-                  color: model.isUser
-                      ? Theme.of(context).colorScheme.background
-                      : Theme.of(context).colorScheme.background,
-                ),
+                    color: isUser
+                        ? Theme.of(context).colorScheme.background
+                        : Theme.of(context).colorScheme.secondary),
               ),
             ),
           ),
           SizedBox(width: 10),
-          if (model.isUser) CircleAvatar(child: Icon(Icons.person)),
+          if (isUser) CircleAvatar(child: Icon(Icons.person)),
         ],
       ),
     );

@@ -70,6 +70,7 @@ dependencies:
   http: ^1.2.1
   envied: ^0.5.4+1
   flutter_dotenv: ^5.1.0
+  google_generative_ai: ^0.4.3
   
 
 dev_dependencies:

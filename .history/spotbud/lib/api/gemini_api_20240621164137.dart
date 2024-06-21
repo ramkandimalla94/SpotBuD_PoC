@@ -15,20 +15,15 @@ class GeminiApiService {
     _model = GenerativeModel(
       model: 'gemini-1.5-pro', // or 'gemini-1.5-flash' depending on your needs
       apiKey: apiKey,
-      generationConfig: GenerationConfig(
-        maxOutputTokens: 1024, // Increased from 100 to 1024
-        temperature: 0.7, // Controls randomness (0.0 to 1.0)
-        topP: 0.8, // Controls diversity of responses
-        topK: 40, // Another parameter for diversity
-      ),
+      generationConfig: GenerationConfig(maxOutputTokens: 100),
     );
 
     _chat = _model.startChat(history: [
       Content.text(
-          'You are a fitness and gym assistant. Help users with workout advice and gym-related queries. Provide detailed and informative responses.'),
+          'You are a fitness and gym assistant. Help users with workout advice and gym-related queries.'),
       Content.model([
         TextPart(
-            'Understood. I am here to provide comprehensive assistance with fitness and gym-related questions. How can I help you today?')
+            'Understood. I am here to help with fitness and gym-related questions. How can I assist you today?')
       ])
     ]);
   }

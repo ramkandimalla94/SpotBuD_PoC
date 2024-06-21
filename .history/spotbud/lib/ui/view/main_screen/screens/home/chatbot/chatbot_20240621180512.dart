@@ -30,7 +30,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String getCurrentUserId() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      print(user.uid);
       return user.uid;
     } else {
       print('No user is currently signed in');

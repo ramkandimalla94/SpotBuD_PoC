@@ -12,25 +12,24 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
-  final List<ChatMessageModel> _messages = [];
+  final List<ChatMessage> _messages = [];
   final GeminiApiService _apiService = GeminiApiService();
   final ScrollController _scrollController = ScrollController();
-  bool _isBotTyping = false;
   late ChatService _chatService;
+  bool _isBotTyping = false;
 
   @override
   void initState() {
     super.initState();
     _apiService.initialize();
-    _chatService =
-        ChatService(userId: getCurrentUserId()); // Replace with actual user ID
+    String userId = getCurrentUserId();
+    _chatService = ChatService(userId: userId);
     _loadMessages();
   }
 
   String getCurrentUserId() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      print(user.uid);
       return user.uid;
     } else {
       print('No user is currently signed in');
@@ -42,43 +41,50 @@ class _ChatScreenState extends State<ChatScreen> {
     _chatService.getMessages().listen((messages) {
       setState(() {
         _messages.clear();
-        _messages.addAll(messages);
+        _messages.addAll(messages.cast<ChatMessage>());
       });
-      _scrollToBottom();
     });
   }
 
   void _sendMessage(String message) async {
-    final chatMessage = ChatMessageModel(text: message, isUser: true);
+    final newMessage = ChatMessage(
+      text: message,
+      isUser: true,
+      timestamp: DateTime.now(),
+    );
     setState(() {
-      _messages.add(chatMessage);
+      _messages.insert(0, newMessage);
       _isBotTyping = true;
     });
     _textController.clear();
     _scrollToBottom();
 
-    // Save user message to Firestore
-    await _chatService.saveMessage(chatMessage);
+    await _chatService.saveMessage(newMessage);
 
     try {
       String reply = await _apiService.sendMessage(message);
-      final botMessage = ChatMessageModel(text: reply, isUser: false);
+      final botMessage = ChatMessage(
+        text: reply,
+        isUser: false,
+        timestamp: DateTime.now(),
+      );
       setState(() {
         _isBotTyping = false;
-        _messages.add(botMessage);
+        _messages.insert(0, botMessage);
       });
-      // Save bot message to Firestore
       await _chatService.saveMessage(botMessage);
       _scrollToBottom();
     } catch (e) {
-      final errorMessage = ChatMessageModel(
-          text: 'Error: Failed to send message', isUser: false);
       setState(() {
         _isBotTyping = false;
-        _messages.add(errorMessage);
+        _messages.insert(
+            0,
+            ChatMessage(
+              text: 'Error: Failed to send message',
+              isUser: false,
+              timestamp: DateTime.now(),
+            ));
       });
-      // Save error message to Firestore
-      await _chatService.saveMessage(errorMessage);
       _scrollToBottom();
     }
   }
@@ -140,13 +146,15 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Container(
               color: Theme.of(context).colorScheme.background.withOpacity(0.2),
               child: ListView.builder(
+                reverse: true,
                 controller: _scrollController,
-                itemCount: _messages.length,
+                itemCount: _messages.length + (_isBotTyping ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index == _messages.length && _isBotTyping) {
+                  if (index == 0 && _isBotTyping) {
                     return _buildTypingIndicator();
                   }
-                  return ChatMessage(model: _messages[index]);
+                  final messageIndex = _isBotTyping ? index - 1 : index;
+                  return _buildMessageWidget(_messages[messageIndex]);
                 },
               ),
             ),
@@ -171,7 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: TextField(
                       controller: _textController,
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.background),
+                          color: Theme.of(context).colorScheme.primary),
                       onSubmitted: (String message) {
                         if (message.trim().isNotEmpty) {
                           _sendMessage(message.trim());
@@ -210,12 +218,78 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
+  Widget _buildMessageWidget(ChatMessage message) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Row(
+        mainAxisAlignment:
+            message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!message.isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
+          SizedBox(width: 10),
+          Flexible(
+            child: Container(
+              padding: EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: message.isUser
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).hintColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FormattedText(
+                    text: message.text,
+                    style: TextStyle(
+                      color: message.isUser
+                          ? Theme.of(context).colorScheme.background
+                          : Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    _formatTimestamp(message.timestamp),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: message.isUser
+                          ? Theme.of(context)
+                              .colorScheme
+                              .background
+                              .withOpacity(0.7)
+                          : Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          if (message.isUser) CircleAvatar(child: Icon(Icons.person)),
+        ],
+      ),
+    );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    return '${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
+  }
 }
 
 class ChatMessage extends StatelessWidget {
-  final ChatMessageModel model;
+  final String text;
+  final bool isUser;
 
-  const ChatMessage({Key? key, required this.model}) : super(key: key);
+  const ChatMessage(
+      {Key? key,
+      required this.text,
+      required this.isUser,
+      required DateTime timestamp})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -223,23 +297,23 @@ class ChatMessage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         mainAxisAlignment:
-            model.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!model.isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
+          if (!isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
           SizedBox(width: 10),
           Flexible(
             child: Container(
               padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: model.isUser
+                color: isUser
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).hintColor,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: FormattedText(
-                text: model.text,
+                text: text,
                 style: TextStyle(
-                  color: model.isUser
+                  color: isUser
                       ? Theme.of(context).colorScheme.background
                       : Theme.of(context).colorScheme.background,
                 ),
@@ -247,7 +321,7 @@ class ChatMessage extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          if (model.isUser) CircleAvatar(child: Icon(Icons.person)),
+          if (isUser) CircleAvatar(child: Icon(Icons.person)),
         ],
       ),
     );
