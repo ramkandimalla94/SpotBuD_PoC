@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:spotbud/api/chat_service.dart';
 import 'package:spotbud/api/gemini_api.dart';
-import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/formattertext.dart';
 import 'package:spotbud/api/chatmodel.dart';
 
@@ -99,13 +98,18 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             child: Row(
               children: [
-                Text(
-                  'Waiting',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.background),
-                ),
+                Text('Typing'),
                 SizedBox(width: 5),
-                SizedBox(width: 20, height: 20, child: LoadingIndicator()),
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

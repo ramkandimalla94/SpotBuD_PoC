@@ -15,6 +15,7 @@ class AppAssets {
   static String evening = 'assets/home/evening.gif';
   static String afternoon = 'assets/home/afternoon.gif';
   static String manlift = 'assets/manlift.gif';
+  static String girlyoga = 'assets/girlyoga.gif';
   static String womenrun = 'assets/womenrunning.gif';
   static String google = 'assets/signin/google.png';
   static String weight = 'assets/signin/weight.gif';
@@ -22,7 +23,11 @@ class AppAssets {
   static String activity = 'assets/activity.png';
   static String stats = 'assets/stats.png';
   static String tracker = 'assets/tracker.png';
-
+  static String male = 'assets/male.png';
+  static String female = 'assets/female.png';
+  static String trainer = 'assets/trainer.png';
+  static String trainee = 'assets/trainee.png';
+  static String chatbot = 'assets/chatbot.png';
   static String sun = 'assets/sun.png';
 
   static String moon = 'assets/moon.png';

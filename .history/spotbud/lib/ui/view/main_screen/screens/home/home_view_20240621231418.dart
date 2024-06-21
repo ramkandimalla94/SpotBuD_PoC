@@ -8,7 +8,6 @@ import 'package:spotbud/ui/view/main_screen/screens/home/chatbot/chatbot.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/work_out_form.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_analytics/workout_analytics.dart';
-import 'package:spotbud/ui/widgets/animated_chat_button.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -82,7 +81,21 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: const AnimatedChatButton(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(ChatScreen());
+        },
+
+        //backgroundColor: Colors.blue, // You can customize the background color
+        elevation: 6.0, // You can adjust the elevation
+        tooltip: 'Chat',
+        child: Image.asset(
+          AppAssets.chatbot,
+          width: 30,
+          height: 30,
+          //color: Theme.of(context).colorScheme.background,
+        ),
+      ),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),

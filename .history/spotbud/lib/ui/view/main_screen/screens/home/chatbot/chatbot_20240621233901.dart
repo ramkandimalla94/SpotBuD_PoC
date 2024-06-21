@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:spotbud/api/chat_service.dart';
 import 'package:spotbud/api/gemini_api.dart';
+import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/custom_loading_indicator.dart';
 import 'package:spotbud/ui/widgets/formattertext.dart';
 import 'package:spotbud/api/chatmodel.dart';
@@ -221,7 +222,7 @@ class ChatMessage extends StatelessWidget {
         mainAxisAlignment:
             model.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!model.isUser) CircleAvatar(child: Icon(Icons.fitness_center)),
+          if (!model.isUser) CircleAvatar(child: Text(AppAssets.chatbot)),
           SizedBox(width: 10),
           Flexible(
             child: Container(

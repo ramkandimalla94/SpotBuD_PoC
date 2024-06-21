@@ -27,7 +27,7 @@ class AppAssets {
   static String female = 'assets/female.png';
   static String trainer = 'assets/trainer.png';
   static String trainee = 'assets/trainee.png';
-
+  static String chatbot = 'assets/chatbot.png';
   static String sun = 'assets/sun.png';
 
   static String moon = 'assets/moon.png';

@@ -8,7 +8,6 @@ import 'package:spotbud/ui/view/main_screen/screens/home/chatbot/chatbot.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/exercise_selection/body.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_logging/work_out_form.dart';
 import 'package:spotbud/ui/view/main_screen/screens/home/workout_analytics/workout_analytics.dart';
-import 'package:spotbud/ui/widgets/animated_chat_button.dart';
 import 'package:spotbud/ui/widgets/assets.dart';
 import 'package:spotbud/ui/widgets/button.dart';
 import 'package:spotbud/ui/widgets/color_theme.dart';
@@ -82,7 +81,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: const AnimatedChatButton(),
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
@@ -193,16 +191,16 @@ class _HomeViewState extends State<HomeView> {
             SizedBox(
               height: 20,
             ),
-            // customHomeButton(
-            //     text: "AI Assitant",
-            //     onPressed: () {
-            //       Get.to(ChatScreen());
-            //     },
-            //     theme: Theme.of(context),
-            //     imagePath: AppAssets.verifymail),
-            // SizedBox(
-            //   height: 20,
-            // ),
+            customHomeButton(
+                text: "AI Assitant",
+                onPressed: () {
+                  Get.to(ChatScreen());
+                },
+                theme: Theme.of(context),
+                imagePath: AppAssets.dumble),
+            SizedBox(
+              height: 20,
+            ),
 
             customHomeButton(
                 text: "History",

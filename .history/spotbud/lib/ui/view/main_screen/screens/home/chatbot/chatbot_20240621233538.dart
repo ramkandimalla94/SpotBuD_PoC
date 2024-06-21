@@ -99,11 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             child: Row(
               children: [
-                Text(
-                  'Waiting',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.background),
-                ),
+                Text('Waiting'),
                 SizedBox(width: 5),
                 SizedBox(width: 20, height: 20, child: LoadingIndicator()),
               ],
